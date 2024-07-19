@@ -1,24 +1,23 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../config/database.js'
 
-const TypeDocument = sequelize.define('TypeDocument', {
+const Session = sequelize.define('Session', {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4
   },
-  name: {
+  token: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: true,
-    defaultValue: 'Sin definir'
+  expiration: {
+    type: DataTypes.DATE,
+    allowNull: false
   }
 },
 {
   timestamps: false
 })
 
-export default TypeDocument
+export default Session

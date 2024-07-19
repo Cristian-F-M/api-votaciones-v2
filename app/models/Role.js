@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../config/database.js'
 
-const TypeDocument = sequelize.define('TypeDocument', {
+const Role = sequelize.define('Role', {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
@@ -21,4 +21,4 @@ const TypeDocument = sequelize.define('TypeDocument', {
   timestamps: false
 })
 
-export default TypeDocument
+export default Role
