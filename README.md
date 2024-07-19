@@ -1,3 +1,3 @@
-## Api Votaciones V2
+# Api Votaciones V2
 
-# Api para la gestión de las votaciones
+### Api para la gestión de las votaciones
