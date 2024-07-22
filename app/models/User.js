@@ -18,7 +18,7 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  typeDocumentId: {
+  typeDocument: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
@@ -42,7 +42,7 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  roleId: {
+  role: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
@@ -50,7 +50,7 @@ const User = sequelize.define('User', {
       key: 'id'
     }
   },
-  sessionId: {
+  session: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {

@@ -18,7 +18,7 @@ const Functions = sequelize.define('Functions', {
     allowNull: true,
     defaultValue: 'Sin definir'
   },
-  rolId: {
+  role: {
     type: DataTypes.UUID,
     allowNull: false,
     reference: {
@@ -26,7 +26,7 @@ const Functions = sequelize.define('Functions', {
       key: 'id'
     }
   },
-  CategoryId: {
+  category: {
     type: DataTypes.UUID,
     allowNull: false,
     reference: {
