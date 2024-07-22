@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "node --watch app.js",
-        "setup:db": "node app/config/syncDb.js"
+        "setup:db": "node app/config/syncDb.js && node app/config/seed.js"
     },
     "keywords": [],
     "author": "",
