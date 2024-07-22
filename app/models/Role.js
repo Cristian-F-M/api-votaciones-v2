@@ -11,6 +11,10 @@ const Role = sequelize.define('Role', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  code: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   description: {
     type: DataTypes.STRING,
     allowNull: true,

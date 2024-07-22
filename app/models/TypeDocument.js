@@ -11,6 +11,10 @@ const TypeDocument = sequelize.define('TypeDocument', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  code: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   description: {
     type: DataTypes.STRING,
     allowNull: true,
