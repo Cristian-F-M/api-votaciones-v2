@@ -11,7 +11,7 @@ const Session = sequelize.define('Session', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  expiration: {
+  expirationDate: {
     type: DataTypes.DATE,
     allowNull: false
   }
