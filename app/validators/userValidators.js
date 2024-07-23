@@ -11,6 +11,7 @@ export const registerValidation = [
 ]
 
 export const loginValidation = [
+  body('typeDocument').notEmpty().withMessage('Type of document is required'),
   body('document').notEmpty().withMessage('Document is required'),
   body('password').notEmpty().withMessage('Password is required')
 ]
