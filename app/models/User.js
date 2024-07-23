@@ -27,15 +27,24 @@ const User = sequelize.define('User', {
   },
   document: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    unique: {
+      msg: 'Document already exists'
+    }
   },
   phone: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    unique: {
+      msg: 'Phone already exists'
+    }
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    unique: {
+      msg: 'Email already exists'
+    }
   },
   password: {
     type: DataTypes.STRING,
