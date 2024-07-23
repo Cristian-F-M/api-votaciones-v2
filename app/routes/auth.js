@@ -1,6 +1,6 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import { registerValidate } from '../middlewares/validationUserMiddleware.js'
+import { validateUser } from '../middlewares/UserMiddlewares.js'
 import { registerValidation } from '../validators/userValidators.js'
 import { Role, User } from '../models/index.js'
 import bcrypt from 'bcrypt'
@@ -27,7 +27,7 @@ auth.get('/', async (req, res) => {
   })
 })
 
-auth.post('/Register', registerValidation, registerValidate, async (req, res) => {
+auth.post('/Register', registerValidation, validateUser, async (req, res) => {
   const { name, lastname, typeDocument, document, phone, email, password } = req.body
 
   const role = await Role.findOne({ where: { code: 'User' } })
