@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator'
 import { groupBy } from '../lib/fields.js'
 
-export function registerValidate (req, res, next) {
+export function validateUser (req, res, next) {
   const errors = validationResult(req).array()
 
   if (errors.length > 0) {
