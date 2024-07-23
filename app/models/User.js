@@ -2,7 +2,6 @@ import { DataTypes } from 'sequelize'
 import sequelize from '../config/database.js'
 import TypeDocument from './TypeDocument.js'
 import Role from './Role.js'
-import Session from './Session.js'
 
 const User = sequelize.define('User', {
   id: {
@@ -47,14 +46,6 @@ const User = sequelize.define('User', {
     allowNull: false,
     references: {
       model: Role,
-      key: 'id'
-    }
-  },
-  session: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: Session,
       key: 'id'
     }
   }
