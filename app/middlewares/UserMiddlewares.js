@@ -17,9 +17,9 @@ export function validateUser (req, res, next) {
 export function verifyToken (req, res, next) {
   const { token } = req.cookies
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (!err) {
-      const session = Session.findOne({ where: { token } })
+      const session = await Session.findOne({ where: { token } })
 
       if (session) {
         res.json({ message: 'You are logged in', user: decoded })
