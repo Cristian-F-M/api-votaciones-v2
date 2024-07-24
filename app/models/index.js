@@ -4,6 +4,7 @@ import Role from './Role.js'
 import TypeDocument from './TypeDocument.js'
 import User from './User.js'
 import Config from './Config.js'
+import Session from './Session.js'
 
 Function.hasOne(CategoryFunctions, { foreignKey: 'function' })
 CategoryFunctions.belongsTo(Function, { foreignKey: 'function' })
@@ -13,5 +14,7 @@ Role.hasMany(User, { foreignKey: 'role' })
 User.belongsTo(Role, { foreignKey: 'role' })
 TypeDocument.hasMany(User, { foreignKey: 'typeDocument' })
 User.belongsTo(TypeDocument, { foreignKey: 'typeDocument' })
+Session.hasOne(User, { foreignKey: 'session' })
+User.belongsTo(Session, { foreignKey: 'session' })
 
-export { CategoryFunctions, Role, Function, TypeDocument, User, Config }
+export { CategoryFunctions, Role, Function, TypeDocument, User, Config, Session }
