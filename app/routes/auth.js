@@ -29,9 +29,12 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
       password: bcrypt.hashSync(password, 10)
     })
   } catch (err) {
-    const groupedErrors = groupBy(err.errors, err => err.path)
-    res.status(400).json({ groupedErrors })
-    return
+    if (err.errors) {
+      const groupedErrors = groupBy(err.errors, err => err.path)
+      res.status(400).json({ groupedErrors })
+      return
+    }
+    res.status(400).json({ message: 'An error has occurred, please try again' })
   }
   res.json({ message: 'Registered' })
 })
