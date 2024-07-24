@@ -17,8 +17,6 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
 
   const role = await Role.findOne({ where: { code: 'User' } })
 
-  res.setHeader('Access-Control-Allow-Origin', '*')
-
   try {
     await User.create({
       name,
