@@ -75,4 +75,25 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
   }
 })
 
+auth.post('/Logout', async (req, res) => {
+  const { token } = req.cookies
+
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    const session = await Session.findOne({ where: { token } })
+    if (!err && session) {
+      const user = await User.findByPk(decoded.id)
+
+      user.session = null
+      await user.save()
+
+      await session.destroy()
+      res.clearCookie('token')
+      res.json({ message: 'You are logged out' })
+      return
+    }
+
+    res.json({ message: 'You are not logged in' })
+  })
+})
+
 export default auth
