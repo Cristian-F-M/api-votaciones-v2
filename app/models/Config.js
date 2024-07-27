@@ -7,11 +7,19 @@ const Config = sequelize.define('Config', {
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4
   },
-  logo: {
+  name: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  color: {
+  code: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.STRING,
+    defaultValue: 'Sin definir'
+  },
+  value: {
     type: DataTypes.STRING,
     allowNull: false
   }
