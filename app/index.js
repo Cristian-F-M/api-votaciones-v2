@@ -1,7 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import { auth } from './routes/index.js'
+import { auth, config } from './routes/index.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
@@ -19,6 +19,7 @@ export default function createApp () {
 
   // ? Hacerlo para las demás rutas
   app.use('/', auth)
+  app.use('/config', config)
 
   return app
 }
