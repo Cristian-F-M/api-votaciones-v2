@@ -51,8 +51,10 @@ async function seedDb () {
 
   await Config.bulkCreate([
     {
-      logo: '/sena-logo-base.avif',
-      color: '#009d00'
+      name: 'Color',
+      code: 'Color',
+      description: 'Color of the logo and the main texts',
+      value: '#ff6719'
     }
   ])
 
