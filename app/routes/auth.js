@@ -10,7 +10,7 @@ import Session from '../models/Session.js'
 const auth = express.Router()
 
 auth.get('/', verifyToken, async (req, res) => {
-  res.status(401).json({ message: 'You needd to be logged in' })
+  res.status(401).json({ message: 'You needd to be logged in', ok: false })
 })
 
 auth.post('/Register', registerValidation, validateUser, async (req, res) => {

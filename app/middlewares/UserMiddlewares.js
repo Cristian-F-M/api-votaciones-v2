@@ -22,7 +22,7 @@ export function verifyToken (req, res, next) {
       const session = await Session.findOne({ where: { token } })
 
       if (session) {
-        res.json({ message: 'You are logged in', user: decoded })
+        res.json({ message: 'You are logged in', user: decoded, ok: true })
         return
       }
     }
