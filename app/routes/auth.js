@@ -45,12 +45,12 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
   const user = await User.findOne({ where: { typeDocument, document } })
 
   if (!user) {
-    res.status(401).json({ message: 'Incorrect credentials' })
+    res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
     return
   }
 
   if (!bcrypt.compareSync(password, user.password)) {
-    res.status(401).json({ message: 'Incorrect credentials' })
+    res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
     return
   }
 
@@ -68,10 +68,10 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
     await user.save()
 
     res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 14400000 })
-    res.json({ message: 'Now you are logged in' })
+    res.json({ message: 'Now you are logged in', ok: true })
   } catch (err) {
     console.log(err)
-    res.status(401).json({ message: 'An error has occurred, please try again' })
+    res.status(401).json({ message: 'An error has occurred, please try again', ok: false })
   }
 })
 
