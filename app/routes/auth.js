@@ -92,11 +92,11 @@ auth.post('/Logout', async (req, res) => {
 
       await session.destroy()
       res.clearCookie('token')
-      res.json({ message: 'You are logged out' })
+      res.json({ message: 'You are logged out', ok: true })
       return
     }
 
-    res.json({ message: 'You are not logged in' })
+    res.json({ message: 'You are not logged in', ok: false })
   })
 })
 
