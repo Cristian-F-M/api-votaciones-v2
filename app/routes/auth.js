@@ -2,7 +2,7 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 import { validateUser, verifyToken } from '../middlewares/UserMiddlewares.js'
 import { loginValidation, registerValidation } from '../validators/userValidators.js'
-import { Role, User } from '../models/index.js'
+import { Role, TypeDocument, User } from '../models/index.js'
 import bcrypt from 'bcrypt'
 import { groupBy } from '../lib/fields.js'
 import Session from '../models/Session.js'
@@ -41,8 +41,9 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
 })
 
 auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res) => {
-  const { typeDocument, document, password } = req.body
-  const user = await User.findOne({ where: { typeDocument, document } })
+  const { typeDocumentCode, document, password } = req.body
+  const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
+  const user = await User.findOne({ where: { typeDocument: typeDocument.id, document } })
 
   if (!user) {
     res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
