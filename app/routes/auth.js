@@ -14,7 +14,8 @@ auth.get('/', verifyToken, async (req, res) => {
 })
 
 auth.post('/Register', registerValidation, validateUser, async (req, res) => {
-  const { name, lastname, typeDocument, document, phone, email, password } = req.body
+  const { name, lastname, typeDocumentCode, document, phone, email, password } = req.body
+  const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
 
   const role = await Role.findOne({ where: { code: 'User' } })
 
@@ -22,7 +23,7 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
     await User.create({
       name,
       lastname,
-      typeDocument,
+      typeDocument: typeDocument.id,
       document,
       phone,
       email,
