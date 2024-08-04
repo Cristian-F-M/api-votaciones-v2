@@ -33,12 +33,12 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
   } catch (err) {
     if (err.errors) {
       const groupedErrors = groupBy(err.errors, err => err.path)
-      res.status(400).json({ groupedErrors })
+      res.status(400).json({ errors: groupedErrors })
       return
     }
-    res.status(400).json({ message: 'An error has occurred, please try again' })
+    res.status(400).json({ message: 'An error has occurred, please try again', ok: false })
   }
-  res.json({ message: 'Registered' })
+  res.json({ message: 'Registered', ok: true })
 })
 
 auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res) => {
