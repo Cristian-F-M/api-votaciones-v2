@@ -10,7 +10,7 @@ import Session from '../models/Session.js'
 const auth = express.Router()
 
 auth.get('/', verifyToken, async (req, res) => {
-  res.status(401).json({ message: 'You needd to be logged in', ok: false })
+  res.status(401).json({ message: 'You needd to be logged in', ok: false, urlRedirect: 'login' })
 })
 
 auth.post('/Register', registerValidation, validateUser, async (req, res) => {
@@ -38,7 +38,7 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
     }
     res.status(400).json({ message: 'An error has occurred, please try again', ok: false })
   }
-  res.json({ message: 'Registered', ok: true })
+  res.json({ message: 'Registered', ok: true, urlRedirect: 'login' })
 })
 
 auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res) => {
@@ -72,7 +72,7 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
     const isMobile = req.get('User-Agent') === 'okhttp/4.9.2'
 
     res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 14400000 })
-    res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null })
+    res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null, urlRedirect: 'apprentice/' })
   } catch (err) {
     console.log(err)
     res.status(401).json({ message: 'An error has occurred, please try again', ok: false })
@@ -92,11 +92,11 @@ auth.post('/Logout', async (req, res) => {
 
       await session.destroy()
       res.clearCookie('token')
-      res.json({ message: 'You are logged out', ok: true })
+      res.json({ message: 'You are logged out', ok: true, urlRedirect: 'login' })
       return
     }
 
-    res.json({ message: 'You are not logged in', ok: false })
+    res.json({ message: 'You are not logged in', ok: false, urlRedirect: 'login' })
   })
 })
 
