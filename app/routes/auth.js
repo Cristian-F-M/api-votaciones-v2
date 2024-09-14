@@ -57,12 +57,11 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
   }
 
   try {
-    const token = jwt.sign({ id: user.id, name: user.name, lastname: user.lastname, email: user.email }, process.env.JWT_SECRET, { expiresIn: '4h' })
-
+    const token = jwt.sign({ id: user.id, name: user.name, lastname: user.lastname, email: user.email }, process.env.JWT_SECRET)
     const session = await Session.create(
       {
         token,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 6)
+        expires: (new Date(Date.now() + 1000 * 60 * 60 * 6)).toISOString()
       }
     )
 
@@ -101,3 +100,8 @@ auth.post('/Logout', async (req, res) => {
 })
 
 export default auth
+
+auth.get('/verifyToken', verifyToken, async (req, res) => {
+  console.log(req.cookies)
+  res.json({ ok: false, message: 'You need to be logged in', urlRedirect: 'login' })
+})
