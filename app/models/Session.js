@@ -12,7 +12,7 @@ const Session = sequelize.define('Session', {
     allowNull: false
   },
   expires: {
-    type: DataTypes.DATE,
+    type: DataTypes.STRING,
     allowNull: false
   }
 },
