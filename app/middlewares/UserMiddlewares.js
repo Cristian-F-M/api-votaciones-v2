@@ -1,7 +1,7 @@
 import { validationResult } from 'express-validator'
 import { groupBy } from '../lib/fields.js'
 import jwt from 'jsonwebtoken'
-import { Session } from '../models/index.js'
+import { Session, User } from '../models/index.js'
 
 export function validateUser (req, res, next) {
   const errors = validationResult(req).array()
@@ -19,12 +19,19 @@ export function verifyToken (req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (!err) {
-      const session = await Session.findOne({ where: { token } })
+      const user = await User.findByPk(decoded.id)
+      if (!user) return next()
 
-      if (session) {
-        res.json({ message: 'You are logged in', user: decoded, ok: true, urlRedirect: 'apprentice/' })
-        return
-      }
+      const session = await Session.findOne({ where: { id: user.session } })
+
+      if (session && new Date() < new Date(session.expires)) return res.json({ message: 'You are logged in', user: decoded, ok: true, urlRedirect: 'apprentice/' })
+
+      user.sesion = null
+      await user.save()
+
+      await session.destroy()
+
+      next()
     }
 
     next()
