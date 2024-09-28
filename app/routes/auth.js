@@ -78,6 +78,31 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
   }
 })
 
+auth.post('/LoginBiometrics', async (req, res) => {
+  const { tokenBiometrics } = req.body
+
+  if (!tokenBiometrics) {
+    return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
+  }
+
+  jwt.verify(tokenBiometrics, process.env.JWT_SECRET, async (err, decoded) => {
+    if (!err) {
+      return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
+    }
+
+    const { id } = decoded
+    const user = User.findByPk(id)
+
+    if (!user) {
+      return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
+    }
+
+    const token = jwt.sign({ id: user.id, name: user.name, lastname: user.lastname, email: user.email }, process.env.JWT_SECRET)
+
+    res.json({ message: 'Now you are logged in', ok: true, token, urlRedirect: 'apprentice/' })
+  })
+})
+
 auth.post('/Logout', async (req, res) => {
   const { token } = req.cookies
 
