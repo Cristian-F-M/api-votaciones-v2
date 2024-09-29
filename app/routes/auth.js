@@ -86,7 +86,7 @@ auth.post('/LoginBiometrics', async (req, res) => {
   }
 
   jwt.verify(tokenBiometrics, process.env.JWT_SECRET, async (err, decoded) => {
-    if (!err) {
+    if (err) {
       return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
     }
 
