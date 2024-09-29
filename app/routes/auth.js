@@ -91,13 +91,31 @@ auth.post('/LoginBiometrics', async (req, res) => {
     }
 
     const { id } = decoded
-    const user = User.findByPk(id)
+    const user = await User.findByPk(id)
+    const session = await Session.findOne({ where: { id: user.session || null } })
 
     if (!user) {
       return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
     }
-
     const token = jwt.sign({ id: user.id, name: user.name, lastname: user.lastname, email: user.email }, process.env.JWT_SECRET)
+
+    if (!session) {
+      const session = await Session.create(
+        {
+          token,
+          expires: (new Date(Date.now() + 1000 * 60 * 60 * 6)).toISOString()
+        }
+      )
+
+      user.session = session.id
+      await user.save()
+    }
+
+    if (session) {
+      session.token = token
+      session.expires = (new Date(Date.now() + 1000 * 60 * 60 * 6)).toISOString()
+      await session.save()
+    }
 
     res.json({ message: 'Now you are logged in', ok: true, token, urlRedirect: 'apprentice/' })
   })
