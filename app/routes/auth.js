@@ -92,11 +92,11 @@ auth.post('/LoginBiometrics', async (req, res) => {
 
     const { id } = decoded
     const user = await User.findByPk(id)
-    const session = await Session.findOne({ where: { id: user.session || null } })
 
     if (!user) {
       return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
     }
+    const session = await Session.findOne({ where: { id: user.session } })
     const token = jwt.sign({ id: user.id, name: user.name, lastname: user.lastname, email: user.email }, process.env.JWT_SECRET)
 
     if (!session) {
