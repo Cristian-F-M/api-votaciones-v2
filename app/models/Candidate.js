@@ -21,6 +21,11 @@ const Candidate = sequelize.define('Candidate', {
   description: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  votes: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
 },
 {
