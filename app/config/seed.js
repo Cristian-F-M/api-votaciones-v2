@@ -46,6 +46,11 @@ async function seedDb () {
       name: 'Desarrollador',
       code: 'Developer',
       description: 'Desarrollador de la aplicación'
+    },
+    {
+      name: 'Candidato',
+      code: 'Candidate',
+      description: 'Usuario candidato a votar'
     }
   ])
 
