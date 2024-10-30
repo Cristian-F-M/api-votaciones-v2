@@ -1,4 +1,4 @@
-import { Role, TypeDocument, Config } from '../models/index.js'
+import { Role, TypeDocument, Config, User } from '../models/index.js'
 
 async function seedDb () {
   await TypeDocument.bulkCreate(
@@ -63,7 +63,23 @@ async function seedDb () {
     }
   ])
 
-  console.log('\nDatabase seeded!!!!')
+  const role = await Role.findOne({ where: { code: 'Candidate' } })
+  const typeDocument = await TypeDocument.findOne({ where: { code: 'CedulaCiudadania' } })
+
+  await User.bulkCreate([
+    {
+      name: 'Voto en blanco',
+      lastname: '',
+      typeDocument: typeDocument.id,
+      document: '0',
+      phone: '0',
+      email: 'voto@votaciones.com',
+      role: role.id,
+      password: 'Cm123456@'
+    }
+  ])
+
+  console.log('Database seeded!!!!')
 }
 
 seedDb()
