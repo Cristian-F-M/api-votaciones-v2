@@ -68,7 +68,7 @@ auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res)
     user.session = session.id
     await user.save()
 
-    const isMobile = req.get('User-Agent') === 'okhttp/4.9.2'
+    const isMobile = req.get('User-Agent') === 'mobile'
 
     res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 14400000 })
     res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null, urlRedirect: 'apprentice/' })
