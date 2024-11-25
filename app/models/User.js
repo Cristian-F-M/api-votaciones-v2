@@ -47,6 +47,10 @@ const User = sequelize.define('User', {
       msg: 'Email already exists'
     }
   },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: true
