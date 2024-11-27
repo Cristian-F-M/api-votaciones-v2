@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '../config/database.js'
+import User from './User.js'
 
 const Candidate = sequelize.define('Candidate', {
   id: {
@@ -11,7 +12,7 @@ const Candidate = sequelize.define('Candidate', {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: 'User',
+      model: User,
       key: 'id'
     }
   },
@@ -24,7 +25,7 @@ const Candidate = sequelize.define('Candidate', {
   },
   votes: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     defaultValue: 0
   }
 },
