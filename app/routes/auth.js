@@ -1,6 +1,6 @@
 import express from 'express'
 import jwt from 'jsonwebtoken'
-import { validateUser, verifyToken } from '../middlewares/UserMiddlewares.js'
+import { validateUser, verifyToken, verifyToken2 } from '../middlewares/UserMiddlewares.js'
 import { loginValidation, registerValidation } from '../validators/userValidators.js'
 import { Role, TypeDocument, User } from '../models/index.js'
 import bcrypt from 'bcrypt'
@@ -41,7 +41,7 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
   res.json({ message: 'Registered', ok: true, urlRedirect: 'login' })
 })
 
-auth.post('/Login', loginValidation, validateUser, verifyToken, async (req, res) => {
+auth.post('/Login', loginValidation, validateUser, async (req, res) => {
   const { typeDocumentCode, document, password } = req.body
   const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
   const user = await User.findOne({ where: { typeDocument: typeDocument.id, document } })
