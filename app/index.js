@@ -1,7 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import { auth, config, typeDocument, user } from './routes/index.js'
+import { auth, config, typeDocument, user, vote, candidate } from './routes/index.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
 
@@ -22,6 +22,8 @@ export default function createApp () {
   app.use('/config', config)
   app.use('/typeDocument', typeDocument)
   app.use('/user', user)
+  app.use('/vote', vote)
+  app.use('/candidate', candidate)
 
   return app
 }
