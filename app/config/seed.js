@@ -1,4 +1,4 @@
-import { Role, TypeDocument, Config, User } from '../models/index.js'
+import { Role, TypeDocument, Config, User, Candidate } from '../models/index.js'
 
 async function seedDb () {
   await TypeDocument.bulkCreate(
@@ -78,6 +78,10 @@ async function seedDb () {
       password: 'Cm123456@'
     }
   ])
+
+  const whiteVote = await User.findOne({ where: { document: 0, phone: 0, email: 'voto@votaciones.com' } })
+
+  await Candidate.create({ userId: whiteVote.id })
 
   console.log('Database seeded!!!!')
 }
