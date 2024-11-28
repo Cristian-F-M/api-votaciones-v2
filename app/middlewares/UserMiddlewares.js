@@ -37,3 +37,17 @@ export function verifyToken (req, res, next) {
     next()
   })
 }
+
+export function verifyToken2 (req, res, next) {
+  const { token } = req.cookies
+  let decoded = null
+
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET)
+  } catch (err) {
+    return res.json({ ok: false, message: 'You need to be logged in', urlRedirect: 'login' })
+  }
+
+  req.headers.userId = decoded.id
+  next()
+}
