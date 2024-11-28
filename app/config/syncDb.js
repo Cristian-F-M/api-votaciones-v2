@@ -1,6 +1,6 @@
 import sequelize from './database.js'
 // eslint-disable-next-line no-unused-vars
-import { Role, TypeDocument, User, Config } from '../models/index.js'
+import { Role, TypeDocument, User, Config, Candidate } from '../models/index.js'
 
 function setupDb () {
   sequelize
