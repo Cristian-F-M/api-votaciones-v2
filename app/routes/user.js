@@ -18,10 +18,6 @@ user.get('/:id', async (req, res) => {
     return
   }
 
-  console.log({ user })
-  // const { id, name, lastname, document, phone, email, roleUser, typeDocumentUser } = user
-
-  // res.json({ user: { id, name, lastname, document, phone, email, roleUser, typeDocumentUser } })
   res.json({ user })
 })
 
