@@ -69,6 +69,10 @@ const User = sequelize.define('User', {
       model: Session,
       key: 'id'
     }
+  },
+  notificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },
 {
