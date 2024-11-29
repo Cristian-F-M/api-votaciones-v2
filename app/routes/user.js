@@ -22,4 +22,18 @@ user.get('/', verifyToken2, async (req, res) => {
   res.json({ user })
 })
 
+user.post('/notificationToken', verifyToken2, async (req, res) => {
+  const { userId } = req.headers
+  const user = await User.findByPk(userId)
+
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+
+  const { notificationToken } = req.body
+
+  user.notificationToken = notificationToken
+  await user.save()
+
+  res.json({ ok: true, message: 'Token de notificaciones actualizado' })
+})
+
 export default user
