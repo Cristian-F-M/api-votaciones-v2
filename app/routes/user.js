@@ -1,10 +1,11 @@
 import express from 'express'
 import { Role, TypeDocument, User } from '../models/index.js'
+import { verifyToken2 } from '../middlewares/UserMiddlewares.js'
 
 const user = express.Router()
 
-user.get('/:id', async (req, res) => {
-  const { id: userId } = req.params
+user.get('/', verifyToken2, async (req, res) => {
+  const { userId } = req.headers
   const user = await User.findByPk(userId, {
     include: [
       { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
@@ -14,7 +15,7 @@ user.get('/:id', async (req, res) => {
   })
 
   if (!user) {
-    res.status(404).json({ message: 'User not found' })
+    res.status(404).json({ ok: false, error: 'User not found' })
     return
   }
 
