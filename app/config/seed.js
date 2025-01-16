@@ -75,7 +75,8 @@ async function seedDb () {
       phone: '0',
       email: 'voto@votaciones.com',
       role: role.id,
-      password: 'Cm123456@'
+      password: 'Cm123456@',
+      voted: false
     }
   ])
 
