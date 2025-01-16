@@ -17,7 +17,7 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
   const { name, lastname, typeDocumentCode, document, phone, email, password } = req.body
   const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
 
-  const role = await Role.findOne({ where: { code: 'User' } })
+  const role = await Role.findOne({ where: { code: 'Apprentice' } })
 
   try {
     await User.create({
