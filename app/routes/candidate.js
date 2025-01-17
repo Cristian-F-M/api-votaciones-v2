@@ -135,4 +135,44 @@ candidate.delete('/:id', verifyToken2, async (req, res) => {
   res.json({ ok: true, message: 'Candidato eliminado' })
 })
 
+candidate.post('/:id/vote', verifyToken2, async (req, res) => {
+  const { id: candidateId } = req.params
+  const { userId } = req.headers
+
+  const userLogged = await User.findByPk(userId, {
+    include: [
+      { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
+      {
+        model: TypeDocument,
+        as: 'typeDocumentUser',
+        attributes: ['id', 'name', 'code']
+      }
+    ],
+    attributes: ['id', 'name', 'lastname', 'document', 'email']
+  })
+
+  if (userLogged.roleUser.code !== 'Apprentice') {
+    return res.status(401).json({
+      ok: false,
+      message: 'No tienes permisos para realizar esta acción'
+    })
+  }
+
+  const candidate = await Candidate.findOne({ where: { id: candidateId } })
+
+  if (!candidate) {
+    return res
+      .status(404)
+      .json({ ok: false, message: 'Candidato no encontrado' })
+  }
+
+  userLogged.voted = true
+  candidate.votes++
+
+  await userLogged.save()
+  await candidate.save()
+
+  return res.json({ ok: true, message: 'Voto realizado' })
+})
+
 export default candidate
