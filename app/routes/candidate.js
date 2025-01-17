@@ -106,15 +106,13 @@ candidate.get('/', async (req, res) => {
 
 candidate.get('/image/:id', async (req, res) => {
   const { id: candidateId } = req.params
-  if (candidateId === 'fine') return res.sendFile(`${imagesUrl}\\base\\this-is-fine.gif`, { root: '.' })
 
   const candidate = await Candidate.findByPk(candidateId)
   const image = candidate.imageUrl
 
-  if (image == null || !candidate) return res.status(404).sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
+  if (!candidate) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
 
-  if (!fs.existsSync(`${imagesUrl}\\user\\${image}`)) return res.status(404).sendFile(`${imagesUrl}\\base\\a`, { root: '.' })
-  console.log({ image: `${imagesUrl}\\user\\${image}` })
+  if (!fs.existsSync(`${imagesUrl}\\user\\${image}`)) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
   return res.sendFile(`${imagesUrl}\\user\\${image}`, { root: '.' })
 })
 
