@@ -31,13 +31,13 @@ candidate.post('/', verifyToken2, async (req, res) => {
     attributes: ['id', 'name', 'lastname', 'document', 'email']
   })
 
-  if (userLogged.roleUser.code !== 'Administrator') return res.status(401).json({ ok: false, message: 'Acceso denegado' })
+  if (userLogged.roleUser.code !== 'Administrator') { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
 
   const { userId } = req.body
   const candidateExist = await Candidate.findOne({ where: { userId } })
   const user = await User.findByPk(userId)
 
-  if (candidateExist) return res.json({ ok: false, message: 'Candidato ya existe' })
+  if (candidateExist) { return res.json({ ok: false, message: 'Candidato ya existe' }) }
   if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
 
   const role = await Role.findOne({ where: { code: 'Candidate' } })
@@ -55,22 +55,36 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
   const userLogged = await User.findByPk(userIdLogged, {
     include: [
       { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-      { model: TypeDocument, as: 'typeDocumentUser', attributes: ['id', 'name', 'code'] }
+      {
+        model: TypeDocument,
+        as: 'typeDocumentUser',
+        attributes: ['id', 'name', 'code']
+      }
     ],
     attributes: ['id', 'name', 'lastname', 'document', 'email']
   })
-  if (!userLogged) return res.status(404).json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
-  if (userLogged.roleUser.code === 'Administrator') return res.status(401).json({ ok: false, message: 'Acceso denegado' })
+  if (!userLogged) {
+    return res
+      .status(404)
+      .json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
+  }
+  if (userLogged.roleUser.code === 'Administrator') { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
 
-  const candidate = await Candidate.findOne({ where: { userId: userIdLogged } })
+  const candidate = await Candidate.findOne({
+    where: { userId: userIdLogged }
+  })
   const { description, useSameUserImage: sameImage } = req.body
   const useSameUserImage = sameImage ? JSON.parse(sameImage) : false
   const image = req.file
 
-  if (!candidate) return res.status(401).json({ ok: false, message: 'Acceso denegado' })
+  if (!candidate) { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
 
   if (useSameUserImage) {
-    if (!userLogged.imageUrl) return res.status(400).json({ ok: false, message: 'El usuario no tiene imagen' })
+    if (!userLogged.imageUrl) {
+      return res
+        .status(400)
+        .json({ ok: false, message: 'El usuario no tiene imagen' })
+    }
     fs.unlinkSync(image.path)
     candidate.imageUrl = userLogged.imageUrl
   }
@@ -80,8 +94,10 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
       const errors = []
 
       if (!image) errors.push({ msg: 'Imagen requerida', path: 'image' })
-      if (!description) errors.push({ msg: 'Descripcion requerida', path: 'description' })
-      return res.status(400).json({ ok: false, message: 'Faltan datos', errors })
+      if (!description) { errors.push({ msg: 'Descripcion requerida', path: 'description' }) }
+      return res
+        .status(400)
+        .json({ ok: false, message: 'Faltan datos', errors })
     }
 
     candidate.imageUrl = fullFileName
@@ -97,7 +113,9 @@ candidate.get('/', async (req, res) => {
   const candidates = await Candidate.findAll({
     include: [
       {
-        model: User, as: 'user', attributes: ['id', 'name', 'lastname', 'document', 'email']
+        model: User,
+        as: 'user',
+        attributes: ['id', 'name', 'lastname', 'document', 'email']
       }
     ]
   })
@@ -120,7 +138,11 @@ candidate.delete('/:id', verifyToken2, async (req, res) => {
   const { id: candidateId } = req.params
   const candidate = await Candidate.findByPk(candidateId)
 
-  if (!candidate) return res.status(404).json({ ok: false, message: 'Candidato no encontrado' })
+  if (!candidate) {
+    return res
+      .status(404)
+      .json({ ok: false, message: 'Candidato no encontrado' })
+  }
 
   const user = await User.findByPk(candidate.userId)
 
