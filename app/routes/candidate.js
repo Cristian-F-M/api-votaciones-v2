@@ -109,7 +109,7 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
   res.json({ ok: true, message: 'Cambios guardados' })
 })
 
-candidate.get('/', async (req, res) => {
+candidate.get('/all', async (req, res) => {
   const candidates = await Candidate.findAll({
     include: [
       {
