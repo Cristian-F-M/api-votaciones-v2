@@ -10,9 +10,7 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const { userId } = req.headers
-    const fileName = file.originalname.split('.')
-    const extension = fileName[fileName.length - 1]
-    const fullFileName = `candidate_${userId}.${extension}`
+    const fullFileName = `candidate_${userId}.png`
 
     req.headers.fullFileName = fullFileName
     cb(null, fullFileName)
