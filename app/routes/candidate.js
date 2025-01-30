@@ -59,7 +59,7 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
         attributes: ['id', 'name', 'code']
       }
     ],
-    attributes: ['id', 'name', 'lastname', 'document', 'email']
+    attributes: ['id', 'name', 'lastname', 'document', 'email', 'imageUrl']
   })
   if (!userLogged) {
     return res
