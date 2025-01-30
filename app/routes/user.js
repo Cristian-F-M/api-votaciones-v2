@@ -13,7 +13,7 @@ user.get('/', verifyToken2, async (req, res) => {
       { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
       { model: TypeDocument, as: 'typeDocumentUser', attributes: ['id', 'name', 'code'] }
     ],
-    attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted']
+    attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl']
   })
 
   if (!user) {
