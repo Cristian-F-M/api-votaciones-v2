@@ -66,7 +66,7 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
       .status(404)
       .json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
   }
-  if (userLogged.roleUser.code === 'Administrator') { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
+  if (userLogged.roleUser.code !== 'Candidate') { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
 
   const candidate = await Candidate.findOne({
     where: { userId: userIdLogged }
