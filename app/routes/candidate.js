@@ -101,8 +101,13 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
         .json({ ok: false, message: 'Faltan datos', errors })
     }
 
-    candidate.imageUrl = fullFileName
-    candidate.description = description
+    if (candidate.imageUrl !== req.headers.fullFileName) candidate.imageUrl = fullFileName
+    if (candidate.description !== description) candidate.description = description
+  }
+
+  if (useForProfileImage) {
+    userLogged.imageUrl = fullFileName
+    await userLogged.save()
   }
 
   candidate.description = description
