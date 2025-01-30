@@ -71,8 +71,11 @@ candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
   const candidate = await Candidate.findOne({
     where: { userId: userIdLogged }
   })
-  const { description, useSameUserImage: sameImage } = req.body
+  const { description, useSameUserImage: sameImage, useForProfileImage: profileImage } = req.body
+
   const useSameUserImage = sameImage ? JSON.parse(sameImage) : false
+  const useForProfileImage = profileImage ? JSON.parse(profileImage) : false
+
   const image = req.file
 
   if (!candidate) { return res.status(401).json({ ok: false, message: 'Acceso denegado' }) }
