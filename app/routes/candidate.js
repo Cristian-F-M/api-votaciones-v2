@@ -168,13 +168,12 @@ candidate.get('/', verifyToken2, async (req, res) => {
 candidate.get('/image/:imageName', async (req, res) => {
   const { imageName } = req.params
 
-  const candidate = await Candidate.findByPk(candidateId)
-  const image = candidate.imageUrl
+  if (!imageName) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
 
-  if (!candidate) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
+  const imageExists = fs.existsSync(`${imagesUrl}\\user\\${imageName}`)
 
-  if (!fs.existsSync(`${imagesUrl}\\user\\${image}`)) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
-  return res.sendFile(`${imagesUrl}\\user\\${image}`, { root: '.' })
+  if (!imageExists) return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
+  return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
 })
 
 candidate.delete('/:id', verifyToken2, async (req, res) => {
