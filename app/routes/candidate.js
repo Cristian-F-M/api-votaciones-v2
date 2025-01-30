@@ -122,8 +122,45 @@ candidate.get('/all', async (req, res) => {
   return res.json({ ok: true, candidates })
 })
 
-candidate.get('/image/:id', async (req, res) => {
-  const { id: candidateId } = req.params
+candidate.get('/', verifyToken2, async (req, res) => {
+  const { userId, candidateId } = req.query
+
+  if (candidateId) {
+    const candidate = await Candidate.findByPk(candidateId, {
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl']
+        }
+      ]
+    })
+
+    if (!candidate) return res.json({ ok: false, message: 'Candidato no encontrado' })
+
+    return res.json({ ok: true, candidate })
+  }
+
+  if (userId) {
+    const candidate = await Candidate.findOne({
+      where: { userId },
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl']
+        }
+      ]
+    })
+
+    if (!candidate) return res.json({ ok: false, message: 'Candidato no encontrado' })
+
+    return res.json({ ok: true, candidate })
+  }
+})
+
+candidate.get('/image/:imageName', async (req, res) => {
+  const { imageName } = req.params
 
   const candidate = await Candidate.findByPk(candidateId)
   const image = candidate.imageUrl
