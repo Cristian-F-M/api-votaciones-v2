@@ -1,10 +1,12 @@
 import express from 'express'
 import { Role, TypeDocument, User } from '../models/index.js'
 import { verifyToken2 } from '../middlewares/UserMiddlewares.js'
+import fs from 'fs'
 
 const user = express.Router()
 
 const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
+const imagesUrl = '.\\app\\assets\\images'
 
 user.get('/', verifyToken2, async (req, res) => {
   const { userId } = req.headers
@@ -72,6 +74,17 @@ user.post('/sendNotification', verifyToken2, async (req, res) => {
   if (data.status !== 'ok') return res.json({ ok: false, message: 'Error al enviar notificacion' })
 
   res.json({ ok: true, message: 'Notificacion enviada' })
+})
+
+user.get('/image/:imageName', async (req, res) => {
+  const { imageName } = req.params
+
+  if (!imageName) { return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' }) }
+
+  const imageExists = fs.existsSync(`${imagesUrl}\\user\\${imageName}`)
+
+  if (!imageExists) return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
+  return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
 })
 
 export default user
