@@ -6,9 +6,7 @@ import Session from './Session.js'
 import Vote from './Vote.js'
 import Candidate from './Candidate.js'
 
-Role.belongsTo(User, { foreignKey: 'role' })
 User.belongsTo(Role, { as: 'roleUser', foreignKey: 'role' })
-TypeDocument.belongsTo(User, { foreignKey: 'typeDocument' })
 User.belongsTo(TypeDocument, { as: 'typeDocumentUser', foreignKey: 'typeDocument' })
 Session.hasOne(User, { foreignKey: 'session' })
 User.belongsTo(Session, { foreignKey: 'session' })
