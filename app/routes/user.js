@@ -1,12 +1,28 @@
 import express from 'express'
 import { Role, TypeDocument, User } from '../models/index.js'
-import { verifyToken2 } from '../middlewares/UserMiddlewares.js'
+import { validateUser, verifyToken2 } from '../middlewares/UserMiddlewares.js'
 import fs from 'fs'
+import { updateProfileValidation } from '../validators/userValidators.js'
+import multer from 'multer'
 
 const user = express.Router()
 
-const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'app/assets/images/user')
+  },
+  filename: (req, file, cb) => {
+    const { userId } = req.headers
+    const fullFileName = `user_${userId}.png`
+
+    req.headers.fullFileName = fullFileName
+    cb(null, fullFileName)
+  }
+})
+const upload = multer({ storage })
 const imagesUrl = '.\\app\\assets\\images'
+
+const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
 
 user.get('/', verifyToken2, async (req, res) => {
   const { userId } = req.headers
@@ -15,7 +31,7 @@ user.get('/', verifyToken2, async (req, res) => {
       { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
       { model: TypeDocument, as: 'typeDocumentUser', attributes: ['id', 'name', 'code'] }
     ],
-    attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl']
+    attributes: ['id', 'name', 'lastname', 'document', 'email', 'phone', 'voted', 'imageUrl']
   })
 
   if (!user) {
@@ -85,6 +101,26 @@ user.get('/image/:imageName', async (req, res) => {
 
   if (!imageExists) return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
   return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
+})
+
+user.put('/profile', verifyToken2, upload.single('image'), updateProfileValidation, validateUser, async (req, res) => {
+  const { userId, fullFileName } = req.headers
+  const user = await User.findByPk(userId)
+
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+
+  const { name, lastname, email, phone } = req.body
+  // const image = req.file
+
+  user.name = name
+  user.lastname = lastname
+  user.phone = phone
+  user.email = email
+  user.imageUrl = fullFileName
+
+  await user.save()
+
+  return res.json({ ok: true, message: 'Datos actualizados' })
 })
 
 export default user
