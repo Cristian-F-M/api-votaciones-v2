@@ -15,3 +15,10 @@ export const loginValidation = [
   body('document').notEmpty().withMessage('Document is required'),
   body('password').notEmpty().withMessage('Password is required')
 ]
+
+export const updateProfileValidation = [
+  body('name').notEmpty().withMessage('Nombre es requerido').isLength({ min: 3, max: 20 }).withMessage('Nombre debe ser entre 3 y 20 caracteres'),
+  body('lastname').notEmpty().withMessage('Apellido es requerido').isLength({ min: 3, max: 25 }).withMessage('Apellido debe ser entre 3 y 25 caracteres'),
+  body('phone').notEmpty().withMessage('Telefono es requerido').isLength({ min: 10, max: 10 }).withMessage('Telefono debe ser entre 10 y 15 caracteres'),
+  body('email').notEmpty().withMessage('Correo electronico es requerido').isEmail().withMessage('El correo electronico debe ser valido')
+]
