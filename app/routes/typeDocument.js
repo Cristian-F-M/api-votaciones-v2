@@ -11,17 +11,17 @@ typeDocument.get('/', async (req, res) => {
       where: { code }
     })
 
-    if (!typeDocument) return res.json({ message: 'Type of document not found' })
+    if (!typeDocument) return res.json({ ok: false, message: 'Type of document not found' })
 
-    res.json({ typeDocument })
+    res.json({ ok: true, typeDocument })
     return
   }
 
   const typesDocuments = await TypeDocument.findAll()
 
-  if (!typesDocuments) return res.json({ message: 'Types of documents not found' })
+  if (!typesDocuments) return res.json({ ok: false, message: 'Types of documents not found' })
 
-  res.json({ typesDocuments })
+  res.json({ ok: true, typesDocuments })
 })
 
 export default typeDocument
