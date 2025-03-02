@@ -77,6 +77,10 @@ const User = sequelize.define('User', {
   notificationToken: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  resetPasswordCode: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },
 {
