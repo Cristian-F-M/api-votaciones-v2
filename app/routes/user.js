@@ -2,8 +2,10 @@ import express from 'express'
 import { Role, TypeDocument, User } from '../models/index.js'
 import { validateUser, verifyToken2 } from '../middlewares/UserMiddlewares.js'
 import fs from 'fs'
-import { updateProfileValidation } from '../validators/userValidators.js'
+import { updateProfileValidation, findUserValidation, verifyPasswordResetCodeValidation, sendResetCodeValidation, updatePasswordValidation } from '../validators/userValidators.js'
 import multer from 'multer'
+import { getPasswordResetCode, getSecretEmail } from '../lib/user.js'
+import bcrypt from 'bcrypt'
 
 const user = express.Router()
 
@@ -121,6 +123,77 @@ user.put('/profile', verifyToken2, upload.single('image'), updateProfileValidati
   await user.save()
 
   return res.json({ ok: true, message: 'Datos actualizados' })
+})
+
+user.post('/findUser', findUserValidation, validateUser, async (req, res) => {
+  const { typeDocumentCode, document } = req.body
+  const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
+  const user = await User.findOne({ where: { typeDocument: typeDocument?.id, document } })
+
+  if (!typeDocument) return res.json({ ok: false, message: 'Tipo de documento no encontrado' })
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+
+  const newEmail = getSecretEmail(user.email, 2)
+
+  res.json({ ok: true, user: { id: user.id, email: newEmail } })
+})
+
+user.post('/sendPasswordResetCode', sendResetCodeValidation, validateUser, async (req, res) => {
+  // TODO: Send email with code
+  const { userId } = req.body
+  const passwordResetCode = getPasswordResetCode(6)
+  const user = await User.findByPk(userId)
+
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+
+  user.resetPasswordCode = passwordResetCode
+  await user.save()
+
+  setTimeout(() => {
+    user.resetPasswordCode = null
+    user.save()
+  }, 6000)
+
+  return res.json({ ok: true })
+})
+
+user.post('/verifyPasswordResetCode', verifyPasswordResetCodeValidation, validateUser, async (req, res) => {
+  const { userId, code } = req.body
+  const user = await User.findByPk(userId)
+
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+  if (user.resetPasswordCode !== code) return res.json({ ok: false, message: 'El código de verificación no es correcto' })
+
+  return res.json({ ok: true })
+})
+
+user.put('/updatePassword', updatePasswordValidation, validateUser, async (req, res) => {
+  const { userId, password, passwordConfirmation, code } = req.body
+  const user = await User.findByPk(userId)
+
+  if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
+
+  if (user.resetPasswordCode !== code) {
+    return res.json({ ok: false, message: 'El código de verificación no es correcto' })
+  }
+
+  if (password !== passwordConfirmation) {
+    return res.json(
+      {
+        ok: false,
+        message: 'Las contraseñas no coinciden',
+        errors: {
+          path: 'passwordConfirmation',
+          message: 'Las contraseñas no coinciden'
+        }
+      })
+  }
+
+  user.password = bcrypt.hashSync(password, 10)
+  user.resetPasswordCode = null
+  await user.save()
+
+  return res.json({ ok: true, message: 'Nueva contraseña actualizada', urlReturn: 'login/' })
 })
 
 export default user
