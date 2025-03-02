@@ -152,7 +152,7 @@ user.post('/sendPasswordResetCode', sendResetCodeValidation, validateUser, async
   setTimeout(() => {
     user.resetPasswordCode = null
     user.save()
-  }, 6000)
+  }, 21600)
 
   return res.json({ ok: true })
 })
