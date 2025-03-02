@@ -22,3 +22,23 @@ export const updateProfileValidation = [
   body('phone').notEmpty().withMessage('Telefono es requerido').isLength({ min: 10, max: 10 }).withMessage('Telefono debe ser entre 10 y 15 caracteres'),
   body('email').notEmpty().withMessage('Correo electronico es requerido').isEmail().withMessage('El correo electronico debe ser valido')
 ]
+
+export const findUserValidation = [
+  body('typeDocumentCode').notEmpty().withMessage('El tipo de documento es requirido'),
+  body('document').notEmpty().withMessage('El documento es requerido')
+]
+
+export const sendResetCodeValidation = [
+  body('userId').notEmpty().withMessage('El id del usuario es requerido')
+]
+
+export const verifyPasswordResetCodeValidation = [
+  body('userId').notEmpty().withMessage('El id del usuario es requerido'),
+  body('code').notEmpty().withMessage('El codigo de verificacion es requerido')
+]
+
+export const updatePasswordValidation = [
+  body('userId').notEmpty().withMessage('El id del usuario es requerido'),
+  body('password').notEmpty().withMessage('La nueva contraseña es requerida').isStrongPassword({ minLength: 8, maxLength: 20, minUppercase: 1, minSymbols: 1 }).withMessage('Password must be between 8 and 20 characters long and contain at least 1 uppercase letter and 1 symbol'),
+  body('passwordConfirmation').notEmpty().withMessage('La confirmación de la nueva contraseña es requerida')
+]
