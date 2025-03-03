@@ -1,8 +1,9 @@
 import express from 'express'
-import { verifyToken2 } from '../middlewares/UserMiddlewares.js'
+import { validateUser, verifyToken2 } from '../middlewares/UserMiddlewares.js'
 import { User, Role, TypeDocument, Candidate } from '../models/index.js'
 import multer from 'multer'
 import fs from 'node:fs'
+import { updateProfileValidation } from '../validators/candidateValidators.js'
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -47,7 +48,7 @@ candidate.post('/', verifyToken2, async (req, res) => {
   return res.json({ ok: true, message: 'Candidato creado' })
 })
 
-candidate.put('/', verifyToken2, upload.single('image'), async (req, res) => {
+candidate.put('/', verifyToken2, upload.single('image'), updateProfileValidation, validateUser, async (req, res) => {
   const { userId: userIdLogged, fullFileName } = req.headers
 
   const userLogged = await User.findByPk(userIdLogged, {
