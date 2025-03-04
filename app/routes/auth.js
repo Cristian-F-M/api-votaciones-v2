@@ -44,7 +44,13 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
 auth.post('/Login', loginValidation, validateUser, async (req, res) => {
   const { typeDocumentCode, document, password } = req.body
   const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
-  const user = await User.findOne({ where: { typeDocument: typeDocument.id, document } })
+  const user = await User.findOne({
+    where: { typeDocument: typeDocument.id, document },
+    include: [
+      { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
+      { model: TypeDocument, as: 'typeDocumentUser', attributes: ['id', 'name', 'code'] }
+    ]
+  })
 
   if (!user) {
     res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
@@ -69,9 +75,12 @@ auth.post('/Login', loginValidation, validateUser, async (req, res) => {
     await user.save()
 
     const isMobile = req.get('User-Agent') === 'mobile'
+    let urlRedirect = 'apprentice/'
+
+    if (user.roleUser.code === 'Administrator') urlRedirect = 'administrator/'
 
     res.cookie('token', token, { httpOnly: true, secure: true, maxAge: 14400000 })
-    res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null, urlRedirect: 'apprentice/' })
+    res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null, urlRedirect })
   } catch (err) {
     console.log(err)
     res.status(401).json({ message: 'An error has occurred, please try again', ok: false })
@@ -91,7 +100,12 @@ auth.post('/LoginBiometrics', async (req, res) => {
     }
 
     const { id } = decoded
-    const user = await User.findByPk(id)
+    const user = await User.findByPk(id, {
+      include: [
+        { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
+        { model: TypeDocument, as: 'typeDocumentUser', attributes: ['id', 'name', 'code'] }
+      ]
+    })
 
     if (!user) {
       return res.json({ message: 'Ocurrio un error, por favor ingrese con su contraseña', ok: false })
@@ -117,7 +131,10 @@ auth.post('/LoginBiometrics', async (req, res) => {
       await session.save()
     }
 
-    res.json({ message: 'Now you are logged in', ok: true, token, urlRedirect: 'apprentice/' })
+    let urlRedirect = 'apprentice/'
+    if (user.roleUser.code === 'Administrator') urlRedirect = 'administrator/'
+
+    res.json({ message: 'Now you are logged in', ok: true, token, urlRedirect })
   })
 })
 
