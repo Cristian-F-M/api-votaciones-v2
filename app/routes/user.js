@@ -134,8 +134,10 @@ user.post('/findUser', findUserValidation, validateUser, async (req, res) => {
   if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
 
   const newEmail = getSecretEmail(user.email, 2)
+  const newCodeData = user.resetPasswordData || { timeNewCode: null, timesCodeSent: 0, code: null }
+  const timeNewCode = newCodeData.timeNewCode
 
-  res.json({ ok: true, user: { id: user.id, email: newEmail } })
+  res.json({ ok: true, user: { id: user.id, email: newEmail, timeNewCode } })
 })
 
 user.post('/sendPasswordResetCode', sendResetCodeValidation, validateUser, async (req, res) => {
@@ -146,17 +148,30 @@ user.post('/sendPasswordResetCode', sendResetCodeValidation, validateUser, async
 
   if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
 
-  user.resetPasswordCode = passwordResetCode
+  const newCodeData = user.resetPasswordData || { timeNewCode: null, timesCodeSent: 0, code: null }
+
+  if (newCodeData.timeNewCode && new Date(newCodeData.timeNewCode) > new Date()) return res.json({ ok: false, message: 'Tiempo de espera excedido', timeNewCode: newCodeData.timeNewCode })
+
+  const timeCooldown = newCodeData.timesCodeSent > 3 ? 3600 : newCodeData.timesCodeSent * 80
+  const timeNewCode = new Date()
+
+  timeNewCode.setSeconds(timeNewCode.getSeconds() + timeCooldown)
+
+  user.resetPasswordData = { timeNewCode, timesCodeSent: newCodeData.timesCodeSent + 1, code: passwordResetCode }
   await user.save()
 
   setTimeout(() => {
-    if (user.resetPasswordCode === passwordResetCode) {
-      user.resetPasswordCode = null
+    if (user.resetPasswordData.code === passwordResetCode) {
+      user.resetPasswordData.code = null
       user.save()
     }
   }, 21600)
 
-  return res.json({ ok: true })
+  setTimeout(() => {
+    user.resetPasswordData = { timeNewCode: null, timesCodeSent: 0, code: null }
+  }, 86400)
+
+  return res.json({ ok: true, timeNewCode })
 })
 
 user.post('/verifyPasswordResetCode', verifyPasswordResetCodeValidation, validateUser, async (req, res) => {
@@ -164,7 +179,7 @@ user.post('/verifyPasswordResetCode', verifyPasswordResetCodeValidation, validat
   const user = await User.findByPk(userId)
 
   if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
-  if (user.resetPasswordCode !== code) return res.json({ ok: false, message: 'El código de verificación no es correcto' })
+  if (user.resetPasswordData.code !== code) return res.json({ ok: false, message: 'El código de verificación no es correcto' })
 
   return res.json({ ok: true })
 })
@@ -175,7 +190,7 @@ user.put('/updatePassword', updatePasswordValidation, validateUser, async (req, 
 
   if (!user) return res.json({ ok: false, message: 'Usuario no encontrado' })
 
-  if (user.resetPasswordCode !== code) {
+  if (user.resetPasswordData.code !== code) {
     return res.json({ ok: false, message: 'El código de verificación no es correcto' })
   }
 
