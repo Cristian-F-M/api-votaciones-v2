@@ -150,8 +150,10 @@ user.post('/sendPasswordResetCode', sendResetCodeValidation, validateUser, async
   await user.save()
 
   setTimeout(() => {
-    user.resetPasswordCode = null
-    user.save()
+    if (user.resetPasswordCode === passwordResetCode) {
+      user.resetPasswordCode = null
+      user.save()
+    }
   }, 21600)
 
   return res.json({ ok: true })
