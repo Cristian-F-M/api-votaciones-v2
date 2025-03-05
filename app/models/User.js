@@ -78,8 +78,8 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
-  resetPasswordCode: {
-    type: DataTypes.STRING,
+  resetPasswordData: {
+    type: DataTypes.JSON,
     allowNull: true
   }
 },
