@@ -33,6 +33,10 @@ const Vote = sequelize.define('Vote', {
   endDate: {
     type: DataTypes.DATE,
     allowNull: false
+  },
+  finishVoteInfo: {
+    type: DataTypes.JSON,
+    allowNull: true
   }
 },
 {
