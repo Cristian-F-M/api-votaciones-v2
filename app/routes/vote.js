@@ -96,6 +96,7 @@ vote.post('/finish', verifyToken2, async (req, res) => {
   lastVote.finishVoteInfo = { totalVotes, cantVotesWinner, candidates: candidatesWinners }
   lastVote.totalVotes = totalVotes
   lastVote.cantVotes = cantVotesWinner
+  lastVote.isFinished = true
 
   await lastVote.save()
 

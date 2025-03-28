@@ -37,6 +37,10 @@ const Vote = sequelize.define('Vote', {
   finishVoteInfo: {
     type: DataTypes.JSON,
     allowNull: true
+  },
+  isFinished: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false
   }
 },
 {
