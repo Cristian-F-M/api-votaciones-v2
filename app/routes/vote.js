@@ -37,7 +37,7 @@ vote.post('/', verifyToken2, async (req, res) => {
   const newStartDate = new Date(startDate).toISOString().split('T')[0] + ' 12:00:00'
   const newEndDate = new Date(endDate).toISOString().split('T')[0] + ' 12:00:00'
 
-  await Vote.create({ startDate: newStartDate, endDate: newEndDate })
+  await Vote.create({ startDate: newStartDate, endDate: newEndDate, isFinished: false })
   return res.json({ ok: true, message: 'Votación creada' })
 })
 
