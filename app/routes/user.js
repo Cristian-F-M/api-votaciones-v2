@@ -2,12 +2,14 @@ import express from 'express'
 import { Role, TypeDocument, User } from '../models/index.js'
 import { validateUser, verifyToken2 } from '../middlewares/UserMiddlewares.js'
 import fs from 'fs'
-import { updateProfileValidation, findUserValidation, verifyPasswordResetCodeValidation, sendResetCodeValidation, updatePasswordValidation } from '../validators/userValidators.js'
+import { updateProfileValidation, findUserValidation, verifyPasswordResetCodeValidation, sendResetCodeValidation, updatePasswordValidation, notifyValidation } from '../validators/userValidators.js'
 import multer from 'multer'
 import { getPasswordResetCode, getSecretEmail } from '../lib/user.js'
 import bcrypt from 'bcrypt'
+import pLimit from 'p-limit'
 
 const user = express.Router()
+const limit = pLimit(6)
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -211,6 +213,47 @@ user.put('/updatePassword', updatePasswordValidation, validateUser, async (req, 
   await user.save()
 
   return res.json({ ok: true, message: 'Nueva contraseña actualizada', urlReturn: 'login/' })
+})
+
+user.post('/notify', verifyToken2, notifyValidation, validateUser, async (req, res) => {
+  const { userId } = req.headers
+  const user = await User.findByPk(userId, {
+    include: [
+      { model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] }
+    ]
+  })
+
+  if (!user || user.roleUser.code !== 'Administrator') return res.json({ ok: false, message: 'Acceso denegado' })
+
+  const { title, body } = req.body
+  const role = await Role.findOne({ where: { code: 'Apprentice' } })
+  const allAprrentices = await User.findAll({ where: { role: role.id }, attributes: ['id', 'notificationToken'] })
+
+  const tasks = []
+
+  allAprrentices.forEach(({ notificationToken }) => {
+    if (!notificationToken) return
+
+    tasks.push(limit(() => fetch(EXPO_NOTIFICATION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        to: notificationToken,
+        sound: 'default',
+        title,
+        body
+      })
+    })))
+  })
+
+  const results = await Promise.all(tasks)
+
+  console.log({ results })
+
+  return res.json({ ok: true, message: 'Notificación enviada' })
 })
 
 export default user
