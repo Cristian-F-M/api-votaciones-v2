@@ -78,6 +78,8 @@ vote.post('/finish', verifyToken2, async (req, res) => {
 
   // Verificar si hay empate sin voto en blanco
   const thereIsBlankVote = candidatesWithMaxVotes.some(c => c.user.document === '0')
+  const thereIsMoreThanOneCandidate = candidatesWithMaxVotes.length > 1
+
   if (candidatesWithMaxVotes.length > 1 && !chooseWinnerRandom && !thereIsBlankVote) {
     return res.json({
       ok: false,
@@ -87,10 +89,11 @@ vote.post('/finish', verifyToken2, async (req, res) => {
   }
 
   // Filtrar el voto en blanco y elegir ganador
-  candidatesWithMaxVotes = candidatesWithMaxVotes.filter(c => c.user.document !== '0')
-  const candidatesWinners = chooseWinnerRandom
-    ? [candidatesWithMaxVotes[getRandomNumber(0, candidatesWithMaxVotes.length - 1)]]
-    : candidatesWithMaxVotes
+  if (thereIsMoreThanOneCandidate) candidatesWithMaxVotes = candidatesWithMaxVotes.filter(c => c.user.document !== '0')
+
+  let candidatesWinners = candidatesWithMaxVotes
+
+  if (chooseWinnerRandom && thereIsMoreThanOneCandidate) candidatesWinners = [candidatesWithMaxVotes[getRandomNumber(0, candidatesWithMaxVotes.length - 1)]]
 
   // Actualizar la votación
   lastVote.finishVoteInfo = { totalVotes, cantVotesWinner, candidates: candidatesWinners }
