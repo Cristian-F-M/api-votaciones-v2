@@ -1,6 +1,6 @@
 node_modules/
 .env
-api.http
+*.http
 database/
 app/assets/images/*
 !app/assets/images/base
