@@ -8,7 +8,7 @@ export function validateUser (req, res, next) {
 
   if (errors.length > 0) {
     const groupedErrors = groupBy(errors, err => err.path)
-    return res.status(400).json({ errors: groupedErrors })
+    return res.status(400).json({ ok: false, errors: groupedErrors })
   }
 
   next()
