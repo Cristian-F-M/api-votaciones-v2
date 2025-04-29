@@ -7,6 +7,8 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGIN.split(',').map(origin => origin.trim())
+
 export default function createApp () {
   const app = express()
 
@@ -14,7 +16,8 @@ export default function createApp () {
   app.use(bodyParser.urlencoded({ extended: true }))
   app.use(cookieParser())
   app.use(cors({
-    origin: process.env.ALLOWED_ORIGIN
+    origin: ALLOWED_ORIGINS,
+    credentials: true
   }))
 
   // ? Hacerlo para las demás rutas
