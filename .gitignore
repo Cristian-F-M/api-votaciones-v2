@@ -5,3 +5,5 @@ database/
 app/assets/images/*
 !app/assets/images/base
 bun.lockb
+
+certificates/
