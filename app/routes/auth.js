@@ -79,14 +79,17 @@ auth.post('/Login', loginValidation, validateUser, async (req, res) => {
 
     if (user.roleUser.code === 'Administrator') urlRedirect = 'administrator/'
 
+    const tokenToSend = isMobile ? token : null
+
     res.cookie('token', token, {
       secure: true,
       httpOnly: true,
       sameSite: 'None',
-      maxAge: 14400000
+      maxAge: 14400000,
+      path: '/'
     })
 
-    res.json({ message: 'Now you are logged in', ok: true, token: isMobile ? token : null, urlRedirect })
+    res.json({ message: 'Now you are logged in', ok: true, token: tokenToSend, urlRedirect })
   } catch (err) {
     console.log(err)
     res.status(401).json({ message: 'An error has occurred, please try again', ok: false })
