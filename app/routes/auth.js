@@ -42,7 +42,7 @@ auth.post('/Register', registerValidation, validateUser, async (req, res) => {
 })
 
 auth.post('/Login', loginValidation, validateUser, async (req, res) => {
-  const { typeDocumentCode, document, password } = req.body
+  const { typeDocumentCode, document, password, remember } = req.body
   const typeDocument = await TypeDocument.findOne({ where: { code: typeDocumentCode } })
   const user = await User.findOne({
     where: { typeDocument: typeDocument.id, document },
@@ -81,13 +81,14 @@ auth.post('/Login', loginValidation, validateUser, async (req, res) => {
 
     const tokenToSend = isMobile ? token : null
 
-    res.cookie('token', token, {
-      secure: true,
-      httpOnly: true,
-      sameSite: 'None',
-      maxAge: 14400000,
-      path: '/'
-    })
+    if (remember === 'true') {
+      res.cookie('token', token, {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'None',
+        maxAge: 14400000
+      })
+    }
 
     res.json({ message: 'Now you are logged in', ok: true, token: tokenToSend, urlRedirect })
   } catch (err) {
