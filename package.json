@@ -28,6 +28,8 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "standard": "^17.1.0"
+    "@biomejs/biome": "^1.9.4",
+    "@types/sequelize": "^4.28.20",
+    "typescript": "^5.8.3"
   }
 }
