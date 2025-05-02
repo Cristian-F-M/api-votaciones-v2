@@ -12,8 +12,8 @@ const ip = getIp()
 app.use(morgan('dev'))
 
 const options = {
-  key: fs.readFileSync(path.join(__dirname, 'certificates/192.168.0.101-key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'certificates/192.168.0.101.pem'))
+  key: fs.readFileSync(path.join(__dirname, 'certificates/192.168.0.100-key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'certificates/192.168.0.100.pem'))
 }
 
 const server = https.createServer(options, app)
