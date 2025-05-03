@@ -1,8 +1,9 @@
 import { DataTypes } from 'sequelize'
-import sequelize from '../config/database.js'
-import User from './User.js'
+import sequelize from '@/config/database.js'
+import User from '@/models/User.js'
+import type { CandidateModel } from '@/types/models'
 
-const Candidate = sequelize.define('Candidate', {
+const Candidate = sequelize.define<CandidateModel>('Candidate', {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
