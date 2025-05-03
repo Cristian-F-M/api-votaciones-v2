@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun --watch app.js",
     "setup:db": "bun app/config/syncDb.js && bun app/config/seed.js",
-    "dev:https": "ALLOWED_ORIGIN='https://localhost:3000, https://192.168.0.100:3000' bun --watch httpsServer.js"
+    "dev:https": "bun --watch httpsServer.js"
   },
   "keywords": [],
   "author": "",

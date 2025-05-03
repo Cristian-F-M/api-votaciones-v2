@@ -18,7 +18,10 @@ dotenv.config()
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || '')
 	.split(',')
-	.map((origin) => origin.trim())
+	.flatMap((origin) => {
+		const o = origin.trim()
+		return [o, o.replace('http', 'https')]
+	})
 
 export default function createApp() {
 	const app = express()
