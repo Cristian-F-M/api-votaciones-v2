@@ -29,7 +29,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
     "typescript": "^5.8.3"
-  }
+  },
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "bcrypt",
+    "sqlite3"
+  ]
 }
