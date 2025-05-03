@@ -8,14 +8,17 @@ import morgan from 'morgan'
 const PORT = process.env.PORT || 3000
 const app = createApp()
 const ip = getIp()
+const CERTIFCATE_NAME = process.env.CERTIFCATE_NAME
 
 app.use(morgan('dev'))
 
 const options = {
 	key: fs.readFileSync(
-		path.join(__dirname, 'certificates/192.168.0.101-key.pem'),
+		path.join(__dirname, `certificates/${CERTIFCATE_NAME}-key.pem`)
 	),
-	cert: fs.readFileSync(path.join(__dirname, 'certificates/192.168.0.101.pem')),
+	cert: fs.readFileSync(
+		path.join(__dirname, `certificates/${CERTIFCATE_NAME}.pem`)
+	),
 }
 
 const server = https.createServer(options, app)
