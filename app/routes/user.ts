@@ -1,7 +1,7 @@
 import express from 'express'
 import type { Request, Response } from 'express'
 import { Role, TypeDocument, User } from '@/models/index'
-import { validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
+import { roleRequired, validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
 import fs from 'node:fs'
 import {
 	updateProfileValidation,
@@ -101,7 +101,7 @@ user.post('/notificationToken', verifyToken2, async (req, res) => {
 	res.json({ ok: true, message: 'Token de notificaciones actualizado' })
 })
 
-user.post('/sendNotification', verifyToken2, async (req, res) => {
+user.post('/sendNotification', verifyToken2, roleRequired('Administrator'), async (req, res) => {
 	const { userId } = req.headers
 
 	if (!userId || typeof userId !== 'string') {
@@ -183,6 +183,7 @@ user.get('/image/:imageName', async (req, res) => {
 user.put(
 	'/profile',
 	verifyToken2,
+  roleRequired(['Apprentice']),
 	upload.single('image'),
 	updateProfileValidation,
 	validateUser,
@@ -402,6 +403,7 @@ user.put(
 user.post(
 	'/notify',
 	verifyToken2,
+  roleRequired('Administrator'),
 	notifyValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
@@ -419,11 +421,6 @@ user.post(
 				{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
 			],
 		})
-
-		if (!user || user.roleUser.code !== 'Administrator') {
-			res.json({ ok: false, message: 'Acceso denegado' })
-			return
-		}
 
 		const { title, body } = req.body
 

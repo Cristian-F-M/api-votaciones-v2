@@ -1,9 +1,10 @@
 import express from 'express'
 import { TypeDocument } from '../models/index.js'
+import { verifyToken2, roleRequired } from '@/middlewares/UserMiddlewares.js'
 
 const typeDocument = express.Router()
 
-typeDocument.get('/', async (req, res) => {
+typeDocument.get('/', verifyToken2, roleRequired(['Apprentice', 'Candidate', 'Administrator']) ,async (req, res) => {
 	const { code } = req.query
 
 	if (!code) {

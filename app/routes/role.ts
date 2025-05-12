@@ -1,9 +1,10 @@
 import express from 'express'
 import { Role } from '../models/index.js'
+import { verifyToken2, roleRequired } from '@/middlewares/UserMiddlewares.js'
 
 const role = express.Router()
 
-role.get('/', async (req, res) => {
+role.get('/', verifyToken2, roleRequired(['Apprentice', 'Candidate', 'Administrator']) ,async (req, res) => {
 	const { code } = req.query
 
 	if (!code || typeof code !== 'string') {

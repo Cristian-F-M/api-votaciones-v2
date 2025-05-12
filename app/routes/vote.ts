@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyToken2 } from '@/middlewares/UserMiddlewares'
+import { roleRequired, verifyToken2 } from '@/middlewares/UserMiddlewares'
 import Vote from '@/models/Vote'
 import User from '@/models/User'
 import Role from '@/models/Role'
@@ -11,7 +11,7 @@ import { Sequelize } from 'sequelize'
 
 const vote = express.Router()
 
-vote.get('/', async (req, res) => {
+vote.get('/', verifyToken2, roleRequired(['Candidate', 'Apprentice']), async (req, res) => {
 	const lastVote = await Vote.findOne({
 		attributes: [[Sequelize.fn('MAX', Sequelize.literal('ROWID')), 'maxRowId']],
 	})
@@ -24,7 +24,7 @@ vote.get('/', async (req, res) => {
 	res.json({ ok: true, lastVote })
 })
 
-vote.post('/', verifyToken2, async (req, res) => {
+vote.post('/', verifyToken2, roleRequired('Administrator'), async (req, res) => {
 	const { userId } = req.headers
 
 	if (!userId || typeof userId !== 'string') {
@@ -40,7 +40,7 @@ vote.post('/', verifyToken2, async (req, res) => {
 		],
 	})
 
-	if (!user || user.roleUser.code !== 'Administrator') {
+	if (!user) {
 		res.status(401).json({ ok: false, message: 'Acceso denegado' })
 		return
 	}
@@ -63,7 +63,7 @@ vote.post('/', verifyToken2, async (req, res) => {
 	res.json({ ok: true, message: 'Votación creada' })
 })
 
-vote.post('/finish', verifyToken2, async (req, res) => {
+vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, res) => {
 	const { userId } = req.headers
 	const { chooseWinnerRandom = false } = req.body
 
@@ -79,7 +79,7 @@ vote.post('/finish', verifyToken2, async (req, res) => {
 		],
 	})
 
-	if (!user || user.roleUser.code !== 'Administrator') {
+	if (!user) {
 		res.status(401).json({ ok: false, message: 'Acceso denegado' })
 		return
 	}

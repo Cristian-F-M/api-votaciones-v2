@@ -1,10 +1,11 @@
 import express from 'express'
 import { Config } from '../models/index.js'
 import type { ConfigModel } from '@/types/models.js'
+import { roleRequired, verifyToken2 } from '@/middlewares/UserMiddlewares.js'
 
 const config = express.Router()
 
-config.get('/', async (req, res) => {
+config.get('/', verifyToken2, roleRequired(['Apprentice', 'Candidate', 'Administrator']) ,async (req, res) => {
 	const { code, name } = req.query
 
 	const query: Record<string, unknown> = {}
