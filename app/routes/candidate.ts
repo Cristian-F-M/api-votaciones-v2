@@ -1,6 +1,6 @@
 import express from 'express'
 import type { Request, Response } from 'express'
-import { validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
+import { roleRequired, validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
 import { User, Role, TypeDocument, Candidate } from '../models/index.js'
 import multer from 'multer'
 import fs from 'node:fs'
@@ -23,7 +23,7 @@ const upload = multer({ storage })
 const candidate = express.Router()
 const imagesUrl = '.\\app\\assets\\images'
 
-candidate.post('/', verifyToken2, async (req: Request, res: Response) => {
+candidate.post('/', verifyToken2, roleRequired('Administrator'),  async (req: Request, res: Response) => {
 	const { userId: userIdLogged } = req.headers
 
 	const id = Array.isArray(userIdLogged) ? userIdLogged[0] : userIdLogged
@@ -34,11 +34,6 @@ candidate.post('/', verifyToken2, async (req: Request, res: Response) => {
 		],
 		attributes: ['id', 'name', 'lastname', 'document', 'email'],
 	})
-
-	if (!userLogged || userLogged.roleUser.code !== 'Administrator') {
-		res.status(401).json({ ok: false, message: 'Acceso denegado' })
-		return
-	}
 
 	const { userId } = req.body
 	const candidateExist = await Candidate.findOne({ where: { userId } })
@@ -74,6 +69,7 @@ candidate.post('/', verifyToken2, async (req: Request, res: Response) => {
 candidate.put(
 	'/',
 	verifyToken2,
+  roleRequired(['Apprentice', 'Candidate']),
 	upload.single('image'),
 	updateProfileValidation,
 	validateUser,
@@ -97,10 +93,6 @@ candidate.put(
 			res
 				.status(404)
 				.json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
-			return
-		}
-		if (userLogged.roleUser.code !== 'Candidate') {
-			res.status(401).json({ ok: false, message: 'Acceso denegado' })
 			return
 		}
 
@@ -271,7 +263,7 @@ candidate.delete('/:id', verifyToken2, async (req, res) => {
 	res.json({ ok: true, message: 'Candidato eliminado' })
 })
 
-candidate.post('/:id/vote', verifyToken2, async (req, res) => {
+candidate.post('/:id/vote', verifyToken2, roleRequired('Apprentice'), async (req, res) => {
 	const { id: candidateId } = req.params
 	const { userId } = req.headers
 
@@ -291,14 +283,6 @@ candidate.post('/:id/vote', verifyToken2, async (req, res) => {
 
 	if (!userLogged) {
 		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
-		return
-	}
-
-	if (userLogged.roleUser.code !== 'Apprentice') {
-		res.status(401).json({
-			ok: false,
-			message: 'No tienes permisos para realizar esta acción',
-		})
 		return
 	}
 
