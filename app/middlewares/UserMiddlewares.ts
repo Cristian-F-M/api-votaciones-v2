@@ -2,7 +2,7 @@ import { validationResult } from 'express-validator'
 import type { Result, ValidationError } from 'express-validator'
 import { groupBy } from '../lib/fields.js'
 import jwt from 'jsonwebtoken'
-import { Session, User } from '@/models/index'
+import { Role, Session, User } from '@/models/index'
 import type { NextFunction, Request, Response } from 'express'
 import type { UserJWTPaylod } from '@/types/auth'
 
@@ -24,7 +24,7 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
 export async function verifyToken2(
 	req: Request,
 	res: Response,
-	next: NextFunction,
+	next: NextFunction
 ) {
 	const { token } = req.cookies
 	let verifyResult = null
@@ -112,4 +112,52 @@ export async function verifyToken2(
 	// ! Change this to req.userId !
 	req.headers.userId = verifyResult.id
 	next()
+}
+
+export function roleRequired(roleCode: string | string[]) {
+	return async (req: Request, res: Response, next: NextFunction) => {
+		const { userId } = req.headers
+
+		if (!roleCode || typeof userId !== 'string') {
+			res.status(401).json({
+				ok: false,
+				message: 'Acceso denegado',
+				urlRedirect: 'access-denied/',
+			})
+			return
+		}
+		const user = await User.findByPk(userId, {
+			include: [
+				{
+					model: Role,
+					as: 'roleUser',
+				},
+			],
+		})
+
+		if (!user) {
+			res.status(401).json({
+				ok: false,
+				message: 'Acceso denegado',
+				urlRedirect: 'access-denied/',
+			})
+			return
+		}
+
+		const userCodeRole = user.roleUser.code
+
+		const isAllowed = Array.isArray(roleCode)
+			? roleCode.includes(userCodeRole)
+			: roleCode === userCodeRole
+
+		if (!user || !isAllowed) {
+			res.status(401).json({
+				ok: false,
+				message: 'Acceso denegado',
+				urlRedirect: 'access-denied/',
+			})
+			return
+		}
+		next()
+	}
 }
