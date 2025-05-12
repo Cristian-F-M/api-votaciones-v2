@@ -4,7 +4,7 @@ import { verifyToken2, roleRequired } from '@/middlewares/UserMiddlewares.js'
 
 const typeDocument = express.Router()
 
-typeDocument.get('/', verifyToken2, roleRequired(['Apprentice', 'Candidate', 'Administrator']) ,async (req, res) => {
+typeDocument.get('/' ,async (req, res) => {
 	const { code } = req.query
 
 	if (!code) {
