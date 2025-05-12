@@ -163,7 +163,7 @@ candidate.put(
 	},
 )
 
-candidate.get('/all', async (req, res) => {
+candidate.get('/all', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
 	const candidates = await Candidate.findAll({
 		include: [
 			{
@@ -177,7 +177,7 @@ candidate.get('/all', async (req, res) => {
 	return
 })
 
-candidate.get('/', verifyToken2, async (req, res) => {
+candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
 	const { userId, candidateId } = req.query
 
 	if (!candidateId || typeof candidateId !== 'string') {
@@ -228,7 +228,7 @@ candidate.get('/image/:imageName', async (req, res) => {
 	return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
 })
 
-candidate.delete('/:id', verifyToken2, async (req, res) => {
+candidate.delete('/:id', verifyToken2, roleRequired('Administrator'),  async (req, res) => {
 	const { id: candidateId } = req.params
 	const candidate = await Candidate.findByPk(candidateId)
 
