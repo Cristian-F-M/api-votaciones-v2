@@ -73,7 +73,7 @@ user.get('/', verifyToken2, async (req, res) => {
 		return
 	}
 
-	res.json({ user })
+	res.json({ ok: true, user })
 })
 
 user.post('/notificationToken', verifyToken2, async (req, res) => {
