@@ -12,6 +12,7 @@ import { groupBy } from '@/lib/fields'
 import Session from '@/models/Session'
 import { ValidationError } from 'sequelize'
 import type { UserJWTPaylod } from '@/types/auth'
+import { session_expiration_time } from '@/constants/auth'
 
 const { JWT_SECRET } = process.env
 const auth = express.Router()
@@ -164,7 +165,7 @@ auth.post(
 			)
 			const session = await Session.create({
 				token,
-				expires: new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString(),
+				expires: new Date(Date.now() + session_expiration_time * 1000).toISOString(),
 			})
 
 			user.session = session.id
@@ -182,7 +183,7 @@ auth.post(
 					secure: true,
 					httpOnly: true,
 					sameSite: 'none',
-					maxAge: 14400000,
+					maxAge: session_expiration_time * 1000,
 				})
 			}
 
