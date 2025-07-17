@@ -368,4 +368,39 @@ auth.post('/Logout', async (req, res) => {
 	}
 })
 
+
+auth.post('/validate-permissions', verifyToken2, async (req, res) => {
+	const { roles } = req.body
+	const { userId } = req.headers
+
+	if (!roles || !Array.isArray(roles) || (!userId || typeof userId !== 'string')) {
+		res.status(401).json({
+			ok: false,
+			message: 'Acceso denegado',
+		})
+		return
+	}
+
+	const user = await User.findByPk(userId, {
+		include: [
+			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
+		],
+	})
+
+	if (!user || !roles.includes(user.roleUser.code)) {
+		res.status(401).json({
+			ok: false,
+			message: 'Acceso denegado',
+		})
+		return
+	}
+
+
+	res.status(200).json({
+		ok: true,
+		message: 'Acceso permitido',
+	})
+	return
+})
+
 export default auth
