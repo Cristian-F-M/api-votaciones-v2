@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import { Role, Session, User } from '@/models/index'
 import type { NextFunction, Request, Response } from 'express'
 import type { UserJWTPaylod } from '@/types/auth'
+import type { AllowRoles } from '@/types/UserMiddleware'
 
 const { JWT_SECRET } = process.env
 
@@ -114,7 +115,7 @@ export async function verifyToken2(
 	next()
 }
 
-export function roleRequired(roleCode: string | string[]) {
+export function roleRequired(roleCode: AllowRoles | AllowRoles[]) {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		const { userId } = req.headers
 
@@ -144,7 +145,7 @@ export function roleRequired(roleCode: string | string[]) {
 			return
 		}
 
-		const userCodeRole = user.roleUser.code
+		const userCodeRole = user.roleUser.code as AllowRoles
 
 		const isAllowed = Array.isArray(roleCode)
 			? roleCode.includes(userCodeRole)
