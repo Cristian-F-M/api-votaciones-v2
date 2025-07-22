@@ -8,13 +8,19 @@ import { getRandomNumber } from '@/lib/global.js'
 import TypeDocument from '@/models/TypeDocument'
 import type { CandidateModel } from '@/types/models'
 import { Sequelize } from 'sequelize'
+import sequelize from '@/config/database'
 
 const vote = express.Router()
 
 vote.get('/', verifyToken2, roleRequired(['Candidate', 'Apprentice']), async (req, res) => {
-	const lastVote = await Vote.findOne({
-		attributes: [[Sequelize.fn('MAX', Sequelize.literal('ROWID')), 'maxRowId']],
-	})
+
+	const [lastVote] = await sequelize.query(
+		'SELECT * FROM votes WHERE ROWID = (SELECT MAX(ROWID) FROM votes)',
+		{
+			model: Vote,
+			mapToModel: true
+		}
+	);
 
 	if (!lastVote) {
 		res.json({ ok: false, lastVote })
