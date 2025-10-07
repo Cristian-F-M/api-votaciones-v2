@@ -263,8 +263,8 @@ candidate.delete('/:id', verifyToken2, roleRequired('Administrator'),  async (re
 	res.json({ ok: true, message: 'Candidato eliminado' })
 })
 
-candidate.post('/:id/vote', verifyToken2, roleRequired('Apprentice'), async (req, res) => {
-	const { id: candidateId } = req.params
+candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, res) => {
+	const { id: candidateId } = req.body
 	const { userId } = req.headers
 
 	const id = Array.isArray(userId) ? userId[0] : userId
