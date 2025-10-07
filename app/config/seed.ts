@@ -92,7 +92,7 @@ async function seedDb() {
 		where: { document: 0, phone: 0, email: 'voto@votaciones.com' },
 	})
 
-	if (whiteVote) await Candidate.create({ userId: whiteVote.id })
+	if (whiteVote) await Candidate.create({ userId: whiteVote.id, description: 'Vota en blanco si no estás de acuerdo con ninguno de los candidatos' })
 
 	console.log('Database seeded!!!!')
 }
