@@ -1,10 +1,10 @@
+import fs from 'node:fs'
+import { roleRequired, validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
+import { updateProfileValidation } from '@/validators/candidateValidators'
 import express from 'express'
 import type { Request, Response } from 'express'
-import { roleRequired, validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
-import { User, Role, TypeDocument, Candidate } from '../models/index.js'
 import multer from 'multer'
-import fs from 'node:fs'
-import { updateProfileValidation } from '@/validators/candidateValidators'
+import { Candidate, Role, TypeDocument, User } from '../models/index.js'
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -278,11 +278,16 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 				attributes: ['id', 'name', 'code'],
 			},
 		],
-		attributes: ['id', 'name', 'lastname', 'document', 'email'],
+		attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted'],
 	})
 
 	if (!userLogged) {
 		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
+		return
+	}
+
+	if (userLogged.voted) {
+		res.status(400).json({ ok: false, message: 'Ya has votado' })
 		return
 	}
 
