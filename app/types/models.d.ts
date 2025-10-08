@@ -71,6 +71,7 @@ export interface UserModel extends BaseModel<UserModel> {
 	password: string
 	role: ForeignKey<RoleModel['id']>
 	voted: boolean
+  candidateVotedId: CandidateModel['id'] | null
 	session: ForeignKey<SessionModel['id']> | null
 	notificationToken: CreationOptional<string>
 	resetPasswordData: CreationOptional<{

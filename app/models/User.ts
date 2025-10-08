@@ -73,6 +73,10 @@ const User = sequelize.define<UserModel>(
 			type: DataTypes.BOOLEAN,
 			defaultValue: false,
 		},
+    candidateVotedId: {
+      type: DataTypes.UUID,
+      allowNull: true,
+    },
 		session: {
 			type: DataTypes.UUID,
 			references: {
