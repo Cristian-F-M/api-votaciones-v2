@@ -23,7 +23,7 @@ vote.get('/', verifyToken2, roleRequired(['Candidate', 'Apprentice']), async (re
 	);
 
 	if (!lastVote) {
-		res.json({ ok: false, lastVote })
+		res.status(404).json({ ok: false, message: "No hay votación pendiente" })
 		return
 	}
 
