@@ -278,7 +278,7 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 				attributes: ['id', 'name', 'code'],
 			},
 		],
-		attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'candidateVotedId'],
+		attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'votedCandidateId'],
 	})
 
 	if (!userLogged) {
@@ -286,7 +286,7 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 		return
 	}
 
-	if (userLogged.voted || userLogged.candidateVotedId) {
+	if (userLogged.voted || userLogged.votedCandidateId) {
 		res.status(400).json({ ok: false, message: 'Ya has votado' })
 		return
 	}
@@ -299,7 +299,7 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 	}
 
 	userLogged.voted = true
-  userLogged.candidateVotedId = candidateId
+  userLogged.votedCandidateId = candidateId
 	candidate.votes++
 
 	await userLogged.save()

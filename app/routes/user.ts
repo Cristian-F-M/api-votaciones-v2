@@ -64,6 +64,7 @@ user.get('/', verifyToken2, async (req, res) => {
 			'email',
 			'phone',
 			'voted',
+			'votedCandidateId',
 			'imageUrl',
 		],
 	})
