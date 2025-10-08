@@ -13,4 +13,4 @@ User.belongsTo(Session, { foreignKey: 'session' })
 Vote.belongsTo(User, { foreignKey: 'userId' })
 Candidate.belongsTo(User, { as: 'user', foreignKey: 'userId' })
 
-export { Role, TypeDocument, User, Config, Session, Candidate }
+export { Role, TypeDocument, User, Config, Session, Candidate, Vote }
