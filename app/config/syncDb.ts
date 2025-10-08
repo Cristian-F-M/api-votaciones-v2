@@ -1,15 +1,15 @@
-import sequelize from './database.js'
-import { Role, TypeDocument, User, Config, Candidate } from '@/models/index.js'
+import { Candidate, User, Role, TypeDocument, Config, Session, Vote } from '@/models/index.js'
 
-function setupDb() {
-	sequelize
-		.sync({ force: true })
-		.then(() => {
-			console.log('\nDatabase synced!!!!')
-		})
-		.catch((err) => {
-			console.error('Error syncing database:', err)
-		})
+const models = [Candidate, User, Role, TypeDocument, Config, Session, Vote]
+
+async function setupDb() {
+	try {
+		for (const model of models) {
+			await model.sync({ force: true })
+		}
+	} catch (error) {
+		console.error('Error syncing database:', error)
+	}
 }
 
 setupDb()
