@@ -214,18 +214,17 @@ candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Ap
 	return
 })
 
-candidate.get('/image/:imageName', async (req, res) => {
-	const { imageName } = req.params
+candidate.get('/image/:candidateId', async (req, res) => {
+	const { candidateId } = req.params
 
-	if (!imageName) {
+	const candidate = await Candidate.findByPk(candidateId)
+	const imageUrl = `${imagesUrl}\\user\\${candidate?.imageUrl}`
+
+	if (!candidate || !fs.existsSync(imageUrl)) {
 		return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
 	}
 
-	const imageExists = fs.existsSync(`${imagesUrl}\\user\\${imageName}`)
-
-	if (!imageExists)
-		return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
-	return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
+	return res.sendFile(imageUrl, { root: '.' })
 })
 
 candidate.delete('/:id', verifyToken2, roleRequired('Administrator'),  async (req, res) => {
