@@ -153,8 +153,21 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 			],
 		]
 
+	const roleApprentice = await Role.findOne({
+		where: {
+			code: 'Apprentice',
+		},
+	})
+
+	const cantApprentices = await User.count({
+		where: {
+			role: roleApprentice?.id ?? '',
+		},
+	})
+
 	// Actualizar la votación
 	lastVote.finishVoteInfo = {
+		cantApprentices,
 		totalVotes,
 		cantVotesWinner,
 		candidates: candidatesWinners,
