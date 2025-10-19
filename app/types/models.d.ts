@@ -92,6 +92,7 @@ export interface VoteModel extends BaseModel<VoteModel> {
 	startDate: string
 	endDate: string
 	finishVoteInfo: CreationOptional<{
+		cantApprentices: number
 		totalVotes: number
 		cantVotesWinner: number
 		candidates: CandidateModel[]
