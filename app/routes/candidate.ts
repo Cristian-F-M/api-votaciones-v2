@@ -23,15 +23,13 @@ const upload = multer({ storage })
 const candidate = express.Router()
 const imagesUrl = '.\\app\\assets\\images'
 
-candidate.post('/', verifyToken2, roleRequired('Administrator'),  async (req: Request, res: Response) => {
+candidate.post('/', verifyToken2, roleRequired('Administrator'), async (req: Request, res: Response) => {
 	const { userId: userIdLogged } = req.headers
 
 	const id = Array.isArray(userIdLogged) ? userIdLogged[0] : userIdLogged
 
 	const userLogged = await User.findByPk(id, {
-		include: [
-			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-		],
+		include: [{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] }],
 		attributes: ['id', 'name', 'lastname', 'document', 'email'],
 	})
 
@@ -51,9 +49,7 @@ candidate.post('/', verifyToken2, roleRequired('Administrator'),  async (req: Re
 	const role = await Role.findOne({ where: { code: 'Candidate' } })
 
 	if (!role) {
-		res
-			.status(500)
-			.json({ ok: false, message: 'Ocurrio un error, intentalo de nuevo' })
+		res.status(500).json({ ok: false, message: 'Ocurrio un error, intentalo de nuevo' })
 		return
 	}
 
@@ -69,7 +65,7 @@ candidate.post('/', verifyToken2, roleRequired('Administrator'),  async (req: Re
 candidate.put(
 	'/',
 	verifyToken2,
-  roleRequired(['Apprentice', 'Candidate']),
+	roleRequired(['Apprentice', 'Candidate']),
 	upload.single('image'),
 	updateProfileValidation,
 	validateUser,
@@ -90,20 +86,14 @@ candidate.put(
 			attributes: ['id', 'name', 'lastname', 'document', 'email', 'imageUrl'],
 		})
 		if (!userLogged) {
-			res
-				.status(404)
-				.json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
+			res.status(404).json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
 			return
 		}
 
 		const candidate = await Candidate.findOne({
 			where: { userId: userIdLogged },
 		})
-		const {
-			description,
-			useSameUserImage: sameImage,
-			useForProfileImage: profileImage,
-		} = req.body
+		const { description, useSameUserImage: sameImage, useForProfileImage: profileImage } = req.body
 
 		const useSameUserImage = sameImage ? JSON.parse(sameImage) : false
 		const useForProfileImage = profileImage ? JSON.parse(profileImage) : false
@@ -117,17 +107,14 @@ candidate.put(
 
 		if (useSameUserImage) {
 			if (!userLogged.imageUrl) {
-				res
-					.status(400)
-					.json({ ok: false, message: 'El usuario no tiene imagen' })
+				res.status(400).json({ ok: false, message: 'El usuario no tiene imagen' })
 				return
 			}
 			if (image && fs.existsSync(image.path)) fs.unlinkSync(image.path)
 			candidate.imageUrl = userLogged.imageUrl
 		}
 
-		const imageName =
-			(Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
+		const imageName = (Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
 
 		if (!useSameUserImage) {
 			if (!image || !description) {
@@ -142,14 +129,11 @@ candidate.put(
 			}
 
 			// ! Change this to use req.imageFullName
-			const imageName =
-				(Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
+			const imageName = (Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
 
-			if (candidate.imageUrl !== req.headers.fullFileName)
-				candidate.imageUrl = imageName
+			if (candidate.imageUrl !== req.headers.fullFileName) candidate.imageUrl = imageName
 
-			if (candidate.description !== description)
-				candidate.description = description
+			if (candidate.description !== description) candidate.description = description
 		}
 
 		if (useForProfileImage) {
@@ -160,7 +144,7 @@ candidate.put(
 		candidate.description = description
 		await candidate.save()
 		res.json({ ok: true, message: 'Cambios guardados' })
-	},
+	}
 )
 
 candidate.get('/all', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
@@ -181,9 +165,7 @@ candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Ap
 	const { userId, candidateId } = req.query
 
 	if (!candidateId || typeof candidateId !== 'string') {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Parametro de busqueda incorrecto' })
+		res.status(400).json({ ok: false, message: 'Parametro de busqueda incorrecto' })
 		return
 	}
 
@@ -192,15 +174,7 @@ candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Ap
 			{
 				model: User,
 				as: 'user',
-				attributes: [
-					'id',
-					'name',
-					'lastname',
-					'document',
-					'email',
-					'voted',
-					'imageUrl',
-				],
+				attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl'],
 			},
 		],
 	})
@@ -298,7 +272,7 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 	}
 
 	userLogged.voted = true
-  userLogged.votedCandidateId = candidateId
+	userLogged.votedCandidateId = candidateId
 	candidate.votes++
 
 	await userLogged.save()
