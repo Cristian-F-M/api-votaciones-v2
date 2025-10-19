@@ -162,6 +162,7 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 	lastVote.totalVotes = totalVotes
 	lastVote.cantVotes = cantVotesWinner
 	lastVote.isFinished = true
+	lastVote.endDate = new Date().toISOString()
 
 	await lastVote.save()
 
