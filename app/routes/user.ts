@@ -167,18 +167,17 @@ user.post('/sendNotification', verifyToken2, roleRequired('Administrator'), asyn
 	res.json({ ok: true, message: 'Notificacion enviada' })
 })
 
-user.get('/image/:imageName', async (req, res) => {
-	const { imageName } = req.params
+user.get('/image/:userId', async (req, res) => {
+	const { userId } = req.params
 
-	if (!imageName) {
+	const user = await User.findByPk(userId)
+	const imageUrl = `${imagesUrl}\\user\\${user?.imageUrl}`
+
+	if (!user || !fs.existsSync(imageUrl)) {
 		return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
 	}
 
-	const imageExists = fs.existsSync(`${imagesUrl}\\user\\${imageName}`)
-
-	if (!imageExists)
-		return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
-	return res.sendFile(`${imagesUrl}\\user\\${imageName}`, { root: '.' })
+	return res.sendFile(imageUrl, { root: '.' })
 })
 
 user.put(
