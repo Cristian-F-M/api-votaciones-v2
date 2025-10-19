@@ -1,29 +1,25 @@
-import express from 'express'
-import { roleRequired, verifyToken2 } from '@/middlewares/UserMiddlewares'
-import Vote from '@/models/Vote'
-import User from '@/models/User'
-import Role from '@/models/Role'
-import Candidate from '@/models/Candidate.js'
-import { getRandomNumber } from '@/lib/global.js'
-import TypeDocument from '@/models/TypeDocument'
-import type { CandidateModel } from '@/types/models'
-import { Sequelize } from 'sequelize'
 import sequelize from '@/config/database'
+import { getRandomNumber } from '@/lib/global.js'
+import { roleRequired, verifyToken2 } from '@/middlewares/UserMiddlewares'
+import Candidate from '@/models/Candidate.js'
+import Role from '@/models/Role'
+import TypeDocument from '@/models/TypeDocument'
+import User from '@/models/User'
+import Vote from '@/models/Vote'
+import type { CandidateModel } from '@/types/models'
+import express from 'express'
+import { Sequelize } from 'sequelize'
 
 const vote = express.Router()
 
 vote.get('/', verifyToken2, roleRequired(['Candidate', 'Apprentice']), async (req, res) => {
-
-	const [lastVote] = await sequelize.query(
-		'SELECT * FROM votes WHERE ROWID = (SELECT MAX(ROWID) FROM votes)',
-		{
-			model: Vote,
-			mapToModel: true
-		}
-	);
+	const [lastVote] = await sequelize.query('SELECT * FROM votes WHERE ROWID = (SELECT MAX(ROWID) FROM votes)', {
+		model: Vote,
+		mapToModel: true,
+	})
 
 	if (!lastVote) {
-		res.status(404).json({ ok: false, message: "No hay votación pendiente" })
+		res.status(404).json({ ok: false, message: 'No hay votación pendiente' })
 		return
 	}
 
@@ -34,16 +30,12 @@ vote.post('/', verifyToken2, roleRequired('Administrator'), async (req, res) => 
 	const { userId } = req.headers
 
 	if (!userId || typeof userId !== 'string') {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Parametro de busqueda incorrecto' })
+		res.status(400).json({ ok: false, message: 'Parametro de busqueda incorrecto' })
 		return
 	}
 
 	const user = await User.findByPk(userId, {
-		include: [
-			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-		],
+		include: [{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] }],
 	})
 
 	if (!user) {
@@ -80,9 +72,7 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 
 	// Verificar si el usuario es administrador
 	const user = await User.findByPk(userId, {
-		include: [
-			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-		],
+		include: [{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] }],
 	})
 
 	if (!user) {
@@ -91,8 +81,9 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 	}
 
 	// Obtener la última votación
-	const lastVote = await Vote.findOne({
-		attributes: [[Sequelize.fn('MAX', Sequelize.literal('ROWID')), 'maxRowId']],
+	const [lastVote] = await sequelize.query('SELECT * FROM votes WHERE ROWID = (SELECT MAX(ROWID) FROM votes)', {
+		model: Vote,
+		mapToModel: true,
 	})
 
 	if (!lastVote) {
@@ -101,10 +92,7 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 	}
 
 	// Obtener estadísticas de votos
-	const [totalVotes, cantVotesWinner] = await Promise.all<number>([
-		Candidate.sum('votes'),
-		Candidate.max('votes'),
-	])
+	const [totalVotes, cantVotesWinner] = await Promise.all<number>([Candidate.sum('votes'), Candidate.max('votes')])
 
 	// Obtener candidatos con la mayor cantidad de votos
 	let candidatesWithMaxVotes = await Candidate.findAll({
@@ -120,16 +108,10 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 	})
 
 	// Verificar si hay empate sin voto en blanco
-	const thereIsBlankVote = candidatesWithMaxVotes.some(
-		(c) => c.user.document === '0'
-	)
+	const thereIsBlankVote = candidatesWithMaxVotes.some((c) => c.user.document === '0')
 	const thereIsMoreThanOneCandidate = candidatesWithMaxVotes.length > 1
 
-	if (
-		candidatesWithMaxVotes.length > 1 &&
-		!chooseWinnerRandom &&
-		!thereIsBlankVote
-	) {
+	if (candidatesWithMaxVotes.length > 1 && !chooseWinnerRandom && !thereIsBlankVote) {
 		res.json({
 			ok: false,
 			message: `Hay ${candidatesWithMaxVotes.length} candidatos con la misma cantidad de votos (${cantVotesWinner})`,
@@ -140,18 +122,12 @@ vote.post('/finish', verifyToken2, roleRequired('Administrator'), async (req, re
 
 	// Filtrar el voto en blanco y elegir ganador
 	if (thereIsMoreThanOneCandidate)
-		candidatesWithMaxVotes = candidatesWithMaxVotes.filter(
-			(c) => c.user.document !== '0'
-		)
+		candidatesWithMaxVotes = candidatesWithMaxVotes.filter((c) => c.user.document !== '0')
 
 	let candidatesWinners = candidatesWithMaxVotes
 
 	if (chooseWinnerRandom && thereIsMoreThanOneCandidate)
-		candidatesWinners = [
-			candidatesWithMaxVotes[
-				getRandomNumber(0, candidatesWithMaxVotes.length - 1)
-			],
-		]
+		candidatesWinners = [candidatesWithMaxVotes[getRandomNumber(0, candidatesWithMaxVotes.length - 1)]]
 
 	const roleApprentice = await Role.findOne({
 		where: {
