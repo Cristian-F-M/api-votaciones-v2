@@ -197,14 +197,6 @@ user.put(
 			return
 		}
 
-		if (!fullFileName || typeof fullFileName !== 'string') {
-			res.status(500).json({
-				ok: false,
-				message: 'Ocurrio un error, por favor intente nuvamente',
-			})
-			return
-		}
-
 		const user = await User.findByPk(userId)
 
 		if (!user) {
@@ -219,7 +211,8 @@ user.put(
 		user.lastname = lastname
 		user.phone = phone
 		user.email = email
-		user.imageUrl = fullFileName
+
+		if (req.file) user.imageUrl = fullFileName
 
 		await user.save()
 
