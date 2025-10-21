@@ -29,6 +29,7 @@ const storage = multer.diskStorage({
 
 		// ! Change this to use req.imageFullName
 		req.headers.fullFileName = fullFileName
+		req.body.fullFileName = fullFileName
 		cb(null, fullFileName)
 	},
 })
@@ -188,7 +189,8 @@ user.put(
 	updateProfileValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
-		const { userId, fullFileName } = req.headers
+		const { userId } = req.headers
+		const fullFileName = req.body.fullFileName as string
 
 		if (!userId || typeof userId !== 'string') {
 			res
