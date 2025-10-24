@@ -15,7 +15,7 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
 
 	if (errors.length > 0) {
 		const groupedErrors = groupBy(filterErrors, (err) => err.path)
-		res.status(400).json({ ok: false, errors: groupedErrors })
+		res.status(400).json({ ok: false, errors: groupedErrors, message: "Completa todos los campos" })
 		return
 	}
 
