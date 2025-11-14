@@ -224,7 +224,7 @@ user.put(
 )
 
 user.post(
-	'/findUser',
+	'/find-user',
 	findUserValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
@@ -259,7 +259,7 @@ user.post(
 )
 
 user.post(
-	'/sendPasswordResetCode',
+	'/send-password-reset-code',
 	sendResetCodeValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
@@ -325,7 +325,7 @@ user.post(
 )
 
 user.post(
-	'/verifyPasswordResetCode',
+	'/verify-password-reset-code',
 	verifyPasswordResetCodeValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
@@ -351,7 +351,7 @@ user.post(
 )
 
 user.put(
-	'/updatePassword',
+	'/update-password',
 	updatePasswordValidation,
 	validateUser,
 	async (req: Request, res: Response) => {
