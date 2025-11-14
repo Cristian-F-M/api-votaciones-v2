@@ -96,6 +96,7 @@ export const updatePasswordValidation = [
 		.notEmpty()
 		.withMessage('La nueva contraseña es requerida')
 		.isLength({ min: 8, max: 20 })
+    .withMessage('Password must be between 8 and 20 characters long')
 		.isStrongPassword({
 			minLength: 8,
 			minUppercase: 1,
@@ -104,7 +105,7 @@ export const updatePasswordValidation = [
 			minLowercase: 1,
 		})
 		.withMessage(
-			'Password must be between 8 and 20 characters long and contain at least 1 uppercase letter and 1 symbol',
+			'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 symbol and 1 number',
 		),
 	body('passwordConfirmation')
 		.notEmpty()
