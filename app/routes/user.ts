@@ -15,23 +15,15 @@ import multer from 'multer'
 import { getPasswordResetCode, getSecretEmail } from '@/lib/user'
 import bcrypt from 'bcrypt'
 import pLimit from 'p-limit'
+import { uploadImage } from '@/lib/cloudinary'
+import path from 'node:path'
 
 const user = express.Router()
 const limit = pLimit(6)
 
 const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, 'app/assets/images/user')
-	},
-	filename: (req, file, cb) => {
-		const { userId } = req.headers
-		const fullFileName = `user_${userId}.png`
-
-		// ! Change this to use req.imageFullName
-		req.headers.fullFileName = fullFileName
-		req.body.fullFileName = fullFileName
-		cb(null, fullFileName)
-	},
+	destination: (req, file, cb) => cb(null, 'app/assets/images/profiles'),
+  filename: (req, file, cb) => cb(null, file.originalname)
 })
 const upload = multer({ storage })
 const imagesUrl = '.\\app\\assets\\images'
@@ -190,7 +182,6 @@ user.put(
 	validateUser,
 	async (req: Request, res: Response) => {
 		const { userId } = req.headers
-		const fullFileName = req.body.fullFileName as string
 
 		if (!userId || typeof userId !== 'string') {
 			res
@@ -214,7 +205,23 @@ user.put(
 		user.phone = phone
 		user.email = email
 
-		if (req.file) user.imageUrl = fullFileName
+		if (req.file?.path) {
+      const imagePath =  path.resolve(req.file.path)
+
+      const { ok, result } = await uploadImage(imagePath, {
+        public_id: user.id
+      })
+
+      fs.unlinkSync(imagePath)
+
+      if (!ok) {
+        res.json({ ok: false, message: 'Error subiendo la imagen' })
+        return
+      }
+      
+      // biome-ignore lint/style/noNonNullAssertion: It will be never null
+      user.imageUrl = result!.secure_url
+    }
 
 		await user.save()
 
