@@ -34,7 +34,7 @@ export async function verifyToken2(
 		res.json({
 			ok: false,
 			message: 'You need to be logged in',
-			urlRedirect: 'login/',
+			urlRedirect: '/login',
 		})
 		return
 	}
@@ -53,7 +53,7 @@ export async function verifyToken2(
 		res.json({
 			ok: false,
 			message: 'You need to be logged in',
-			urlRedirect: 'login/',
+			urlRedirect: '/login',
 		})
 		return
 	}
@@ -67,7 +67,7 @@ export async function verifyToken2(
 			res.json({
 				ok: false,
 				message: 'No se encontro la sesión',
-				urlRedirect: 'login/',
+				urlRedirect: '/login',
 			})
 			return
 		}
@@ -75,7 +75,7 @@ export async function verifyToken2(
 		res.status(500).json({
 			ok: false,
 			message: 'Ocurrio un error, intentalo de nuevo',
-			urlRedirect: 'login/',
+			urlRedirect: '/login',
 		})
 		return
 	}
@@ -97,7 +97,7 @@ export async function verifyToken2(
 			res.json({
 				ok: false,
 				message: 'Sessión expirada',
-				urlRedirect: 'login/',
+				urlRedirect: '/login',
 			})
 			return
 		}
@@ -105,7 +105,7 @@ export async function verifyToken2(
 		res.status(500).json({
 			ok: false,
 			message: 'Ocurrio un error, intentalo de nuevo',
-			urlRedirect: 'login/',
+			urlRedirect: '/login',
 		})
 		return
 	}
