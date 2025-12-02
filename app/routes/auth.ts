@@ -359,7 +359,7 @@ auth.post('/Logout', async (req, res) => {
 		user.session = null
 		await user.save()
 		res.clearCookie('token')
-		res.json({ ok: true, message: 'Sesión cerrada', urlRedirect: 'login/' })
+		res.json({ ok: true, message: 'Sesión cerrada', urlRedirect: '/login' })
 	} catch (_) {
 		res
 			.status(500)
