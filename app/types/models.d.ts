@@ -100,3 +100,10 @@ export interface VoteModel extends BaseModel<VoteModel> {
 	isFinished: boolean
 	user: CreationOptional<NonAttribute<UserModel>>
 }
+
+
+export interface ObjectiveModel extends BaseModel<ObjectiveModel> {
+  id: CreationOptional<string>
+  text: string
+  candidateId: ForeignKey<CandidateModel['id']>
+}
