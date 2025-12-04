@@ -1,6 +1,6 @@
-import { Candidate, User, Role, TypeDocument, Config, Session, Vote } from '@/models/index.js'
+import { Candidate, User, Role, TypeDocument, Config, Session, Vote, Objective } from '@/models/index.js'
 
-const models = [Candidate, User, Role, TypeDocument, Config, Session, Vote]
+const models = [Candidate, User, Role, TypeDocument, Config, Session, Vote, Objective]
 
 async function setupDb() {
 	try {
