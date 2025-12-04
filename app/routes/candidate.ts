@@ -4,7 +4,8 @@ import { updateProfileValidation } from '@/validators/candidateValidators'
 import express from 'express'
 import type { Request, Response } from 'express'
 import multer from 'multer'
-import { Candidate, Role, TypeDocument, User } from '../models/index.js'
+import { Candidate, Objective, Role, TypeDocument, User } from '../models/index.js'
+import { Op } from 'sequelize'
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -77,19 +78,30 @@ candidate.get('/all', verifyToken2, roleRequired(['Administrator', 'Candidate', 
 })
 
 candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
-	const { userId, candidateId } = req.query
+	const { candidateId } = req.query
+	const { userId } = req.headers
 
-	if (!candidateId || typeof candidateId !== 'string') {
+	if (candidateId && typeof candidateId !== 'string') {
 		res.status(400).json({ ok: false, message: 'Parametro de busqueda incorrecto' })
 		return
 	}
 
-	const candidate = await Candidate.findByPk(candidateId, {
+	const whereOptions: Record<string, string> = {}
+
+	if (userId) whereOptions.userId = userId as string
+	if (candidateId) whereOptions.id = candidateId
+
+	const candidate = await Candidate.findOne({
+		where: whereOptions,
 		include: [
 			{
 				model: User,
 				as: 'user',
 				attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl'],
+			},
+			{
+				model: Objective,
+				as: 'objectives',
 			},
 		],
 	})
