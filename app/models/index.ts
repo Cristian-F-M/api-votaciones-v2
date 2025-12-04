@@ -5,6 +5,12 @@ import Config from './Config.js'
 import Session from './Session.js'
 import Vote from './Vote.js'
 import Candidate from './Candidate.js'
+import Objective from './Objetives.js'
+
+// TODO: Update all relationships 
+
+Candidate.hasMany(Objective, { foreignKey: 'candidateId', as: 'objectives' })
+Objective.belongsTo(Candidate, { foreignKey: 'candidateId' })
 
 User.belongsTo(Role, { as: 'roleUser', foreignKey: 'role' })
 User.belongsTo(TypeDocument, { as: 'typeDocumentUser', foreignKey: 'typeDocument' })
@@ -13,4 +19,4 @@ User.belongsTo(Session, { foreignKey: 'session' })
 Vote.belongsTo(User, { foreignKey: 'userId' })
 Candidate.belongsTo(User, { as: 'user', foreignKey: 'userId' })
 
-export { Role, TypeDocument, User, Config, Session, Candidate, Vote }
+export { Role, TypeDocument, User, Config, Session, Candidate, Vote, Objective }
