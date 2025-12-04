@@ -1,0 +1,1 @@
+export const TEMP_IMAGE_NAME = 'image_temp.png'
