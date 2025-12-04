@@ -62,91 +62,6 @@ candidate.post('/', verifyToken2, roleRequired('Administrator'), async (req: Req
 	return
 })
 
-candidate.put(
-	'/',
-	verifyToken2,
-	roleRequired(['Apprentice', 'Candidate']),
-	upload.single('image'),
-	updateProfileValidation,
-	validateUser,
-	async (req: Request, res: Response) => {
-		const { userId, fullFileName } = req.headers
-
-		const userIdLogged = Array.isArray(userId) ? userId[0] : userId
-
-		const userLogged = await User.findByPk(userIdLogged, {
-			include: [
-				{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-				{
-					model: TypeDocument,
-					as: 'typeDocumentUser',
-					attributes: ['id', 'name', 'code'],
-				},
-			],
-			attributes: ['id', 'name', 'lastname', 'document', 'email', 'imageUrl'],
-		})
-		if (!userLogged) {
-			res.status(404).json({ ok: false, message: 'Usuario no encontrado', userIdLogged })
-			return
-		}
-
-		const candidate = await Candidate.findOne({
-			where: { userId: userIdLogged },
-		})
-		const { description, useSameUserImage: sameImage, useForProfileImage: profileImage } = req.body
-
-		const useSameUserImage = sameImage ? JSON.parse(sameImage) : false
-		const useForProfileImage = profileImage ? JSON.parse(profileImage) : false
-
-		const image = req.file
-
-		if (!candidate) {
-			res.status(401).json({ ok: false, message: 'Acceso denegado' })
-			return
-		}
-
-		if (useSameUserImage) {
-			if (!userLogged.imageUrl) {
-				res.status(400).json({ ok: false, message: 'El usuario no tiene imagen' })
-				return
-			}
-			if (image && fs.existsSync(image.path)) fs.unlinkSync(image.path)
-			candidate.imageUrl = userLogged.imageUrl
-		}
-
-		const imageName = (Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
-
-		if (!useSameUserImage) {
-			if (!image || !description) {
-				const errors = []
-
-				if (!image) errors.push({ msg: 'Imagen requerida', path: 'image' })
-				if (!description) {
-					errors.push({ msg: 'Descripcion requerida', path: 'description' })
-				}
-				res.status(400).json({ ok: false, message: 'Faltan datos', errors })
-				return
-			}
-
-			// ! Change this to use req.imageFullName
-			const imageName = (Array.isArray(fullFileName) ? fullFileName[0] : fullFileName) || null
-
-			if (candidate.imageUrl !== req.headers.fullFileName) candidate.imageUrl = imageName
-
-			if (candidate.description !== description) candidate.description = description
-		}
-
-		if (useForProfileImage) {
-			userLogged.imageUrl = imageName
-			await userLogged.save()
-		}
-
-		candidate.description = description
-		await candidate.save()
-		res.json({ ok: true, message: 'Cambios guardados' })
-	}
-)
-
 candidate.get('/all', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
 	const candidates = await Candidate.findAll({
 		include: [
@@ -281,5 +196,46 @@ candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, re
 	res.json({ ok: true, message: 'Voto realizado' })
 	return
 })
+
+candidate.put(
+	'/profile',
+	verifyToken2,
+	roleRequired('Candidate'),
+	updateProfileValidation,
+	validateUser,
+	async (req: Request, res: Response) => {
+		const { objectives, description } = req.body as { objectives: { id: string; text: string }[]; description: string }
+
+		const user = await User.findByPk(req.headers.userId as string)
+		// biome-ignore lint/style/noNonNullAssertion: It will be not null
+		const candidate = await Candidate.findOne({ where: { userId: user!.id } })
+
+		if (!candidate) {
+			res.status(404).json({ ok: false, message: 'Candidato no encontrado' })
+			return
+		}
+
+		try {
+			for (const objective of objectives) {
+				await Objective.upsert({ text: objective.text, candidateId: candidate.id })
+			}
+
+			const toDeleteIds = await Objective.findAll({
+				where: { candidateId: candidate.id, id: { [Op.notIn]: objectives.map((objective) => objective.id) } },
+			})
+
+			for (const { id } of toDeleteIds) await Objective.destroy({ where: { id } })
+		} catch (err) {
+			res.status(500).json({ ok: false, message: 'Ocurrio un error, intenta nuevamente' })
+			return
+		}
+
+		candidate.description = description
+		await candidate.save()
+
+		res.json({ ok: true, message: 'Perfil actualizado' })
+		return
+	}
+)
 
 export default candidate
