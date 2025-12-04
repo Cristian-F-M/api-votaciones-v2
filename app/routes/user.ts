@@ -176,7 +176,7 @@ user.get('/image/:userId', async (req, res) => {
 user.put(
 	'/profile',
 	verifyToken2,
-  roleRequired(['Apprentice']),
+	roleRequired(['Apprentice', 'Candidate', 'Administrator']),
 	upload.single('image'),
 	updateProfileValidation,
 	validateUser,
