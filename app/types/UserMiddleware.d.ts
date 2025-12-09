@@ -1,6 +1,3 @@
-export type AllowRoles =
-	| 'User'
-	| 'Apprentice'
-	| 'Administrator'
-	| 'Developer'
-	| 'Candidate'
+import type { ROLES } from '@/constants/database'
+
+export type AllowedRole = keyof typeof ROLES
