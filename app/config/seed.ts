@@ -1,98 +1,49 @@
-import { Role, TypeDocument, Config, User, Candidate } from '@/models/index.js'
+import { Role, TypeDocument, Config, User, Candidate, Profile } from '@/models/index.js'
+import { BLANK_VOTE_USER, CONFIGS, ROLES, TYPES_DOCUMENTS } from '@/constants/database'
 
 async function seedDb() {
-	await TypeDocument.bulkCreate([
+	const typesDocuments = TypeDocument.bulkCreate(Object.values(TYPES_DOCUMENTS))
+	const roles = Role.bulkCreate(Object.values(ROLES))
+	const configs = Config.bulkCreate(Object.values(CONFIGS))
+
+	await Promise.all([typesDocuments, roles, configs])
+
+	const role = await Role.findOne({ where: { code: ROLES.CANDIDATE.code } })
+	const typeDocument = await TypeDocument.findOne({ where: { code: TYPES_DOCUMENTS.CEDULA_CIUDADANIA.code } })
+
+	const users = await User.bulkCreate([
 		{
-			name: 'Cédula de ciudadanía',
-			code: 'CedulaCiudadania',
-			description:
-				'Documento de identidad emitido a los ciudadanos colombianos mayores de 18 años para acreditar su ciudadanía',
-		},
-		{
-			name: 'Tarjeta de identidad',
-			code: 'TarjetaIdentidad',
-			description:
-				'Documento emitido a los ciudadanos colombianos mayores de 7 años para acreditar su identidad',
-		},
-		{
-			name: 'Cédula de extranjería',
-			code: 'CedulaExtranjeria',
-			description:
-				'Documento emitido a los ciudadanos extranjeros para acreditar su ciudadanía',
-		},
-		{
-			name: 'Pasaporte',
-			code: 'Passport',
-			description:
-				'Documento con validez internacional expedido por las autoridades de su respectivo país',
+			// biome-ignore lint/style/noNonNullAssertion: newly created
+			typeDocumentId: typeDocument!.id,
+			document: BLANK_VOTE_USER.document,
+			email: BLANK_VOTE_USER.email,
+			// biome-ignore lint/style/noNonNullAssertion: newly created
+			roleId: role!.id,
+			// biome-ignore lint/style/noNonNullAssertion: I know that this is not null
+			password: BLANK_VOTE_USER.password!,
 		},
 	])
 
-	await Role.bulkCreate([
-		{
-			name: 'Usuario',
-			code: 'User',
-			description: 'Usuario de la aplicación',
-		},
-		{
-			name: 'Aprendiz',
-			code: 'Apprentice',
-			description:
-				'Usuario que se encuentra registrado en el sistema y tiene acceso a las funciones de aprendizaje',
-		},
-		{
-			name: 'Administrador',
-			code: 'Administrator',
-			description:
-				'Usuario que tiene acceso a la administración de la aplicación',
-		},
-		{
-			name: 'Desarrollador',
-			code: 'Developer',
-			description: 'Desarrollador de la aplicación',
-		},
-		{
-			name: 'Candidato',
-			code: 'Candidate',
-			description: 'Usuario candidato a votar',
-		},
-	])
+	const blankVoteUser = users.find(
+		({ document, email }) => BLANK_VOTE_USER.document === document && BLANK_VOTE_USER.email === email
+	)
 
-	await Config.bulkCreate([
-		{
-			name: 'Color',
-			code: 'Color',
-			description: 'Color of the logo and the main texts',
-			value: '#ff6719',
-		},
-	])
+	// biome-ignore lint/style/noNonNullAssertion: newly created
+	const blankVoteUserId = blankVoteUser!.id
 
-	const role = await Role.findOne({ where: { code: 'Candidate' } })
-	const typeDocument = await TypeDocument.findOne({
-		where: { code: 'CedulaCiudadania' },
+	await Profile.create({
+		name: BLANK_VOTE_USER.name,
+		lastname: BLANK_VOTE_USER.lastname,
+		phone: BLANK_VOTE_USER.phone,
+		imageUrl: null,
+		userId: blankVoteUserId,
 	})
 
-	if (role && typeDocument) {
-		await User.bulkCreate([
-			{
-				name: 'Voto en blanco',
-				lastname: '',
-				typeDocument: typeDocument.id,
-				document: '0',
-				phone: '0',
-				email: 'voto@votaciones.com',
-				role: role.id,
-				password: 'Cm123456@',
-				voted: false,
-			},
-		])
-	}
-
-	const whiteVote = await User.findOne({
-		where: { document: 0, phone: 0, email: 'voto@votaciones.com' },
+	await Candidate.create({
+		userId: blankVoteUserId,
+		description: BLANK_VOTE_USER.description,
+		isActive: true,
 	})
-
-	if (whiteVote) await Candidate.create({ userId: whiteVote.id, description: 'Vota en blanco si no estás de acuerdo con ninguno de los candidatos' })
 
 	console.log('Database seeded!!!!')
 }
