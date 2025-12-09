@@ -1,12 +1,39 @@
-import { Candidate, User, Role, TypeDocument, Config, Session, Vote, Objective } from '@/models/index.js'
+import {
+	Candidate,
+	User,
+	Role,
+	TypeDocument,
+	Config,
+	Session,
+	Vote,
+	Objective,
+	PasswordReset,
+	DeviceToken,
+	ShiftType,
+	Election,
+	Profile,
+} from '@/models/index.js'
+import sequelize from '@/config/database'
 
-const models = [Candidate, User, Role, TypeDocument, Config, Session, Vote, Objective]
+;[
+	Config,
+	Profile,
+	Vote,
+	ShiftType,
+	Objective,
+	Candidate,
+	User,
+	Role,
+	TypeDocument,
+	Session,
+	PasswordReset,
+	DeviceToken,
+	Election,
+]
 
 async function setupDb() {
 	try {
-		for (const model of models) {
-			await model.sync({ force: true })
-		}
+		await sequelize.sync({ force: true })
 	} catch (error) {
 		console.error('Error syncing database:', error)
 	}
