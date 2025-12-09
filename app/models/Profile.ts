@@ -1,9 +1,9 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database.js'
 import User from '@/models/User.js'
-import type { Candidate as CandidateModel } from '@/types/models'
+import type { Profile as ProfileModel } from '@/types/models'
 
-const Candidate = sequelize.define<CandidateModel>('Candidate', {
+const Profile = sequelize.define<ProfileModel>('Profile', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
@@ -17,15 +17,22 @@ const Candidate = sequelize.define<CandidateModel>('Candidate', {
 			key: 'id',
 		},
 	},
-	description: {
+	name: {
+		type: DataTypes.STRING,
+		allowNull: false,
+	},
+	lastname: {
+		type: DataTypes.STRING,
+		allowNull: false,
+	},
+	phone: {
+		type: DataTypes.STRING,
+		allowNull: false,
+	},
+	imageUrl: {
 		type: DataTypes.STRING,
 		allowNull: true,
 	},
-	isActive: {
-		type: DataTypes.BOOLEAN,
-		allowNull: false,
-		defaultValue: true,
-	},
 })
 
-export default Candidate
+export default Profile

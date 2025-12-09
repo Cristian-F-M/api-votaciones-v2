@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database.js'
-import type { Role as RoleModel } from '@/types/models'
+import type { ShiftType as ShiftTypeModel } from '@/types/models'
 
-const Role = sequelize.define<RoleModel>('Role', {
+const ShiftType = sequelize.define<ShiftTypeModel>('ShiftType', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
@@ -18,9 +18,16 @@ const Role = sequelize.define<RoleModel>('Role', {
 	},
 	description: {
 		type: DataTypes.STRING,
-		allowNull: true,
-		defaultValue: 'Sin definir',
-	}
+		allowNull: false,
+	},
+	startTime: {
+		type: DataTypes.TIME,
+		allowNull: false,
+	},
+	endTime: {
+		type: DataTypes.TIME,
+		allowNull: false,
+	},
 })
 
-export default Role
+export default ShiftType

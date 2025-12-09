@@ -1,9 +1,9 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database.js'
 import User from '@/models/User.js'
-import type { Candidate as CandidateModel } from '@/types/models'
+import type { DeviceToken as DeviceTokenModel } from '@/types/models'
 
-const Candidate = sequelize.define<CandidateModel>('Candidate', {
+const DeviceToken = sequelize.define<DeviceTokenModel>('DeviceToken', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
@@ -17,9 +17,17 @@ const Candidate = sequelize.define<CandidateModel>('Candidate', {
 			key: 'id',
 		},
 	},
-	description: {
+	token: {
 		type: DataTypes.STRING,
-		allowNull: true,
+		allowNull: false,
+	},
+	deviceType: {
+		type: DataTypes.ENUM('ios', 'android', 'web'),
+		allowNull: false,
+	},
+	lastUsedAt: {
+		type: DataTypes.DATE,
+		allowNull: false,
 	},
 	isActive: {
 		type: DataTypes.BOOLEAN,
@@ -28,4 +36,4 @@ const Candidate = sequelize.define<CandidateModel>('Candidate', {
 	},
 })
 
-export default Candidate
+export default DeviceToken

@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize'
-import sequelize from '@/config/database.js'
-import type { ConfigModel } from '@/types/models'
+import sequelize from '@/config/database'
+import type { Config as ConfigModel } from '@/types/models'
 
 const Config = sequelize.define<ConfigModel>(
 	'Config',
@@ -26,10 +26,7 @@ const Config = sequelize.define<ConfigModel>(
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-	},
-	{
-		timestamps: false,
-	},
+	}
 )
 
 export default Config

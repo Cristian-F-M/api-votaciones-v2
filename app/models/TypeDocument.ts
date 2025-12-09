@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database.js'
-import type { TypeDocumentModel } from '@/types/models'
+import type { TypeDocument as TypeDocumentModel } from '@/types/models'
 
 const TypeDocument = sequelize.define<TypeDocumentModel>(
 	'TypeDocument',
@@ -23,10 +23,7 @@ const TypeDocument = sequelize.define<TypeDocumentModel>(
 			allowNull: true,
 			defaultValue: 'Sin definir',
 		},
-	},
-	{
-		timestamps: false,
-	},
+	}
 )
 
 export default TypeDocument
