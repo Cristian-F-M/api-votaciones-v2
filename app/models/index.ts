@@ -1,22 +1,62 @@
-import Role from './Role.js'
-import TypeDocument from './TypeDocument.js'
-import User from './User.js'
-import Config from './Config.js'
-import Session from './Session.js'
-import Vote from './Vote.js'
-import Candidate from './Candidate.js'
-import Objective from './Objetives.js'
+import Role from '@/models/Role'
+import TypeDocument from '@/models/TypeDocument'
+import User from '@/models/User'
+import Config from '@/models/Config'
+import Session from '@/models/Session'
+import Vote from '@/models/Vote'
+import Candidate from '@/models/Candidate'
+import Objective from '@/models/Objectives'
+import Election from '@/models/Vote'
+import DeviceToken from '@/models/DeviceToken'
+import PasswordReset from '@/models/PasswordReset'
+import ShiftType from '@/models/ShiftType'
+import Profile from '@/models/Profile'
 
-// TODO: Update all relationships 
+Vote.belongsTo(Candidate, { foreignKey: 'candidateId', as: 'candidate' })
+Candidate.hasMany(Vote, { foreignKey: 'candidateId', as: 'votes' })
 
+Objective.belongsTo(Candidate, { foreignKey: 'candidateId', as: 'candidate' })
 Candidate.hasMany(Objective, { foreignKey: 'candidateId', as: 'objectives' })
-Objective.belongsTo(Candidate, { foreignKey: 'candidateId' })
 
-User.belongsTo(Role, { as: 'roleUser', foreignKey: 'role' })
-User.belongsTo(TypeDocument, { as: 'typeDocumentUser', foreignKey: 'typeDocument' })
-Session.hasOne(User, { foreignKey: 'session' })
-User.belongsTo(Session, { foreignKey: 'session' })
-Vote.belongsTo(User, { foreignKey: 'userId' })
-Candidate.belongsTo(User, { as: 'user', foreignKey: 'userId' })
+User.belongsTo(TypeDocument, { foreignKey: 'typeDocumentId', as: 'typeDocument' })
+TypeDocument.hasMany(User, { foreignKey: 'typeDocumentId', as: 'users' })
 
-export { Role, TypeDocument, User, Config, Session, Candidate, Vote, Objective }
+User.hasMany(Vote, { foreignKey: 'userId', as: 'votes' })
+Vote.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+
+Election.hasMany(Vote, { foreignKey: 'electionId', as: 'votes' })
+Vote.belongsTo(Election, { foreignKey: 'electionId', as: 'election' })
+
+User.hasMany(DeviceToken, { foreignKey: 'userId', as: 'deviceTokens' })
+DeviceToken.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+
+User.belongsTo(Role, { foreignKey: 'roleId', as: 'role' })
+Role.hasMany(User, { foreignKey: 'roleId', as: 'users' })
+
+PasswordReset.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+User.hasMany(PasswordReset, { foreignKey: 'userId', as: 'passwordResets' })
+
+User.hasMany(Session, { foreignKey: 'userId', as: 'sessions' })
+Session.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+
+Election.belongsTo(ShiftType, { foreignKey: 'shiftTypeId', as: 'shiftType' })
+ShiftType.hasMany(Election, { foreignKey: 'shiftTypeId', as: 'elections' })
+
+User.hasOne(Profile, { foreignKey: 'userId', as: 'profile' })
+Profile.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+
+export {
+	Role,
+	TypeDocument,
+	User,
+	Config,
+	Session,
+	Candidate,
+	Vote,
+	Objective,
+	PasswordReset,
+	Election,
+	ShiftType,
+	Profile,
+	DeviceToken,
+}
