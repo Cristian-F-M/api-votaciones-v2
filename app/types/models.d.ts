@@ -6,6 +6,7 @@ import type {
 	Model,
 	NonAttribute
 } from 'sequelize'
+import type { ALLOWED_SESSION_TYPE } from '@/types'
 
 type BaseModel<T> = Model<InferAttributes<T>, InferCreationAttributes<T>>
 
@@ -39,7 +40,7 @@ export interface Session extends BaseModel<Session> {
 	token: string
 	expires: Date
 	userId: ForeignKey<User['id']>
-	type: 'mobile' | 'web'
+	type: ALLOWED_SESSION_TYPE
 	user: NonAttribute<User>
 }
 
