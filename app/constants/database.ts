@@ -3,6 +3,11 @@ dotenv.config()
 
 const { CM_PASSWORD } = process.env
 
+export const ALLOWED_SESSION_TYPES = {
+  WEB: 'WEB',
+	MOBILE: 'MOBILE'
+}
+
 export const BLANK_VOTE_USER = {
 	document: '0',
 	email: 'voto@votaciones.com',
