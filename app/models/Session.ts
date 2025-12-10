@@ -2,6 +2,8 @@ import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database.js'
 import type { Session as SessionModel } from '@/types/models'
 import User from '@/models/User'
+import { ALLOWED_SESSION_TYPES } from '@/constants/database'
+
 
 const Session = sequelize.define<SessionModel>('Session', {
 	id: {
@@ -25,7 +27,7 @@ const Session = sequelize.define<SessionModel>('Session', {
 		},
 	},
 	type: {
-		type: DataTypes.ENUM('mobile', 'web'),
+		type: DataTypes.ENUM(...Object.keys(ALLOWED_SESSION_TYPES)),
 		allowNull: false,
 	},
 })
