@@ -8,10 +8,10 @@ import type {
 } from 'sequelize'
 import type { ALLOWED_SESSION_TYPE } from '@/types'
 
-type BaseModel<T> = Model<InferAttributes<T>, InferCreationAttributes<T>>
+type BaseModel<T, K extends keyof T = never> = Model<InferAttributes<T>, InferCreationAttributes<Omit<T, 'id' | K>>>
 
 export interface Candidate extends BaseModel<Candidate> {
-	id: CreationOptional<string>
+	id: string
 	userId: ForeignKey<User['id']>
 	description: CreationOptional<string>
 	isActive: boolean
@@ -19,7 +19,7 @@ export interface Candidate extends BaseModel<Candidate> {
 }
 
 export interface Config extends BaseModel<Config> {
-	id: CreationOptional<string>
+	id: string
 	name: string
 	code: string
 	description: string
@@ -27,16 +27,16 @@ export interface Config extends BaseModel<Config> {
 }
 
 export interface Role extends BaseModel<Role> {
-	id: CreationOptional<string>
+	id: string
 	name: string
 	code: string
 	description: string
 
-  users: NonAttribute<User[]>
+	users: NonAttribute<User[]>
 }
 
 export interface Session extends BaseModel<Session> {
-	id: CreationOptional<string>
+	id: string
 	token: string
 	expires: Date
 	userId: ForeignKey<User['id']>
@@ -45,16 +45,16 @@ export interface Session extends BaseModel<Session> {
 }
 
 export interface TypeDocument extends BaseModel<TypeDocument> {
-	id: CreationOptional<string>
+	id: string
 	name: string
 	code: string
 	description: string
-  
-  users: NonAttribute<User[]>
+
+	users: NonAttribute<User[]>
 }
 
 export interface User extends BaseModel<User> {
-	id: CreationOptional<string>
+	id: string
 	typeDocumentId: ForeignKey<TypeDocument['id']>
 	document: string
 	email: string
@@ -82,7 +82,7 @@ export interface PasswordReset extends BaseModel<PasswordReset> {
 }
 
 export interface DeviceToken extends BaseModel<DeviceToken> {
-	id: CreationOptional<string>
+	id: string
 	userId: ForeignKey<User['id']>
 	token: string
 	deviceType: 'ios' | 'android' | 'web'
@@ -92,7 +92,7 @@ export interface DeviceToken extends BaseModel<DeviceToken> {
 }
 
 export interface Vote extends BaseModel<Vote> {
-	id: CreationOptional<string>
+	id: string
 	userId: ForeignKey<User['id']>
 	candidateId: ForeignKey<Candidate['id']>
 	electionId: ForeignKey<Election['id']>
@@ -102,7 +102,7 @@ export interface Vote extends BaseModel<Vote> {
 }
 
 export interface Election extends BaseModel<Election> {
-	id: CreationOptional<string>
+	id: string
 	apprenticeCount: CreationOptional<number>
 	totalVotes: CreationOptional<number>
 	winnerVoteCount: CreationOptional<number>
@@ -116,14 +116,14 @@ export interface Election extends BaseModel<Election> {
 }
 
 export interface Objective extends BaseModel<Objective> {
-	id: CreationOptional<string>
+	id: string
 	text: string
 	candidateId: ForeignKey<Candidate['id']>
 	candidate: NonAttribute<Candidate>
 }
 
 export interface ShiftType extends BaseModel<ShiftType> {
-	id: CreationOptional<string>
+	id: string
 	name: string
 	code: string
 	description: string
@@ -133,7 +133,7 @@ export interface ShiftType extends BaseModel<ShiftType> {
 }
 
 export interface Profile extends BaseModel<Profile> {
-	id: CreationOptional<string>
+	id: string
 	userId: ForeignKey<User['id']>
 	name: string
 	lastname: string
