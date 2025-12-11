@@ -1,5 +1,7 @@
 export function getSecretEmail(email: string, maxLetter: number) {
 	const [user, dom] = email.split('@')
+  if (!user || !dom) return '****@****'
+
 	const visiblePercent = Math.floor((user.length * 20) / 100) || 2
 	const visibleLetters =
 		visiblePercent <= maxLetter ? visiblePercent : maxLetter
