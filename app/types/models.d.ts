@@ -63,7 +63,7 @@ export interface User extends BaseModel<User> {
 
 	role: NonAttribute<Role>
 	typeDocument: NonAttribute<TypeDocument>
-	session: NonAttribute<Session>
+	sessions: NonAttribute<Session[]>
 	passwordResets: NonAttribute<PasswordReset[]>
 	deviceTokens: NonAttribute<DeviceToken[]>
 	profile: NonAttribute<Profile>
