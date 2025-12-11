@@ -26,6 +26,13 @@ export default function createApp() {
 		}),
 	)
 
+	app.use((req, res, next) => {
+		const SESSION_TYPE = (req.headers['session-type'] ?? '').toUpperCase()
+		req.headers['session-type'] = SESSION_TYPE as ALLOWED_SESSION_TYPE
+
+		next()
+	})
+
 	// ? Hacerlo para las demás rutas
 	app.use('/', auth)
 	app.use('/config', config)
@@ -35,7 +42,7 @@ export default function createApp() {
 	app.use('/candidate', candidate)
 	app.use('/role', role)
 	app.use('/assets', assets)
-  app.use('/reset-password', resetPassword)
+	app.use('/reset-password', resetPassword)
 
 	return app
 }
