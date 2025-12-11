@@ -5,6 +5,7 @@ import { auth, config, typeDocument, user, vote, candidate, role, assets, resetP
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { setToUpperCaseHeader } from './middlewares/global'
+import { globalValidator } from './validators/global'
 
 dotenv.config()
 
@@ -27,6 +28,7 @@ export default function createApp() {
 	)
 
   app.use(setToUpperCaseHeader('session-type'))
+  app.use(globalValidator)
 
 	// ? Hacerlo para las demás rutas
 	app.use('/', auth)
