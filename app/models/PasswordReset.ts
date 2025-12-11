@@ -18,22 +18,25 @@ const PasswordReset = sequelize.define<PasswordResetModel>('PasswordReset', {
 		},
 	},
 	code: {
-		type: DataTypes.STRING,
-		allowNull: false,
+		type: DataTypes.STRING
 	},
 	attempts: {
 		type: DataTypes.INTEGER,
 		allowNull: false,
 		defaultValue: 0,
 	},
+	isActive: {
+		type: DataTypes.BOOLEAN
+	},
+	nextSendAt: {
+		type: DataTypes.DATE
+	},
 	expiresAt: {
-		type: DataTypes.DATE,
-		allowNull: false,
+		type: DataTypes.DATE
 	},
 	usedAt: {
-		type: DataTypes.DATE,
-		allowNull: true,
-	},
+		type: DataTypes.DATE
+	}
 })
 
 export default PasswordReset
