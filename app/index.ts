@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser'
 import { auth, config, typeDocument, user, vote, candidate, role, assets, resetPassword } from '@/routes'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import type { ALLOWED_SESSION_TYPE } from '@/types/'
+import { setToUpperCaseHeader } from './middlewares/global'
 
 dotenv.config()
 
@@ -26,12 +26,7 @@ export default function createApp() {
 		}),
 	)
 
-	app.use((req, res, next) => {
-		const SESSION_TYPE = (req.headers['session-type'] ?? '').toUpperCase()
-		req.headers['session-type'] = SESSION_TYPE as ALLOWED_SESSION_TYPE
-
-		next()
-	})
+  app.use(setToUpperCaseHeader('session-type'))
 
 	// ? Hacerlo para las demás rutas
 	app.use('/', auth)
