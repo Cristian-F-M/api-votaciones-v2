@@ -17,3 +17,11 @@ export function getPasswordResetCode(length: number) {
 	})
 	return characters.join('')
 }
+
+export function getWaitSeconds(attempts: number): number {
+	const waitTimes = [0, 30, 60, 120, 300, 600, 1800, 3600]
+  const index = Math.min(Math.max(0, attempts), waitTimes.length - 1)
+
+	// biome-ignore lint/style/noNonNullAssertion: It will be not undefined 
+	return waitTimes[index]!
+}
