@@ -1,5 +1,5 @@
 import { RESET_PASSWORD_CODE_EXPIRATION_TIME } from '@/constants/auth'
-import { getWaitSeconds } from '@/lib/global'
+import { getWaitSeconds } from '@/lib/user'
 import { getPasswordResetCode, getSecretEmail } from '@/lib/user'
 import { validateRequest } from '@/middlewares/UserMiddlewares'
 import { PasswordReset, TypeDocument, User } from '@/models'
