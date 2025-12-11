@@ -74,9 +74,11 @@ export interface User extends BaseModel<User> {
 export interface PasswordReset extends BaseModel<PasswordReset> {
 	id: string
 	userId: ForeignKey<User['id']>
-	code: string
+	code: string | null
 	attempts: number
-	expiresAt: Date
+  isActive: boolean
+  nextSendAt: Date | null
+	expiresAt: Date | null
 	usedAt: Date | null
 	user: NonAttribute<User>
 }
