@@ -1,406 +1,260 @@
+import { SESSION_EXPIRATION_TIME, TOKEN_EXPIRATION_TIME } from '@/constants/auth'
+import { ROLES } from '@/constants/database'
+import { getCleanedSequelizeErrors } from '@/lib/fields'
+import { sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares'
+import Session from '@/models/Session'
+import { Profile, Role, TypeDocument, User } from '@/models/index.js'
+import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
+import { loginValidation, registerValidation, validatePermissions } from '@/validators/userValidators'
+import bcrypt from 'bcrypt'
 import express from 'express'
 import type { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
-import {
-	loginValidation,
-	registerValidation,
-} from '@/validators/userValidators'
-import { Role, TypeDocument, User } from '@/models/index.js'
-import bcrypt from 'bcrypt'
-import { groupBy } from '@/lib/fields'
-import Session from '@/models/Session'
 import { ValidationError } from 'sequelize'
-import type { UserJWTPaylod } from '@/types/auth'
-import { session_expiration_time } from '@/constants/auth'
 
 const { JWT_SECRET } = process.env
-const auth = express.Router()
+const router = express.Router()
 
-auth.get('/', verifyToken2, async (req, res) => {
-	res.json({
-		message: 'You are logged in',
-		ok: true,
-		urlRedirect: 'apprentice/',
-	})
+
+router.get('/', sessionRequired, async (req: Request, res: Response) => {
+	res.json({ ok: true, urlRedirect: 'apprentice/' })
 })
 
-auth.post(
-	'/Register',
-	registerValidation,
-	validateUser,
-	async (req: Request, res: Response) => {
-		const {
-			name,
-			lastname,
-			typeDocumentCode,
+router.post('/register', validateRequest(registerValidation), async (req: Request, res: Response) => {
+	const { name, lastname, typeDocumentCode, document, phone, email, password, passwordConfirmation } = req.body
+
+	const typeDocument = await TypeDocument.findOne({
+		where: { code: typeDocumentCode }
+	})
+
+	if (!typeDocument) {
+		const typeDocumentErrors = [{ path: 'typeDocumentCode', msg: 'Tipo de documento no valido' }]
+		res.status(400).json({
+			ok: false,
+			message: 'Tipo de documento no valido',
+			errors: {
+				typeDocumentCode: typeDocumentErrors
+			}
+		})
+		return
+	}
+
+	const role = await Role.findOne({
+		where: {
+			code: ROLES.APPRENTICE.code
+		}
+	})
+
+	if (!role) {
+		res.status(400).json({
+			ok: false,
+			message: 'Ocurrio un error creando tu usuario, intentalo nuevamente.'
+		})
+		return
+	}
+
+	if (password !== passwordConfirmation) {
+		const passwordConfirmationError = { path: 'passwordConfirmation', msg: 'Las contraseas deben ser iguales' }
+		res.status(400).json({ ok: false, errors: [passwordConfirmationError] })
+		return
+	}
+
+	try {
+		const user = await User.create({
 			document,
-			phone,
 			email,
-			password,
-		} = req.body
-
-		const typeDocument = await TypeDocument.findOne({
-			where: { code: typeDocumentCode },
+			password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
+			typeDocumentId: typeDocument.id,
+			roleId: role.id
 		})
 
-		if (!typeDocument) {
-			const typeDocumentErrors = [
-				{ path: 'typeDocumentCode', msg: 'Tipo de documento no valido' },
-			]
-			res.status(400).json({
-				ok: false,
-				message: 'Tipo de documento no valido',
-				errors: {
-					typeDocumentCode: typeDocumentErrors,
-				},
-			})
-			return
-		}
-
-		const role = await Role.findOne({ where: { code: 'Apprentice' } })
-
-		if (!role) {
-			res.status(400).json({
-				ok: false,
-				message: 'Ocurrio un error creando tu usuario, intentalo nuevamente.',
-			})
-			return
-		}
-
-		try {
-			await User.create({
-				name,
-				lastname,
-				typeDocument: typeDocument.id,
-				document,
-				phone,
-				email,
-				role: role.id,
-				password: bcrypt.hashSync(password, 10),
-				voted: false,
-			})
-		} catch (err: unknown) {
-			if (!(err instanceof ValidationError)) {
-				res.json({
-					ok: false,
-					message:
-						'Error desconocido. Asegúrate de completar los campos correctamente',
-				})
-				return
-			}
-
-			if (err.errors) {
-				const errors = err.errors
-				const groupedErrors = groupBy(errors, (item) => item.path || '')
-				res.status(400).json({ ok: false, errors: groupedErrors })
-				return
-			}
-			res
-				.status(400)
-				.json({ message: 'An error has occurred, please try again', ok: false })
-		}
-
-		res.json({ message: 'Registered', ok: true, urlRedirect: 'login' })
-	},
-)
-
-auth.post(
-	'/Login',
-	loginValidation,
-	validateUser,
-	async (req: Request, res: Response) => {
-		const { typeDocumentCode, document, password, remember } = req.body
-		const typeDocument = await TypeDocument.findOne({
-			where: { code: typeDocumentCode },
+		const profile = await Profile.create({
+			lastname,
+			name,
+			phone,
+			userId: user.id
 		})
-
-		if (!typeDocument) {
-			const typeDocumentErrors = [
-				{ path: 'typeDocumentCode', msg: 'Tipo de documento no valido' },
-			]
-			res.status(400).json({
-				ok: false,
-				message: 'Tipo de documento no valido',
-				errors: {
-					typeDocumentCode: typeDocumentErrors,
-				},
-			})
-			return
-		}
-
-		const user = await User.findOne({
-			where: { typeDocument: typeDocument.id, document },
-			include: [
-				{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-				{
-					model: TypeDocument,
-					as: 'typeDocumentUser',
-					attributes: ['id', 'name', 'code'],
-				},
-			],
-		})
-
-		if (!user) {
-			res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
-			return
-		}
-
-		if (!bcrypt.compareSync(password, user.password)) {
-			res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
-			return
-		}
-
-		try {
-			if (!JWT_SECRET) throw new Error('JWT_SECRET not found')
-
-			const token = jwt.sign(
-				{
-					id: user.id,
-					name: user.name,
-					lastname: user.lastname,
-					email: user.email,
-				},
-				JWT_SECRET,
-			)
-			const session = await Session.create({
-				token,
-				expires: new Date(Date.now() + session_expiration_time * 1000).toISOString(),
-			})
-
-			user.session = session.id
-			await user.save()
-
-			const isMobile = req.get('User-Agent') === 'mobile'
-			let urlRedirect = 'apprentice/'
-
-			if (user.roleUser.code === 'Administrator') urlRedirect = 'administrator/'
-
-			const tokenToSend = isMobile ? token : null
-
-			if (remember === 'true') {
-				res.cookie('token', token, {
-					secure: true,
-					httpOnly: true,
-					sameSite: 'none',
-					maxAge: session_expiration_time * 1000,
-				})
-			}
-
+	} catch (err) {
+		if (!(err instanceof ValidationError)) {
 			res.json({
-				message: 'Now you are logged in',
-				ok: true,
-				token: tokenToSend,
-				urlRedirect,
-			})
-		} catch (err) {
-			console.log(err)
-			res
-				.status(401)
-				.json({ message: 'An error has occurred, please try again', ok: false })
-		}
-	},
-)
-
-auth.post('/LoginBiometrics', async (req, res) => {
-	const { tokenBiometrics } = req.body
-
-	const isMobile = req.get('User-Agent') === 'mobile'
-
-	if (!JWT_SECRET) {
-		res.json({
-			ok: false,
-			message: 'Ocurrio un error, por favor ingrese de nuevo',
-		})
-		return
-	}
-
-	if (tokenBiometrics == null) {
-		res.json({
-			message: 'Ocurrio un error, por favor ingrese con su contraseña',
-			ok: false,
-		})
-		return
-	}
-
-	let verifyResult = null
-
-	try {
-		verifyResult = jwt.verify(tokenBiometrics, JWT_SECRET) as UserJWTPaylod
-	} catch (_) {
-		res.json({
-			message: 'Tu sesión expiro, por favor ingresa de nuevo',
-			ok: false,
-		})
-		return
-	}
-
-	const { id } = verifyResult
-	let user = null
-
-	try {
-		user = await User.findByPk(id, {
-			include: [
-				{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-				{
-					model: TypeDocument,
-					as: 'typeDocumentUser',
-					attributes: ['id', 'name', 'code'],
-				},
-			],
-		})
-		if (!user || user.session == null) {
-			res.json({
-				message: 'Por favor ingrese con su contraseña',
 				ok: false,
+				message: 'Ocurrio un error, asegúrate de completar los campos correctamente'
 			})
 			return
 		}
-	} catch {
-		res.json({
-			message: 'Por favor ingrese con su contraseña',
+
+		if (err.errors) {
+			const errors = getCleanedSequelizeErrors(err)
+			res.status(400).json({ ok: false, errors })
+			return
+		}
+		res.status(400).json({ message: 'Un error a ocurrido, por favor intenta más tarde...', ok: false })
+	}
+	res.json({ message: 'Registered', ok: true, urlRedirect: 'login' })
+})
+
+router.post('/login', validateRequest(loginValidation), async (req: Request, res: Response) => {
+	const { typeDocumentCode, document, password, remember } = req.body
+	const { 'session-type': sessionType } = req.headers
+
+	const typeDocument = await TypeDocument.findOne({
+		where: {
+			code: typeDocumentCode
+		}
+	})
+
+	if (!typeDocument) {
+		const typeDocumentError = { path: 'typeDocumentCode', msg: 'Tipo de documento no valido' }
+		res.status(400).json({
 			ok: false,
+			message: 'Tipo de documento no valido',
+			errors: {
+				typeDocumentCode: [typeDocumentError]
+			}
 		})
 		return
 	}
 
-	let newToken = null
-
-	try {
-		newToken = jwt.sign(
+	const user = await User.findOne({
+		where: {
+			typeDocumentId: typeDocument.id,
+			document: document
+		},
+		include: [
 			{
-				id: user.id,
-				name: user.name,
-				lastname: user.lastname,
-				email: user.email,
-			},
-			JWT_SECRET,
-		)
-	} catch (_) {
-		res.json({ ok: false, message: 'Ocurrio un error, intenta de nuevo' })
+				model: Role,
+				as: 'role'
+			}
+		]
+	})
+
+	if (!user || !bcrypt.compareSync(password, user.password)) {
+		res.status(401).json({ message: 'Credenciales incorrectas', ok: false })
+		return
+	}
+
+	const tokenDuration = remember === 'true' ? SESSION_EXPIRATION_TIME : TOKEN_EXPIRATION_TIME
+	const sessionExpirationDate = new Date(new Date().getTime() + tokenDuration * 1000)
+
+	let jwtToken: null | string = null
+	const jwtUserPayload: UserJWTPaylod = {
+		id: user.id,
+		email: user.email,
+		typeDocumentId: user.typeDocumentId
+	}
+
+	try {
+		if (!JWT_SECRET) throw new Error('Ocurrio un error procesando la solicitud, intenta más tarde')
+
+		jwtToken = jwt.sign(jwtUserPayload, JWT_SECRET, {
+			expiresIn: tokenDuration
+		})
+
+		// biome-ignore lint/suspicious/noExplicitAny: It doesn't matter
+	} catch (err: any) {
+		res.status(500).json({ ok: false, message: err.message })
 		return
 	}
 
 	try {
-		const session = await Session.findOne({ where: { id: user.session } })
+		const [session, created] = await Session.findOrCreate({
+			where: {
+				type: sessionType,
+				userId: user.id
+			},
+			defaults: {
+				token: jwtToken,
+				type: sessionType,
+				userId: user.id,
+				expires: sessionExpirationDate
+			}
+		})
 
-		if (session) {
-			session.token = newToken
-			session.expires = new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString()
-			await session.save()
-		}
-
-		if (!session) {
-			const newSession = await Session.create({
-				token: newToken,
-				expires: new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString(),
+		if (!created) {
+			session.update({
+				token: jwtToken,
+				expires: sessionExpirationDate
 			})
-
-			user.session = newSession.id
-			await user.save()
 		}
-	} catch (_) {
-		res.json({
+	} catch (err) {
+		console.log(err)
+		res.json({ ok: false, message: 'Ocurrio un error, por favor intenta nuevamente' })
+		return
+	}
+
+	let urlRedirect = '/apprentice'
+	if (user.role.code === ROLES.ADMINISTRATOR.code) urlRedirect = '/administrator'
+
+	const tokenToSend = sessionType === 'MOBILE' && jwtToken
+
+	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend })
+})
+
+router.post('/login-biometrics', sessionRequired, async (req: Request, res: Response) => {
+	const { 'session-type': sessionType } = req.headers
+	const user = (req as RequestWithUser).user
+
+	if (sessionType !== 'MOBILE') {
+		res.status(400).json({
 			ok: false,
-			message: 'Ocurrio un error al guardar la sesión, intenta de nuevo',
+			messages: 'Iniciar sesión con datos biometricos solo está disponible en la aplicación móvil.'
 		})
 		return
 	}
+
+	const currentSession = user.sessions.find((s) => s.type === 'MOBILE')
 
 	let urlRedirect = 'apprentice/'
-	if (user.roleUser.code === 'Administrator') urlRedirect = 'administrator/'
+	if (user.role.code === ROLES.ADMINISTRATOR.code) urlRedirect = 'administrator/'
 
-	const tokenToSend = isMobile ? newToken : null
+	// biome-ignore lint/style/noNonNullAssertion: It will be defined
+	const tokenToSend = sessionType === 'MOBILE' && currentSession!.token
 
-	res.json({
-		message: 'Now you are logged in',
-		ok: true,
-		token: tokenToSend,
-		urlRedirect,
-	})
+	res.json({ message: 'Has iniciado sessión correctamente', ok: true, token: tokenToSend, urlRedirect })
 })
 
-auth.post('/Logout', async (req, res) => {
-	const { token } = req.cookies
+router.post('/logout', sessionRequired, async (req: Request, res: Response) => {
+	const { 'session-type': sessionType } = req.headers
+	const user = (req as RequestWithUser).user
 
-	if (!JWT_SECRET) {
-		res
-			.status(500)
-			.json({ ok: false, message: 'Ocurrio un error al cerrar sesión' })
-		return
-	}
-
-	let verifyResult = null
+	const currentSession = user.sessions.find((s) => s.type === sessionType && s.userId === user.id)
 
 	try {
-		verifyResult = jwt.verify(token, JWT_SECRET) as UserJWTPaylod
-	} catch (_) {
-		res.status(498).json({
-			ok: false,
-			message: 'No hay sesión activa',
-			urlRedirect: 'login/',
-		})
+		// biome-ignore lint/style/noNonNullAssertion: It will be define
+		await currentSession!.destroy()
+
+		res.clearCookie('token')
+		res.json({ ok: true, message: 'Sesión cerrada correctamente', urlRedirect: '/login' })
+	} catch (err) {
+		res.json({ ok: false, message: 'Ocurrio un error cerrando la sesión, porfavor intenta más tarde' })
 		return
 	}
+})
 
-	try {
-		const session = await Session.findOne({ where: { token } })
-		const user = await User.findByPk(verifyResult.id)
+router.post(
+	'validate-permissions',
+	validateRequest(validatePermissions),
+	sessionRequired,
+	async (req: Request, res: Response) => {
+		const roles = req.body.roles as string[]
+		const user = (req as RequestWithUser).user
 
-		if (!session || !user) {
-			res.status(498).json({
+		if (!roles.includes(user.role.code)) {
+			res.status(401).json({
 				ok: false,
-				message: 'No hay sesión activa',
-				urlRedirect: 'login/',
+				message: 'No tienes permisos para acceder a esta página'
 			})
 			return
 		}
 
-		user.session = null
-		await user.save()
-		res.clearCookie('token')
-		res.json({ ok: true, message: 'Sesión cerrada', urlRedirect: '/login' })
-	} catch (_) {
-		res
-			.status(500)
-			.json({ ok: false, message: 'Ocurrio un error al cerrar la sesión' })
-		return
-	}
-})
-
-
-auth.post('/validate-permissions', verifyToken2, async (req, res) => {
-	const { roles } = req.body
-	const { userId } = req.headers
-
-	if (!roles || !Array.isArray(roles) || (!userId || typeof userId !== 'string')) {
-		res.status(401).json({
-			ok: false,
-			message: 'Acceso denegado',
+		res.status(200).json({
+			ok: true,
+			message: 'Acceso permitido'
 		})
+
 		return
 	}
-
-	const user = await User.findByPk(userId, {
-		include: [
-			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-		],
-	})
-
-	if (!user || !roles.includes(user.roleUser.code)) {
-		res.status(401).json({
-			ok: false,
-			message: 'Acceso denegado',
-		})
-		return
-	}
+)
 
 
-	res.status(200).json({
-		ok: true,
-		message: 'Acceso permitido',
-	})
-	return
-})
-
-export default auth
+export default router
