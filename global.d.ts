@@ -4,6 +4,6 @@ import type { ALLOWED_SESSION_TYPE } from '@/types'
 
 declare module 'http' {
 	interface IncomingHttpHeaders {
-		'Session-Type': ALLOWED_SESSION_TYPE
+		'session-type': ALLOWED_SESSION_TYPE
 	}
 }
