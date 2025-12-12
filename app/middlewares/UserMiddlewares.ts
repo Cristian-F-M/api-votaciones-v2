@@ -49,7 +49,7 @@ export function roleRequired(role: '*' | AllowedRole | AllowedRole[]) {
 
 		const isAllowed =
 			role === '*' ||
-			(Array.isArray(role) ? role.includes(user.role.code as AllowedRole) : ROLES[role].code === user.role.code)
+			(Array.isArray(role) ? role.some((r) => ROLES[r].code === user.role.code) : ROLES[role].code === user.role.code)
 
 		if (!isAllowed) {
 			res.status(401).json(notAllowedData)
