@@ -27,7 +27,7 @@ const DeviceToken = sequelize.define<DeviceTokenModel>('DeviceToken', {
 	},
 	lastUsedAt: {
 		type: DataTypes.DATE,
-		allowNull: false,
+		allowNull: true,
 	},
 	isActive: {
 		type: DataTypes.BOOLEAN,
