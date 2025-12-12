@@ -1,5 +1,6 @@
 import { Role, TypeDocument, Config, User, Candidate, Profile } from '@/models/index.js'
 import { BLANK_VOTE_USER, CONFIGS, ROLES, TYPES_DOCUMENTS } from '@/constants/database'
+import bcrypt from 'bcrypt'
 
 async function seedDb() {
 	const typesDocuments = TypeDocument.bulkCreate(Object.values(TYPES_DOCUMENTS))
@@ -20,7 +21,7 @@ async function seedDb() {
 			// biome-ignore lint/style/noNonNullAssertion: newly created
 			roleId: role!.id,
 			// biome-ignore lint/style/noNonNullAssertion: I know that this is not null
-			password: BLANK_VOTE_USER.password!,
+			password: bcrypt.hashSync(BLANK_VOTE_USER.password!, bcrypt.genSaltSync()),
 		},
 	])
 
