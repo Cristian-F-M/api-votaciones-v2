@@ -70,6 +70,7 @@ export interface User extends BaseModel<User> {
 	profile: NonAttribute<Profile>
 	votes: NonAttribute<Vote[]>
 	candidate?: NonAttribute<Candidate>
+  shiftType: NonAttribute<ShiftType>
 }
 
 export interface PasswordReset extends BaseModel<PasswordReset> {
@@ -133,6 +134,7 @@ export interface ShiftType extends BaseModel<ShiftType> {
 	startTime: Date
 	endTime: Date
 	elections: NonAttribute<Election[]>
+  users: NonAttribute<User[]>
 }
 
 export interface Profile extends BaseModel<Profile> {
