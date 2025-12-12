@@ -104,7 +104,7 @@ router.post(
 		const passwordResetCode = getPasswordResetCode(6)
 		const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
 
-		passwordReset.update({
+		await passwordReset.update({
 			nextSendAt,
 			attempts: passwordReset.attempts + 1,
 			code: passwordResetCode,
@@ -194,14 +194,15 @@ router.patch('/update-password', validateRequest(updatePasswordValidation), asyn
 		return
 	}
 
-	user.update({
-		password: bcryp.hashSync(password, bcryp.genSaltSync())
-	})
-
-	passwordReset.update({
-		isActive: false,
-		usedAt: new Date()
-	})
+	await Promise.all([
+		user.update({
+			password: bcryp.hashSync(password, bcryp.genSaltSync())
+		}),
+		passwordReset.update({
+			isActive: false,
+			usedAt: new Date()
+		})
+	])
 
 	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlReturn: 'login/' })
 })
