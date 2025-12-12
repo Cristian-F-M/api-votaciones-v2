@@ -1,164 +1,120 @@
-import { validationResult } from 'express-validator'
-import type { Result, ValidationError } from 'express-validator'
-import { groupBy } from '../lib/fields.js'
-import jwt from 'jsonwebtoken'
-import { Role, Session, User } from '@/models/index'
+import { groupBy } from '@/lib/fields.js'
+import { DeviceToken, PasswordReset, Profile, Role, Session, TypeDocument, User, Vote } from '@/models/index'
+import type { AllowedRole } from '@/types/UserMiddleware'
+import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
+import type { ALLOWED_SESSION_TYPE } from '@/types/index'
 import type { NextFunction, Request, Response } from 'express'
-import type { UserJWTPaylod } from '@/types/auth'
-import type { AllowRoles } from '@/types/UserMiddleware'
+import { type ValidationChain, validationResult } from 'express-validator'
+import * as jwt from 'jsonwebtoken'
 
 const { JWT_SECRET } = process.env
 
-export function validateUser(req: Request, res: Response, next: NextFunction) {
-	const errors = validationResult(req).array()
-	const filterErrors = errors.filter((item) => item.type === 'field')
+export function validateRequest(middlewares: ValidationChain[]) {
+	return async function middleware(req: Request, res: Response, next: NextFunction) {
+		for (const m of middlewares) m(req, res, () => {})
 
-	if (errors.length > 0) {
+		await new Promise((r) => setTimeout(r, 0))
+
+		const errors = validationResult(req).array()
+		const filterErrors = errors.filter((item) => item.type === 'field')
+
+		if (errors.length === 0) return next()
+
 		const groupedErrors = groupBy(filterErrors, (err) => err.path)
-		res.status(400).json({ ok: false, errors: groupedErrors, message: "Completa todos los campos" })
+		res.status(400).json({ ok: false, errors: groupedErrors, message: 'Completa todos los campos' })
 		return
 	}
-
-	next()
 }
 
-export async function verifyToken2(
-	req: Request,
-	res: Response,
-	next: NextFunction
-) {
-	const { token } = req.cookies
-	let verifyResult = null
+/**
+ * Use it after {@link sessionRequired} middleware
+ */
+export function roleRequired(role: '*' | AllowedRole | AllowedRole[]) {
+	// TODO -> modificar la función para acceptar el comodin `*`
+	const fn = (req: Request, res: Response, next: NextFunction) => {
+		const notAllowedData = { ok: false, message: 'No tienes permiso para acceder a esta ruta' }
 
-	if (!token) {
-		res.json({
-			ok: false,
-			message: 'You need to be logged in',
-			urlRedirect: '/login',
-		})
-		return
-	}
-
-	if (!JWT_SECRET) {
-		res.status(500).json({
-			ok: false,
-			message: 'Ocurrio un error verificando la sesión',
-		})
-		return
-	}
-
-	try {
-		verifyResult = jwt.verify(token, JWT_SECRET) as UserJWTPaylod
-	} catch (err) {
-		res.json({
-			ok: false,
-			message: 'You need to be logged in',
-			urlRedirect: '/login',
-		})
-		return
-	}
-
-	let user = null
-
-	try {
-		user = await User.findByPk(verifyResult.id)
-
-		if (!user || !user.session) {
-			res.json({
-				ok: false,
-				message: 'No se encontro la sesión',
-				urlRedirect: '/login',
-			})
-			return
-		}
-	} catch (_) {
-		res.status(500).json({
-			ok: false,
-			message: 'Ocurrio un error, intentalo de nuevo',
-			urlRedirect: '/login',
-		})
-		return
-	}
-
-	try {
-		const session = await Session.findOne({ where: { id: user.session } })
-
-		if (!session) {
-			res.json({
-				ok: false,
-				message: 'No se encontro la sesión',
-				urlRedirect: 'login/',
-			})
+		if ((!role || (role ?? []).length === 0) && role !== '*') {
+			res.status(401).json(notAllowedData)
 			return
 		}
 
-		const sessionExpiredDate = new Date(session.expires)
-		if (new Date() > sessionExpiredDate) {
-			res.json({
-				ok: false,
-				message: 'Sessión expirada',
-				urlRedirect: '/login',
-			})
-			return
-		}
-	} catch (_) {
-		res.status(500).json({
-			ok: false,
-			message: 'Ocurrio un error, intentalo de nuevo',
-			urlRedirect: '/login',
-		})
-		return
-	}
-
-	// ! Change this to req.userId !
-	req.headers.userId = verifyResult.id
-	next()
-}
-
-export function roleRequired(roleCode: AllowRoles | AllowRoles[]) {
-	return async (req: Request, res: Response, next: NextFunction) => {
-		const { userId } = req.headers
-
-		if (!roleCode || typeof userId !== 'string') {
-			res.status(401).json({
-				ok: false,
-				message: 'Acceso denegado',
-				urlRedirect: 'access-denied/',
-			})
-			return
-		}
-		const user = await User.findByPk(userId, {
-			include: [
-				{
-					model: Role,
-					as: 'roleUser',
-				},
-			],
-		})
+		const user = (req as RequestWithUser).user
 
 		if (!user) {
-			res.status(401).json({
-				ok: false,
-				message: 'Acceso denegado',
-				urlRedirect: 'access-denied/',
-			})
+			res.status(401).json(notAllowedData)
 			return
 		}
 
-		const userCodeRole = user.roleUser.code as AllowRoles
+		let isAllowed = false
 
-		const isAllowed = Array.isArray(roleCode)
-			? roleCode.includes(userCodeRole)
-			: roleCode === userCodeRole
+		if (role === '*') isAllowed = true
+		else isAllowed = Array.isArray(role) ? role.includes(user.role.code as AllowedRole) : role === user.role.code
 
-		if (!user || !isAllowed) {
-			res.status(401).json({
-				ok: false,
-				message: 'Acceso denegado',
-				urlRedirect: 'access-denied/',
-			})
+		if (!isAllowed) {
+			res.status(401).json(notAllowedData)
 			return
 		}
+
 		next()
 	}
+
+	return fn
+}
+
+export async function sessionRequired(req: Request, res: Response, next: NextFunction) {
+	const { token: userToken } = req.cookies
+	const { 'session-type': sessionType } = req.headers
+
+	const SESSION_TYPE = sessionType.toUpperCase() as ALLOWED_SESSION_TYPE
+
+	const needLoginData = { ok: false, message: 'Debes iniciar sesión para acceder al aplicativo', urlRedirect: '/login' }
+
+	if (!userToken || !JWT_SECRET) {
+		res.status(404).json(needLoginData)
+		return
+	}
+
+	let JWTResult: null | UserJWTPaylod = null
+
+	try {
+		JWTResult = jwt.verify(userToken, JWT_SECRET) as UserJWTPaylod
+	} catch {
+		res.status(401).json(needLoginData)
+		return
+	}
+
+	const user = await User.findByPk(JWTResult.id, {
+		include: [
+			{ model: TypeDocument, as: 'typeDocument' },
+			{ model: Role, as: 'role' },
+			{ model: Profile, as: 'profile' },
+			{ model: Session, as: 'sessions' },
+			{ model: PasswordReset, as: 'passwordResets' },
+			{ model: DeviceToken, as: 'deviceTokens' },
+			{ model: Vote, as: 'votes' }
+		]
+	})
+
+	const session = await Session.findOne({
+		where: {
+			userId: JWTResult.id,
+			type: SESSION_TYPE
+		}
+	})
+
+	if (!user) {
+		res
+			.status(404)
+			.json({ ok: false, message: 'Usuario no encontrado, por favor registrate primero', urlRedirect: '/register' })
+		return
+	}
+
+	if (!session || new Date() > session.expires) {
+		res.status(401).json(needLoginData)
+		return
+	}
+	req.headers['session-type'] = SESSION_TYPE
+	;(req as RequestWithUser).user = user
+	next()
 }
