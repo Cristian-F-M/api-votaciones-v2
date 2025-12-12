@@ -1,9 +1,9 @@
-import express from 'express'
+import { auth, candidate, config, resetPassword, role, typeDocument, user, vote } from '@/routes'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
-import { auth, config, typeDocument, user, vote, candidate, role, assets, resetPassword } from '@/routes'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import express from 'express'
 import { setToUpperCaseHeader } from './middlewares/global'
 import { globalValidator } from './validators/global'
 
@@ -23,12 +23,12 @@ export default function createApp() {
 	app.use(
 		cors({
 			origin: ALLOWED_ORIGINS,
-			credentials: true,
-		}),
+			credentials: true
+		})
 	)
 
-  app.use(setToUpperCaseHeader('session-type'))
-  app.use(globalValidator)
+	app.use(setToUpperCaseHeader('session-type'))
+	app.use(globalValidator)
 
 	// ? Hacerlo para las demás rutas
 	app.use('/', auth)
@@ -38,7 +38,6 @@ export default function createApp() {
 	app.use('/vote', vote)
 	app.use('/candidate', candidate)
 	app.use('/role', role)
-	app.use('/assets', assets)
 	app.use('/reset-password', resetPassword)
 
 	return app
