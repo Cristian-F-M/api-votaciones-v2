@@ -171,7 +171,7 @@ router.post('/login', validateRequest(loginValidation), async (req: Request, res
 		})
 
 		if (!created) {
-			session.update({
+			await session.update({
 				token: jwtToken,
 				expires: sessionExpirationDate
 			})
