@@ -3,8 +3,9 @@ import { ROLES } from '@/constants/database'
 import { getCleanedSequelizeErrors } from '@/lib/fields'
 import { sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares'
 import Session from '@/models/Session'
-import { Profile, Role, TypeDocument, User } from '@/models/index.js'
+import { Profile, Role, ShiftType, TypeDocument, User } from '@/models/index.js'
 import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
+import type { Role as RoleModel, ShiftType as ShiftTypeModel, TypeDocument as TypeDocumentModel } from '@/types/models'
 import { loginValidation, registerValidation, validatePermissions } from '@/validators/userValidators'
 import bcrypt from 'bcrypt'
 import express from 'express'
@@ -15,35 +16,61 @@ import { ValidationError } from 'sequelize'
 const { JWT_SECRET } = process.env
 const router = express.Router()
 
-
 router.get('/', sessionRequired, async (req: Request, res: Response) => {
 	res.json({ ok: true, urlRedirect: 'apprentice/' })
 })
 
 router.post('/register', validateRequest(registerValidation), async (req: Request, res: Response) => {
-	const { name, lastname, typeDocumentCode, document, phone, email, password, passwordConfirmation } = req.body
+	const { name, lastname, typeDocumentCode, document, phone, email, shiftTypeCode, password, passwordConfirmation } =
+		req.body
 
-	const typeDocument = await TypeDocument.findOne({
+	type Models<T> = Promise<T | null> | T | null
+
+	let [typeDocument, role, shiftType]: [Models<TypeDocumentModel>, Models<RoleModel>, Models<ShiftTypeModel>] = [
+		null,
+		null,
+		null
+	]
+
+	typeDocument = TypeDocument.findOne({
 		where: { code: typeDocumentCode }
 	})
 
-	if (!typeDocument) {
-		const typeDocumentErrors = [{ path: 'typeDocumentCode', msg: 'Tipo de documento no valido' }]
-		res.status(400).json({
-			ok: false,
-			message: 'Tipo de documento no valido',
-			errors: {
-				typeDocumentCode: typeDocumentErrors
-			}
-		})
-		return
-	}
-
-	const role = await Role.findOne({
+	role = Role.findOne({
 		where: {
 			code: ROLES.APPRENTICE.code
 		}
 	})
+
+	shiftType = ShiftType.findOne({
+		where: {
+			code: shiftTypeCode
+		}
+	})
+
+	try {
+		;[typeDocument, role, shiftType] = await Promise.all([typeDocument, role, shiftType])
+	} catch (err) {
+		console.log(err)
+		res
+			.status(500)
+			.json({ ok: false, message: 'Ocurrio un error creando el usuario, por favor intentalo nuevamente...' })
+		return
+	}
+
+	const errors = []
+
+	if (!typeDocument) errors.push({ typeDocumentCode: { path: 'typeDocumentCode', msg: 'Tipo de documento no valido' } })
+	if (!shiftType) errors.push({ shiftTypeCode: { path: 'shiftTypeCode', msg: 'Jornada no valida' } })
+
+	if (!typeDocument || !shiftType || errors.length > 1) {
+		res.status(400).json({
+			ok: false,
+			message: 'Campos no válidos',
+			errors: errors
+		})
+		return
+	}
 
 	if (!role) {
 		res.status(400).json({
@@ -65,7 +92,8 @@ router.post('/register', validateRequest(registerValidation), async (req: Reques
 			email,
 			password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
 			typeDocumentId: typeDocument.id,
-			roleId: role.id
+			roleId: role.id,
+			shiftType: shiftType.id
 		})
 
 		const profile = await Profile.create({
@@ -187,7 +215,7 @@ router.post('/login', validateRequest(loginValidation), async (req: Request, res
 
 	const tokenToSend = sessionType === 'MOBILE' && jwtToken
 
-	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend })
+	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend, r: jwtToken })
 })
 
 router.post('/login-biometrics', sessionRequired, async (req: Request, res: Response) => {
@@ -255,6 +283,5 @@ router.post(
 		return
 	}
 )
-
 
 export default router
