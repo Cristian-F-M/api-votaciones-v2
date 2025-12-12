@@ -48,6 +48,9 @@ Profile.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 Candidate.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 User.hasOne(Candidate, { foreignKey: 'userId', as: 'candidate' })
 
+User.belongsTo(ShiftType, { foreignKey: 'shiftTypeId', as: 'shift' })
+ShiftType.hasMany(User, { foreignKey: 'shiftTypeId', as: 'users' })
+
 export {
 	Role,
 	TypeDocument,
@@ -61,5 +64,5 @@ export {
 	Election,
 	ShiftType,
 	Profile,
-	DeviceToken,
+	DeviceToken
 }
