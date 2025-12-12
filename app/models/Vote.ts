@@ -1,7 +1,8 @@
 import sequelize from '@/config/database.js'
 import { DataTypes } from 'sequelize'
-import { Candidate, User, Election } from '@/models'
-import ShiftType from './ShiftType'
+import Candidate from '@/models/Candidate'
+import User from '@/models/User'
+import Election from '@/models/Candidate'
 import type { Vote as VoteModel } from '@/types/models'
 
 const Vote = sequelize.define<VoteModel>('Election', {
