@@ -1,6 +1,6 @@
 import { ROLES } from '@/constants/database'
 import { groupBy } from '@/lib/fields.js'
-import { DeviceToken, PasswordReset, Profile, Role, Session, TypeDocument, User, Vote } from '@/models/index'
+import { DeviceToken, PasswordReset, Profile, Role, Session, ShiftType, TypeDocument, User, Vote } from '@/models/index'
 import type { AllowedRole } from '@/types/UserMiddleware'
 import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
 import type { ALLOWED_SESSION_TYPE } from '@/types/index'
@@ -92,7 +92,8 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 			{ model: Session, as: 'sessions' },
 			{ model: PasswordReset, as: 'passwordResets' },
 			{ model: DeviceToken, as: 'deviceTokens' },
-			{ model: Vote, as: 'votes' }
+			{ model: Vote, as: 'votes' },
+      { model: ShiftType, as: 'shiftType' }
 		]
 	})
 
