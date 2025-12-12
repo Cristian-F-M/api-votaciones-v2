@@ -78,3 +78,28 @@ export const CONFIGS = {
 		value: '#ff6719',
 	},
 }
+
+
+export const SHIFT_TYPES = {
+  MORNING: {
+    name: 'Mañana',
+    code: 'MORNING',
+    description: 'Jornada de la mañana',
+    startTime: new Date(0, 0, 0, 7, 0, 0),
+    endTime: new Date(0, 0, 0, 12, 0, 0)
+  },
+  AFTERNOON: {
+    name: 'Tarde',
+    code: 'AFTERNOON',
+    description: 'Jornada de la tarde',
+    startTime: new Date(0, 0, 0, 13, 0, 0),
+    endTime: new Date(0, 0, 0, 18, 0, 0)
+  },
+  NIGHT: {
+    name: 'Noche',
+    code: 'NIGHT',
+    description: 'Jornada de la noche',
+    startTime: new Date(0, 0, 0, 19, 0, 0),
+    endTime: new Date(0, 0, 0, 22, 0, 0)
+  }
+}
