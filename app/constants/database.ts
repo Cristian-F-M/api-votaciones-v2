@@ -85,21 +85,21 @@ export const SHIFT_TYPES = {
     name: 'Mañana',
     code: 'MORNING',
     description: 'Jornada de la mañana',
-    startTime: new Date(0, 0, 0, 7, 0, 0),
-    endTime: new Date(0, 0, 0, 12, 0, 0)
+    startTime: '07:00',
+    endTime: '12:00'
   },
   AFTERNOON: {
     name: 'Tarde',
     code: 'AFTERNOON',
     description: 'Jornada de la tarde',
-    startTime: new Date(0, 0, 0, 13, 0, 0),
-    endTime: new Date(0, 0, 0, 18, 0, 0)
+    startTime: '13:00',
+    endTime: '18:00'
   },
   NIGHT: {
     name: 'Noche',
     code: 'NIGHT',
     description: 'Jornada de la noche',
-    startTime: new Date(0, 0, 0, 19, 0, 0),
-    endTime: new Date(0, 0, 0, 22, 0, 0)
+    startTime: '19:00',
+    endTime: '10:00'
   }
 }
