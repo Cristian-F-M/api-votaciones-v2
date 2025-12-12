@@ -3,6 +3,7 @@ import sequelize from '@/config/database.js'
 import TypeDocument from '@/models/TypeDocument.js'
 import Role from '@/models/Role.js'
 import type { User as UserModel } from '@/types/models'
+import ShiftType from '@/models/ShiftType'
 
 const User = sequelize.define<UserModel>('User', {
 	id: {
@@ -34,6 +35,13 @@ const User = sequelize.define<UserModel>('User', {
 			msg: 'Email already exists',
 		},
 	},
+  shiftType: {
+    type: DataTypes.STRING,
+    references: {
+      model: ShiftType,
+      key: 'id'
+    }
+  },
 	password: {
 		type: DataTypes.STRING,
 		allowNull: true,

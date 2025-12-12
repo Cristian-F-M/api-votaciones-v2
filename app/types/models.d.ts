@@ -58,6 +58,7 @@ export interface User extends BaseModel<User> {
 	typeDocumentId: ForeignKey<TypeDocument['id']>
 	document: string
 	email: string
+  shiftType: ForeignKey<ShiftType['id']>
 	password: string
 	roleId: ForeignKey<Role['id']>
 
