@@ -1,3 +1,4 @@
+import { ROLES } from '@/constants/database'
 import { groupBy } from '@/lib/fields.js'
 import { DeviceToken, PasswordReset, Profile, Role, Session, TypeDocument, User, Vote } from '@/models/index'
 import type { AllowedRole } from '@/types/UserMiddleware'
@@ -46,10 +47,9 @@ export function roleRequired(role: '*' | AllowedRole | AllowedRole[]) {
 			return
 		}
 
-		let isAllowed = false
-
-		if (role === '*') isAllowed = true
-		else isAllowed = Array.isArray(role) ? role.includes(user.role.code as AllowedRole) : role === user.role.code
+		const isAllowed =
+			role === '*' ||
+			(Array.isArray(role) ? role.includes(user.role.code as AllowedRole) : ROLES[role].code === user.role.code)
 
 		if (!isAllowed) {
 			res.status(401).json(notAllowedData)
