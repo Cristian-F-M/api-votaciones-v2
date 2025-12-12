@@ -45,6 +45,9 @@ ShiftType.hasMany(Election, { foreignKey: 'shiftTypeId', as: 'elections' })
 User.hasOne(Profile, { foreignKey: 'userId', as: 'profile' })
 Profile.belongsTo(User, { foreignKey: 'userId', as: 'user' })
 
+Candidate.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+User.hasOne(Candidate, { foreignKey: 'userId', as: 'candidate' })
+
 export {
 	Role,
 	TypeDocument,
