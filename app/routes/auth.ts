@@ -93,7 +93,7 @@ router.post('/register', validateRequest(registerValidation), async (req: Reques
 			password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
 			typeDocumentId: typeDocument.id,
 			roleId: role.id,
-			shiftType: shiftType.id
+			shiftTypeId: shiftType.id
 		})
 
 		const profile = await Profile.create({

@@ -35,7 +35,7 @@ const User = sequelize.define<UserModel>('User', {
 			msg: 'Email already exists',
 		},
 	},
-  shiftType: {
+  shiftTypeId: {
     type: DataTypes.STRING,
     references: {
       model: ShiftType,
