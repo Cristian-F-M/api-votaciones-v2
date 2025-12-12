@@ -131,8 +131,8 @@ export interface ShiftType extends BaseModel<ShiftType> {
 	name: string
 	code: string
 	description: string
-	startTime: Date
-	endTime: Date
+	startTime: string
+	endTime: string
 	elections: NonAttribute<Election[]>
   users: NonAttribute<User[]>
 }
