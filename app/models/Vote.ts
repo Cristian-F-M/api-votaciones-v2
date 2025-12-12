@@ -1,52 +1,36 @@
 import sequelize from '@/config/database.js'
 import { DataTypes } from 'sequelize'
-import type { Election as ElectionModel } from '@/types/models'
+import { Candidate, User, Election } from '@/models'
 import ShiftType from './ShiftType'
+import type { Vote as VoteModel } from '@/types/models'
 
-const Election = sequelize.define<ElectionModel>('Election', {
+const Vote = sequelize.define<VoteModel>('Election', {
 	id: {
-		type: DataTypes.UUID,
+		type: DataTypes.UUIDV4,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
-	apprenticeCount: {
-		type: DataTypes.INTEGER,
-		defaultValue: 0,
-	},
-	totalVotes: {
-		type: DataTypes.INTEGER,
-		allowNull: false,
-		defaultValue: 0,
-	},
-	winnerVoteCount: {
-		type: DataTypes.INTEGER,
-		defaultValue: 0,
-	},
-	winner: {
-		type: DataTypes.JSON,
-		allowNull: true,
-	},
-	startDate: {
-		type: DataTypes.DATE,
-		allowNull: false,
-	},
-	endDate: {
-		type: DataTypes.DATE,
-		allowNull: false,
-	},
-	status: {
-		type: DataTypes.ENUM('active', 'finished', 'canceled'),
-		allowNull: false,
-		defaultValue: 'active',
-	},
-	shiftTypeId: {
-		type: DataTypes.UUID,
-		allowNull: false,
+	userId: {
+		type: DataTypes.STRING,
 		references: {
-			model: ShiftType,
-			key: 'id',
-		},
+			model: User,
+			key: 'id'
+		}
 	},
+	candidateId: {
+		type: DataTypes.STRING,
+		references: {
+			model: Candidate,
+			key: 'id'
+		}
+	},
+	electionId: {
+		type: DataTypes.STRING,
+		references: {
+			model: Election,
+			key: 'id'
+		}
+	}
 })
 
-export default Election
+export default Vote
