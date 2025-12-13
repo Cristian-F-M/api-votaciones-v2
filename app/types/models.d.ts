@@ -1,24 +1,14 @@
-import type {
-	CreationOptional,
-	ForeignKey,
-	InferAttributes,
-	InferCreationAttributes,
-	Model,
-	NonAttribute
-} from 'sequelize'
+import type { ForeignKey } from 'sequelize'
 import type { ALLOWED_SESSION_TYPE } from '@/types'
 
-type BaseModel<T, K extends keyof T = never> = Model<InferAttributes<T>, InferCreationAttributes<Omit<T, 'id' | K>>>
-
-export interface Candidate extends BaseModel<Candidate> {
+export interface Candidate {
 	id: string
 	userId: ForeignKey<User['id']>
 	description: CreationOptional<string>
 	isActive: boolean
-	user: NonAttribute<User>
 }
 
-export interface Config extends BaseModel<Config> {
+export interface Config {
 	id: string
 	name: string
 	code: string
@@ -26,86 +16,66 @@ export interface Config extends BaseModel<Config> {
 	value: string
 }
 
-export interface Role extends BaseModel<Role> {
+export interface Role {
 	id: string
 	name: string
 	code: string
 	description: string
-
-	users: NonAttribute<User[]>
 }
 
-export interface Session extends BaseModel<Session> {
+export interface Session {
 	id: string
 	token: string
 	expires: Date
 	userId: ForeignKey<User['id']>
 	type: ALLOWED_SESSION_TYPE
-	user: NonAttribute<User>
 }
 
-export interface TypeDocument extends BaseModel<TypeDocument> {
+export interface TypeDocument {
 	id: string
 	name: string
 	code: string
 	description: string
-
-	users: NonAttribute<User[]>
 }
 
-export interface User extends BaseModel<User> {
+export interface User {
 	id: string
 	typeDocumentId: ForeignKey<TypeDocument['id']>
 	document: string
 	email: string
-  shiftTypeId: ForeignKey<ShiftType['id']>
+	shiftTypeId: ForeignKey<ShiftType['id']>
 	password: string
 	roleId: ForeignKey<Role['id']>
-
-	role: NonAttribute<Role>
-	typeDocument: NonAttribute<TypeDocument>
-	sessions: NonAttribute<Session[]>
-	passwordResets: NonAttribute<PasswordReset[]>
-	deviceTokens: NonAttribute<DeviceToken[]>
-	profile: NonAttribute<Profile>
-	votes: NonAttribute<Vote[]>
-	candidate?: NonAttribute<Candidate>
-  shiftType: NonAttribute<ShiftType>
 }
 
-export interface PasswordReset extends BaseModel<PasswordReset> {
+export interface PasswordReset {
 	id: string
 	userId: ForeignKey<User['id']>
 	code: string | null
 	attempts: number
-  isActive: boolean
-  nextSendAt: Date | null
+	isActive: boolean
+	nextSendAt: Date | null
 	expiresAt: Date | null
 	usedAt: Date | null
-	user: NonAttribute<User>
 }
 
-export interface DeviceToken extends BaseModel<DeviceToken> {
+export interface DeviceToken {
 	id: string
 	userId: ForeignKey<User['id']>
 	token: string
 	deviceType: 'ios' | 'android' | 'web'
 	lastUsedAt: CreationOptional<Date>
 	isActive: boolean
-	user: NonAttribute<User>
 }
 
-export interface Vote extends BaseModel<Vote> {
+export interface Vote {
 	id: string
 	userId: ForeignKey<User['id']>
 	candidateId: ForeignKey<Candidate['id']>
 	electionId: ForeignKey<Election['id']>
-	user: NonAttribute<User>
-	candidate: NonAttribute<Candidate>
-	election: NonAttribute<Election>
 }
 
-export interface Election extends BaseModel<Election> {
+export interface Election {
 	id: string
 	apprenticeCount: CreationOptional<number>
 	totalVotes: CreationOptional<number>
@@ -115,34 +85,28 @@ export interface Election extends BaseModel<Election> {
 	endDate: Date
 	status: 'active' | 'finished' | 'canceled'
 	shiftTypeId: ForeignKey<ShiftType['id']>
-	shiftType: NonAttribute<ShiftType>
-	votes: NonAttribute<Vote[]>
 }
 
-export interface Objective extends BaseModel<Objective> {
+export interface Objective {
 	id: string
 	text: string
 	candidateId: ForeignKey<Candidate['id']>
-	candidate: NonAttribute<Candidate>
 }
 
-export interface ShiftType extends BaseModel<ShiftType> {
+export interface ShiftType {
 	id: string
 	name: string
 	code: string
 	description: string
 	startTime: string
 	endTime: string
-	elections: NonAttribute<Election[]>
-  users: NonAttribute<User[]>
 }
 
-export interface Profile extends BaseModel<Profile> {
+export interface Profile {
 	id: string
 	userId: ForeignKey<User['id']>
 	name: string
 	lastname: string
 	phone: string
 	imageUrl: CreationOptional<string> | null
-	user: NonAttribute<User>
 }
