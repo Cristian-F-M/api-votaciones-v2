@@ -1,6 +1,6 @@
 import express from 'express'
 import type { Request, Response } from 'express'
-import { DeviceToken, Profile } from '@/models/index'
+import { DeviceToken, Profile, User } from '@/models/index'
 import { roleRequired, sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares'
 import fs from 'node:fs'
 import { updateProfileValidation, notificationTokenValidation } from '@/validators/userValidators'
@@ -34,27 +34,21 @@ user.get('/', sessionRequired, async (req: Request, res: Response) => {
 		typeDocumentId
 	} = (req as RequestWithUser).user
 
-	const typeDocumentObj = {
-		id: typeDocument.id,
-		name: typeDocument.name
-	}
-
-	const roleObj = {
-		id: role.id,
-		name: role.name
-	}
-
-	const profileObj = { name, lastname, phone, imageUrl }
-
 	const userObject = {
 		id,
 		email,
 		document,
 		typeDocumentId,
-		typeDocument: typeDocumentObj,
+		typeDocument: {
+			id: typeDocument.id,
+			name: typeDocument.name
+		},
 		roleId,
-		role: roleObj,
-		profile: profileObj
+		role: {
+			id: role.id,
+			name: role.name
+		},
+		profile: { name, lastname, phone, imageUrl }
 	}
 
 	res.json({ ok: true, user: userObject })
