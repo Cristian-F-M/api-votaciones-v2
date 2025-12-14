@@ -1,15 +1,15 @@
-import type { ForeignKey } from 'sequelize'
+import type { CreationOptional, ForeignKey } from 'sequelize'
 import type { ALLOWED_SESSION_TYPE } from '@/types'
 
 export interface Candidate {
-	id: string
+	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	description: CreationOptional<string>
 	isActive: boolean
 }
 
 export interface Config {
-	id: string
+	id: CreationOptional<string>
 	name: string
 	code: string
 	description: string
@@ -17,14 +17,14 @@ export interface Config {
 }
 
 export interface Role {
-	id: string
+	id: CreationOptional<string>
 	name: string
 	code: string
 	description: string
 }
 
 export interface Session {
-	id: string
+	id: CreationOptional<string>
 	token: string
 	expires: Date
 	userId: ForeignKey<User['id']>
@@ -32,14 +32,14 @@ export interface Session {
 }
 
 export interface TypeDocument {
-	id: string
+	id: CreationOptional<string>
 	name: string
 	code: string
 	description: string
 }
 
 export interface User {
-	id: string
+	id: CreationOptional<string>
 	typeDocumentId: ForeignKey<TypeDocument['id']>
 	document: string
 	email: string
@@ -49,7 +49,7 @@ export interface User {
 }
 
 export interface PasswordReset {
-	id: string
+	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	code: string | null
 	attempts: number
@@ -60,7 +60,7 @@ export interface PasswordReset {
 }
 
 export interface DeviceToken {
-	id: string
+	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	token: string
 	deviceType: 'ios' | 'android' | 'web'
@@ -69,14 +69,14 @@ export interface DeviceToken {
 }
 
 export interface Vote {
-	id: string
+	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	candidateId: ForeignKey<Candidate['id']>
 	electionId: ForeignKey<Election['id']>
 }
 
 export interface Election {
-	id: string
+	id: CreationOptional<string>
 	apprenticeCount: CreationOptional<number>
 	totalVotes: CreationOptional<number>
 	winnerVoteCount: CreationOptional<number>
@@ -88,13 +88,13 @@ export interface Election {
 }
 
 export interface Objective {
-	id: string
+	id: CreationOptional<string>
 	text: string
 	candidateId: ForeignKey<Candidate['id']>
 }
 
 export interface ShiftType {
-	id: string
+	id: CreationOptional<string>
 	name: string
 	code: string
 	description: string
@@ -103,7 +103,7 @@ export interface ShiftType {
 }
 
 export interface Profile {
-	id: string
+	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	name: string
 	lastname: string
