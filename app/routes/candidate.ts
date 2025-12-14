@@ -1,252 +1,282 @@
-import fs from 'node:fs'
-import { roleRequired, validateUser, verifyToken2 } from '@/middlewares/UserMiddlewares'
-import { updateProfileValidation } from '@/validators/candidateValidators'
+import { ROLES } from '@/constants/database'
+import { roleRequired, sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares'
+import { Candidate, Election, Objective, Profile, Role, ShiftType, User, Vote } from '@/models/index'
+import type { RequestWithUser } from '@/types/auth'
+import type { Candidate as CandidateModel } from '@/types/models'
+import {
+	createCandidate,
+	deleteCandidate,
+	getCandidate,
+	updateProfileValidation,
+	voteToCandidate
+} from '@/validators/candidateValidators'
 import express from 'express'
 import type { Request, Response } from 'express'
-import multer from 'multer'
-import { Candidate, Objective, Role, TypeDocument, User } from '../models/index.js'
+import type { WhereOptions } from 'sequelize'
 import { Op } from 'sequelize'
 
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, 'app/assets/images/user')
-	},
-	filename: (req, file, cb) => {
-		const { userId } = req.headers
-		const fullFileName = `candidate_${userId}.png`
-
-		// ! Change this to use req.imageFullName
-		req.headers.fullFileName = fullFileName
-		cb(null, fullFileName)
-	},
-})
-const upload = multer({ storage })
 const candidate = express.Router()
-const imagesUrl = '.\\app\\assets\\images'
 
-candidate.post('/', verifyToken2, roleRequired('Administrator'), async (req: Request, res: Response) => {
-	const { userId: userIdLogged } = req.headers
+candidate.get(
+	'/',
+	sessionRequired,
+	roleRequired('*'),
+	validateRequest(getCandidate),
+	async (req: Request, res: Response) => {
+		const user = (req as RequestWithUser).user
+		const id = req.query.id as string
 
-	const id = Array.isArray(userIdLogged) ? userIdLogged[0] : userIdLogged
+		try {
+			const candidate = await Candidate.findByPk(id, {
+				include: [
+					{
+						model: User,
+						as: 'user',
+						include: [{ model: Profile, as: 'profile', attributes: ['name', 'lastname', 'phone', 'imageUrl'] }],
+						attributes: ['id', 'typeDocumentId', 'document', 'email', 'roleId']
+					}
+				],
+				attributes: ['id', 'userId', 'description', 'isActive']
+			})
 
-	const userLogged = await User.findByPk(id, {
-		include: [{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] }],
-		attributes: ['id', 'name', 'lastname', 'document', 'email'],
-	})
+			if (!candidate) {
+				res.status(404).json({ ok: false, message: 'Candidato no encontrado...' })
+				return
+			}
 
-	const { userId } = req.body
-	const candidateExist = await Candidate.findOne({ where: { userId } })
-	const user = await User.findByPk(userId)
-
-	if (candidateExist) {
-		res.json({ ok: false, message: 'Candidato ya existe' })
-		return
+			res.json({ ok: true, candidate })
+			return
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error buscando el candidato, por favor intenta nuevamente' })
+			return
+		}
 	}
-	if (!user) {
-		res.json({ ok: false, message: 'Usuario no encontrado' })
-		return
-	}
+)
 
-	const role = await Role.findOne({ where: { code: 'Candidate' } })
+candidate.get(
+	'/all',
+	sessionRequired,
+	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
+	async (req: Request, res: Response) => {
+		const { showInactives } = req.body
+		const user = (req as RequestWithUser).user
 
-	if (!role) {
-		res.status(500).json({ ok: false, message: 'Ocurrio un error, intentalo de nuevo' })
-		return
-	}
+		const clauseWhere: WhereOptions<CandidateModel> = {}
+		const allowShowInactives = user.role.code === ROLES.ADMINISTRATOR.code && showInactives === 'true'
+		if (!allowShowInactives) clauseWhere.isActive = true
 
-	await Candidate.create({ userId })
-
-	user.role = role.id
-	await user.save()
-
-	res.status(201).json({ ok: true, message: 'Candidato creado' })
-	return
-})
-
-candidate.get('/all', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
-	const candidates = await Candidate.findAll({
-		include: [
-			{
+		// TODO ->
+		const candidates = await Candidate.findAll({
+			where: clauseWhere,
+			include: {
 				model: User,
 				as: 'user',
-				attributes: ['id', 'name', 'lastname', 'document', 'email'],
+				include: [{ model: Profile, as: 'profile', attributes: ['name', 'lastname', 'phone', 'imageUrl'] }],
+				attributes: ['id', 'typeDocumentId', 'document', 'email', 'roleId']
 			},
-		],
-	})
-	res.json({ ok: true, candidates })
-	return
-})
+			attributes: ['id', 'userId', 'description', 'isActive']
+		})
 
-candidate.get('/', verifyToken2, roleRequired(['Administrator', 'Candidate', 'Apprentice']), async (req, res) => {
-	const { candidateId } = req.query
-	const { userId } = req.headers
-
-	if (candidateId && typeof candidateId !== 'string') {
-		res.status(400).json({ ok: false, message: 'Parametro de busqueda incorrecto' })
-		return
+		res.json({ ok: true, candidates })
 	}
+)
 
-	const whereOptions: Record<string, string> = {}
+candidate.patch(
+	'/',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(createCandidate),
+	async (req: Request, res: Response) => {
+		const { userId } = req.body
+		try {
+			const role = await Role.findOne({
+				where: {
+					code: ROLES.CANDIDATE.code
+				}
+			})
 
-	if (userId) whereOptions.userId = userId as string
-	if (candidateId) whereOptions.id = candidateId
+			const user = await User.findByPk(userId)
 
-	const candidate = await Candidate.findOne({
-		where: whereOptions,
-		include: [
-			{
-				model: User,
-				as: 'user',
-				attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'imageUrl'],
+			if (!role) {
+				res.status(404).json({
+					ok: false,
+					message: `No se ha encontrado el role ${ROLES.CANDIDATE.name}, asegurate de que este creado...`
+				})
+				return
+			}
+
+			if (!user) {
+				res.status(404).json({
+					ok: false,
+					message: 'El usuario solicitado no existe, asegurate de que este creado...'
+				})
+				return
+			}
+
+			const [candidate, created] = await Candidate.findOrCreate({
+				where: {
+					userId: user.id
+				},
+				defaults: {
+					isActive: true,
+					userId: user.id
+				}
+			})
+
+			if (!created) await candidate.update({ isActive: true, userId: user.id })
+			await user.update({ roleId: role.id })
+
+			res.json({ ok: true, message: 'Se ha creado correctamente el candidato...' })
+			return
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error creando al candidato, por favor intenta nuevamente' })
+			return
+		}
+	}
+)
+
+candidate.delete(
+	'/:id',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(deleteCandidate),
+	async (req: Request, res: Response) => {
+		const { id } = req.params
+
+		try {
+			const candidate = await Candidate.findOne({
+				where: {
+					id,
+					isActive: true
+				}
+			})
+
+			const [user, role] = await Promise.all([
+				User.findByPk(candidate?.userId ?? ''),
+				Role.findOne({
+					where: {
+						code: ROLES.APPRENTICE.code
+					}
+				})
+			])
+
+			if (!candidate || !user || !role) {
+				res.status(404).json({ ok: false, message: 'No se encontro el candidato solicitado para eliminar...' })
+				return
+			}
+
+			await Promise.all([
+				candidate.update({ isActive: false }),
+				user.update({
+					roleId: role.id
+				})
+			])
+			res.json({ ok: true, message: 'Candidato "eliminado" correctamente...' })
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error eliminado al candidato, por favor intentalo más tarde...' })
+			return
+		}
+	}
+)
+candidate.post(
+	'/vote/:id',
+	sessionRequired,
+	roleRequired('APPRENTICE'),
+	validateRequest(voteToCandidate),
+	async (req: Request, res: Response) => {
+		const id = req.params.id as string
+		const user = (req as RequestWithUser).user
+
+		const [election, candidate] = await Promise.all([
+			Election.findOne({
+				where: {
+					shiftTypeId: user.shiftType.id,
+					status: 'active'
+				},
+				include: [{ model: ShiftType, as: 'shiftType' }]
+			}),
+
+			Candidate.findByPk(id)
+		])
+
+		if (!candidate) {
+			res.status(404).json({
+				ok: false,
+				message: 'No se encuentra a el candidato por el cual deseas votar, por favor intenta nuevamente...'
+			})
+			return
+		}
+
+		if (!election) {
+			res
+				.status(404)
+				.json({ ok: false, message: `No hay una votación activa para la jornada de ${user.shiftType.name}...` })
+			return
+		}
+
+		const [vote, created] = await Vote.findOrCreate({
+			where: {
+				userId: user.id,
+				candidateId: id,
+				electionId: election.id
 			},
-			{
-				model: Objective,
-				as: 'objectives',
-			},
-		],
-	})
+			defaults: {
+				candidateId: candidate.id,
+				electionId: election.id,
+				userId: user.id
+			}
+		})
 
-	if (!candidate) {
-		res.json({ ok: false, message: 'Candidato no encontrado' })
+		if (!created) {
+			res
+				.status(400)
+				.json({ ok: false, message: 'Tú ya haz ejercido tu derecho al voto, no puedes cambiar tu voto...' })
+			return
+		}
+
+		res.json({ ok: true, message: 'Voto registrado con exito...' })
 		return
 	}
-
-	res.json({ ok: true, candidate })
-	return
-})
-
-candidate.get('/image/:candidateId', async (req, res) => {
-	const { candidateId } = req.params
-
-	const candidate = await Candidate.findByPk(candidateId)
-	const imageUrl = `${imagesUrl}\\user\\${candidate?.imageUrl}`
-
-	if (!candidate || !fs.existsSync(imageUrl)) {
-		return res.sendFile(`${imagesUrl}\\base\\base_user.png`, { root: '.' })
-	}
-
-	return res.sendFile(imageUrl, { root: '.' })
-})
-
-candidate.delete('/:id', verifyToken2, roleRequired('Administrator'),  async (req, res) => {
-	const { id: candidateId } = req.params
-	const candidate = await Candidate.findByPk(candidateId)
-
-	if (!candidate) {
-		res.status(404).json({ ok: false, message: 'Candidato no encontrado' })
-		return
-	}
-
-	const user = await User.findByPk(candidate.userId)
-
-	if (!user) {
-		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
-		return
-	}
-
-	const apprenticeRole = await Role.findOne({ where: { code: 'Apprentice' } })
-
-	if (!apprenticeRole) {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Ocurrio un error, intenta nuevamente' })
-		return
-	}
-
-	user.role = apprenticeRole.id
-
-	const imageUrl = `${imagesUrl}\\user\\${candidate.imageUrl}`
-	if (fs.existsSync(imageUrl)) fs.unlinkSync(imageUrl)
-
-	await candidate.destroy()
-	user.save()
-	res.json({ ok: true, message: 'Candidato eliminado' })
-})
-
-candidate.post('/vote', verifyToken2, roleRequired('Apprentice'), async (req, res) => {
-	const { id: candidateId } = req.body
-	const { userId } = req.headers
-
-	const id = Array.isArray(userId) ? userId[0] : userId
-
-	const userLogged = await User.findByPk(id, {
-		include: [
-			{ model: Role, as: 'roleUser', attributes: ['id', 'name', 'code'] },
-			{
-				model: TypeDocument,
-				as: 'typeDocumentUser',
-				attributes: ['id', 'name', 'code'],
-			},
-		],
-		attributes: ['id', 'name', 'lastname', 'document', 'email', 'voted', 'votedCandidateId'],
-	})
-
-	if (!userLogged) {
-		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
-		return
-	}
-
-	if (userLogged.voted || userLogged.votedCandidateId) {
-		res.status(400).json({ ok: false, message: 'Ya has votado' })
-		return
-	}
-
-	const candidate = await Candidate.findOne({ where: { id: candidateId } })
-
-	if (!candidate) {
-		res.status(404).json({ ok: false, message: 'Candidato no encontrado' })
-		return
-	}
-
-	userLogged.voted = true
-	userLogged.votedCandidateId = candidateId
-	candidate.votes++
-
-	await userLogged.save()
-	await candidate.save()
-
-	res.json({ ok: true, message: 'Voto realizado' })
-	return
-})
+)
 
 candidate.put(
 	'/profile',
-	verifyToken2,
-	roleRequired('Candidate'),
-	updateProfileValidation,
-	validateUser,
+	sessionRequired,
+	roleRequired('CANDIDATE'),
+	validateRequest(updateProfileValidation),
 	async (req: Request, res: Response) => {
 		const { objectives, description } = req.body as { objectives: { id: string; text: string }[]; description: string }
+		const user = (req as RequestWithUser).user
 
-		const user = await User.findByPk(req.headers.userId as string)
-		// biome-ignore lint/style/noNonNullAssertion: It will be not null
-		const candidate = await Candidate.findOne({ where: { userId: user!.id } })
-
-		if (!candidate) {
-			res.status(404).json({ ok: false, message: 'Candidato no encontrado' })
-			return
-		}
+		// biome-ignore lint/style/noNonNullAssertion: `CANDIDATE` role is required for this endpoint, so, there will be a candidate
+		const candidate = await user.getCandidate()!
 
 		try {
 			for (const objective of objectives) {
-				await Objective.upsert({ text: objective.text, candidateId: candidate.id })
+				await Objective.upsert({ id: objective.id, text: objective.text, candidateId: candidate.id })
 			}
 
 			const toDeleteIds = await Objective.findAll({
-				where: { candidateId: candidate.id, id: { [Op.notIn]: objectives.map((objective) => objective.id) } },
+				where: { candidateId: candidate.id, id: { [Op.notIn]: objectives.map((objective) => objective.id) } }
 			})
 
-			for (const { id } of toDeleteIds) await Objective.destroy({ where: { id } })
+			await Promise.all(toDeleteIds.map(({ id }) => Objective.destroy({ where: { id } })))
+			await candidate.update({ description })
 		} catch (err) {
-			res.status(500).json({ ok: false, message: 'Ocurrio un error, intenta nuevamente' })
+			res.status(500).json({ ok: false, message: 'Ocurrio un error actualizando tu perfil, intenta nuevamente' })
 			return
 		}
 
-		candidate.description = description
-		await candidate.save()
-
 		res.json({ ok: true, message: 'Perfil actualizado' })
-		return
 	}
 )
 
