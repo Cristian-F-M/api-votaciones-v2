@@ -1,10 +1,8 @@
-import auth from './auth.js'
-import config from './config.js'
-import typeDocument from './typeDocument.js'
-import user from './user.js'
-import vote from './vote.js'
-import candidate from './candidate.js'
-import role from './role.js'
-import resetPassword from './resetPassword'
-
-export { auth, config, typeDocument, user, vote, candidate, role, resetPassword }
+export { default as auth } from './auth'
+export { default as config } from './config'
+export { default as typeDocument } from './typeDocument'
+export { default as user } from './user'
+export { default as vote } from './vote'
+export { default as candidate } from './candidate'
+export { default as role } from './role'
+export { default as resetPassword } from './resetPassword'
