@@ -1,5 +1,5 @@
+import type { ALLOWED_SESSION_TYPE } from '@/types/index'
 import type { CreationOptional, ForeignKey } from 'sequelize'
-import type { ALLOWED_SESSION_TYPE } from '@/types'
 
 export interface Candidate {
 	id: CreationOptional<string>

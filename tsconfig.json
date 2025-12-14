@@ -28,7 +28,11 @@
 		"noPropertyAccessFromIndexSignature": false,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./app/*"]
+			"@/*": ["./app/*"],
+			"@/types/*": ["types/*"],
+			"@/constants/*": ["constants/*"],
+			"@/lib/*": ["lib/*"],
+			"@/config/*": ["config/*"],
 		}
 	}
 }

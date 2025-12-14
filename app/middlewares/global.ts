@@ -1,4 +1,4 @@
-import type { ALLOWED_SESSION_TYPE } from '@/types'
+import type { ALLOWED_SESSION_TYPE } from '@/types/index'
 import type { Request, Response, NextFunction } from 'express'
 
 export function setToUpperCaseHeader(headernName: string) {
