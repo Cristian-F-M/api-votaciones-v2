@@ -21,8 +21,6 @@ const upload = multer({ storage })
 const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
 
 user.get('/', sessionRequired, async (req: Request, res: Response) => {
-	// TODO -> Buscar una mejor forma de hacer 👇
-	// TODO -> Eliminar los timestamps
 	const {
 		id,
 		email,
