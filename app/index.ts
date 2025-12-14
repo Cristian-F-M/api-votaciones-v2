@@ -1,4 +1,4 @@
-import { auth, candidate, config, resetPassword, role, typeDocument, user, vote } from '@/routes'
+import * as routes from '@/routes'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -31,14 +31,14 @@ export default function createApp() {
 	app.use(globalValidator)
 
 	// ? Hacerlo para las demás rutas
-	app.use('/', auth)
-	app.use('/config', config)
-	app.use('/typeDocument', typeDocument)
-	app.use('/user', user)
-	app.use('/vote', vote)
-	app.use('/candidate', candidate)
-	app.use('/role', role)
-	app.use('/reset-password', resetPassword)
+	app.use('/', routes.auth)
+	app.use('/config', routes.config)
+	app.use('/typeDocument', routes.typeDocument)
+	app.use('/user', routes.user)
+	app.use('/vote', routes.vote)
+	app.use('/candidate', routes.candidate)
+	app.use('/role', routes.role)
+	app.use('/reset-password', routes.resetPassword)
 
 	return app
 }
