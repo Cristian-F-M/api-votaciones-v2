@@ -110,7 +110,7 @@ for (const [modelName, model] of Object.entries(models)) {
 
 	lines.push('declare module "@/types/models" {')
 	lines.push(
-		`  interface ${modelName} extends MagicModel<${modelName}, ${timestampsText}, 'id' | ${timestampsText}>, Timestamps {`
+		`  interface ${modelName} extends MagicModel<${modelName}, ${timestampsText}, ${timestampsText}>, Timestamps {`
 	)
 
 	for (const assoc of Object.values(assocs)) {
