@@ -4,6 +4,7 @@ import { DeviceToken, PasswordReset, Profile, Role, Session, ShiftType, TypeDocu
 import type { AllowedRole } from '@/types/UserMiddleware'
 import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
 import type { ALLOWED_SESSION_TYPE } from '@/types/index'
+import type { Session as SessionModel, User as UserModel } from '@/types/models'
 import type { NextFunction, Request, Response } from 'express'
 import { type ValidationChain, validationResult } from 'express-validator'
 import * as jwt from 'jsonwebtoken'
@@ -84,25 +85,34 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 		return
 	}
 
-	const user = await User.findByPk(JWTResult.id, {
-		include: [
-			{ model: TypeDocument, as: 'typeDocument' },
-			{ model: Role, as: 'role' },
-			{ model: Profile, as: 'profile' },
-			{ model: Session, as: 'sessions' },
-			{ model: PasswordReset, as: 'passwordResets' },
-			{ model: DeviceToken, as: 'deviceTokens' },
-			{ model: Vote, as: 'votes' },
-      { model: ShiftType, as: 'shiftType' }
-		]
-	})
+	let user: null | UserModel = null
+	let session: null | SessionModel = null
 
-	const session = await Session.findOne({
-		where: {
-			userId: JWTResult.id,
-			type: SESSION_TYPE
-		}
-	})
+	try {
+		user = await User.findByPk(JWTResult.id, {
+			include: [
+				{ model: TypeDocument, as: 'typeDocument' },
+				{ model: Role, as: 'role' },
+				{ model: Profile, as: 'profile' },
+				{ model: Session, as: 'sessions' },
+				{ model: PasswordReset, as: 'passwordResets' },
+				{ model: DeviceToken, as: 'deviceTokens' },
+				{ model: Vote, as: 'votes' },
+				{ model: ShiftType, as: 'shiftType' }
+			]
+		})
+
+		session = await Session.findOne({
+			where: {
+				userId: JWTResult.id,
+				type: SESSION_TYPE
+			}
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error verificando tu sesión, por favor intenta más tarde' })
+		return
+	}
 
 	if (!user) {
 		res
