@@ -8,16 +8,16 @@ type MagicModel<M, AttrsOmit extends keyof InferAttributes<M> = never, CreationA
 interface Timestamps { createdAt: Date; updatedAt: Date }
 
 declare module "@/types/models" {
-  interface Candidate extends MagicModel<Candidate, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
-    //Tl Candidate HasMany Election
+  interface Candidate extends MagicModel<Candidate, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
+    //Tl Candidate HasMany Vote
     //* Property
-    elections: NonAttribute<Models.Election[]>
+    votes: NonAttribute<Models.Vote[]>
 
     //* Mixins
-    getElections: HasManyGetAssociationsMixin<Models.Election>
-    addElection: HasManyAddAssociationMixin<Models.Election, Models.Election['id']>
-    addElections: HasManyAddAssociationsMixin<Models.Election, Models.Election['id']>
-    createElection: HasManyCreateAssociationMixin<Election>
+    getVotes: HasManyGetAssociationsMixin<Models.Vote>
+    addVote: HasManyAddAssociationMixin<Models.Vote, Models.Vote['id']>
+    addVotes: HasManyAddAssociationsMixin<Models.Vote, Models.Vote['id']>
+    createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl Candidate HasMany Objective
     //* Property
@@ -42,7 +42,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface DeviceToken extends MagicModel<DeviceToken, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface DeviceToken extends MagicModel<DeviceToken, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl DeviceToken BelongsTo User
     //* Property
     user: NonAttribute<Models.User>
@@ -56,16 +56,16 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Election extends MagicModel<Election, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
-    //Tl Election HasMany Election
+  interface Election extends MagicModel<Election, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
+    //Tl Election HasMany Vote
     //* Property
-    elections: NonAttribute<Models.Election[]>
+    votes: NonAttribute<Models.Vote[]>
 
     //* Mixins
-    getElections: HasManyGetAssociationsMixin<Models.Election>
-    addElection: HasManyAddAssociationMixin<Models.Election, Models.Election['id']>
-    addElections: HasManyAddAssociationsMixin<Models.Election, Models.Election['id']>
-    createElection: HasManyCreateAssociationMixin<Election>
+    getVotes: HasManyGetAssociationsMixin<Models.Vote>
+    addVote: HasManyAddAssociationMixin<Models.Vote, Models.Vote['id']>
+    addVotes: HasManyAddAssociationsMixin<Models.Vote, Models.Vote['id']>
+    createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl Election BelongsTo ShiftType
     //* Property
@@ -80,7 +80,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Objective extends MagicModel<Objective, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface Objective extends MagicModel<Objective, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Objective BelongsTo Candidate
     //* Property
     candidate: NonAttribute<Models.Candidate>
@@ -94,7 +94,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface PasswordReset extends MagicModel<PasswordReset, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface PasswordReset extends MagicModel<PasswordReset, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl PasswordReset BelongsTo User
     //* Property
     user: NonAttribute<Models.User>
@@ -108,7 +108,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Profile extends MagicModel<Profile, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface Profile extends MagicModel<Profile, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Profile BelongsTo User
     //* Property
     user: NonAttribute<Models.User>
@@ -122,7 +122,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Role extends MagicModel<Role, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface Role extends MagicModel<Role, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Role HasMany User
     //* Property
     users: NonAttribute<Models.User[]>
@@ -137,7 +137,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Session extends MagicModel<Session, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface Session extends MagicModel<Session, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Session BelongsTo User
     //* Property
     user: NonAttribute<Models.User>
@@ -151,7 +151,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface ShiftType extends MagicModel<ShiftType, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface ShiftType extends MagicModel<ShiftType, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl ShiftType HasMany Election
     //* Property
     elections: NonAttribute<Models.Election[]>
@@ -176,7 +176,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface TypeDocument extends MagicModel<TypeDocument, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface TypeDocument extends MagicModel<TypeDocument, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl TypeDocument HasMany User
     //* Property
     users: NonAttribute<Models.User[]>
@@ -191,7 +191,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface User extends MagicModel<User, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface User extends MagicModel<User, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl User BelongsTo TypeDocument
     //* Property
     typeDocument: NonAttribute<Models.TypeDocument>
@@ -201,15 +201,15 @@ declare module "@/types/models" {
     setTypeDocument: BelongsToSetAssociationMixin<TypeDocument, Models.TypeDocument['id']>
     createTypeDocument: BelongsToCreateAssociationMixin<TypeDocument>
     
-    //Tl User HasMany Election
+    //Tl User HasMany Vote
     //* Property
-    elections: NonAttribute<Models.Election[]>
+    votes: NonAttribute<Models.Vote[]>
 
     //* Mixins
-    getElections: HasManyGetAssociationsMixin<Models.Election>
-    addElection: HasManyAddAssociationMixin<Models.Election, Models.Election['id']>
-    addElections: HasManyAddAssociationsMixin<Models.Election, Models.Election['id']>
-    createElection: HasManyCreateAssociationMixin<Election>
+    getVotes: HasManyGetAssociationsMixin<Models.Vote>
+    addVote: HasManyAddAssociationMixin<Models.Vote, Models.Vote['id']>
+    addVotes: HasManyAddAssociationsMixin<Models.Vote, Models.Vote['id']>
+    createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl User HasMany DeviceToken
     //* Property
@@ -281,7 +281,7 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
-  interface Vote extends MagicModel<Vote, 'createdAt' | 'updatedAt', 'id' | 'createdAt' | 'updatedAt'>, Timestamps {
+  interface Vote extends MagicModel<Vote, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Vote BelongsTo Candidate
     //* Property
     candidate: NonAttribute<Models.Candidate>
