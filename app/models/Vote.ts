@@ -5,7 +5,7 @@ import User from '@/models/User'
 import Election from '@/models/Candidate'
 import type { Vote as VoteModel } from '@/types/models'
 
-const Vote = sequelize.define<VoteModel>('Election', {
+const Vote = sequelize.define<VoteModel>('Vote', {
 	id: {
 		type: DataTypes.UUIDV4,
 		primaryKey: true,
