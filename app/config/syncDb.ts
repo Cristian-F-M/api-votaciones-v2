@@ -1,35 +1,7 @@
-import {
-	Candidate,
-	User,
-	Role,
-	TypeDocument,
-	Config,
-	Session,
-	Vote,
-	Objective,
-	PasswordReset,
-	DeviceToken,
-	ShiftType,
-	Election,
-	Profile,
-} from '@/models/index.js'
 import sequelize from '@/config/database'
+import * as models from '@/models'
 
-;[
-	Config,
-	Profile,
-	Vote,
-	ShiftType,
-	Objective,
-	Candidate,
-	User,
-	Role,
-	TypeDocument,
-	Session,
-	PasswordReset,
-	DeviceToken,
-	Election,
-]
+;[models]
 
 async function setupDb() {
 	try {
