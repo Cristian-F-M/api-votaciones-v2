@@ -10,8 +10,10 @@ interface Timestamps { createdAt: Date; updatedAt: Date }
 declare module "@/types/models" {
   interface Candidate extends MagicModel<Candidate, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Candidate HasMany Vote
-    //* Property
-    votes: NonAttribute<Models.Vote[]>
+
+    //* Properties
+    vote: NonAttribute<Models.Vote>
+
 
     //* Mixins
     getVotes: HasManyGetAssociationsMixin<Models.Vote>
@@ -20,8 +22,10 @@ declare module "@/types/models" {
     createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl Candidate HasMany Objective
-    //* Property
-    objectives: NonAttribute<Models.Objective[]>
+
+    //* Properties
+    objective: NonAttribute<Models.Objective>
+
 
     //* Mixins
     getObjectives: HasManyGetAssociationsMixin<Models.Objective>
@@ -30,8 +34,10 @@ declare module "@/types/models" {
     createObjective: HasManyCreateAssociationMixin<Objective>
     
     //Tl Candidate BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -42,10 +48,17 @@ declare module "@/types/models" {
 }
 
 declare module "@/types/models" {
+  interface Config extends MagicModel<Config, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
+  }
+}
+
+declare module "@/types/models" {
   interface DeviceToken extends MagicModel<DeviceToken, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl DeviceToken BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -58,8 +71,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Election extends MagicModel<Election, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Election HasMany Vote
-    //* Property
-    votes: NonAttribute<Models.Vote[]>
+
+    //* Properties
+    vote: NonAttribute<Models.Vote>
+
 
     //* Mixins
     getVotes: HasManyGetAssociationsMixin<Models.Vote>
@@ -68,8 +83,10 @@ declare module "@/types/models" {
     createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl Election BelongsTo ShiftType
-    //* Property
+
+    //* Properties
     shiftType: NonAttribute<Models.ShiftType>
+
 
     //* Mixins
     getShiftType: BelongsToGetAssociationMixin<ShiftType>
@@ -82,8 +99,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Objective extends MagicModel<Objective, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Objective BelongsTo Candidate
-    //* Property
+
+    //* Properties
     candidate: NonAttribute<Models.Candidate>
+
 
     //* Mixins
     getCandidate: BelongsToGetAssociationMixin<Candidate>
@@ -96,8 +115,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface PasswordReset extends MagicModel<PasswordReset, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl PasswordReset BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -110,8 +131,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Profile extends MagicModel<Profile, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Profile BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -124,8 +147,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Role extends MagicModel<Role, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Role HasMany User
-    //* Property
-    users: NonAttribute<Models.User[]>
+
+    //* Properties
+    user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUsers: HasManyGetAssociationsMixin<Models.User>
@@ -139,8 +164,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Session extends MagicModel<Session, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Session BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -153,8 +180,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface ShiftType extends MagicModel<ShiftType, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl ShiftType HasMany Election
-    //* Property
-    elections: NonAttribute<Models.Election[]>
+
+    //* Properties
+    election: NonAttribute<Models.Election>
+
 
     //* Mixins
     getElections: HasManyGetAssociationsMixin<Models.Election>
@@ -163,8 +192,10 @@ declare module "@/types/models" {
     createElection: HasManyCreateAssociationMixin<Election>
     
     //Tl ShiftType HasMany User
-    //* Property
-    users: NonAttribute<Models.User[]>
+
+    //* Properties
+    user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUsers: HasManyGetAssociationsMixin<Models.User>
@@ -178,8 +209,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface TypeDocument extends MagicModel<TypeDocument, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl TypeDocument HasMany User
-    //* Property
-    users: NonAttribute<Models.User[]>
+
+    //* Properties
+    user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUsers: HasManyGetAssociationsMixin<Models.User>
@@ -193,8 +226,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface User extends MagicModel<User, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl User BelongsTo TypeDocument
-    //* Property
+
+    //* Properties
     typeDocument: NonAttribute<Models.TypeDocument>
+
 
     //* Mixins
     getTypeDocument: BelongsToGetAssociationMixin<TypeDocument>
@@ -202,8 +237,10 @@ declare module "@/types/models" {
     createTypeDocument: BelongsToCreateAssociationMixin<TypeDocument>
     
     //Tl User HasMany Vote
-    //* Property
-    votes: NonAttribute<Models.Vote[]>
+
+    //* Properties
+    vote: NonAttribute<Models.Vote>
+
 
     //* Mixins
     getVotes: HasManyGetAssociationsMixin<Models.Vote>
@@ -212,8 +249,10 @@ declare module "@/types/models" {
     createVote: HasManyCreateAssociationMixin<Vote>
     
     //Tl User HasMany DeviceToken
-    //* Property
-    deviceTokens: NonAttribute<Models.DeviceToken[]>
+
+    //* Properties
+    deviceToken: NonAttribute<Models.DeviceToken>
+
 
     //* Mixins
     getDeviceTokens: HasManyGetAssociationsMixin<Models.DeviceToken>
@@ -222,8 +261,10 @@ declare module "@/types/models" {
     createDeviceToken: HasManyCreateAssociationMixin<DeviceToken>
     
     //Tl User BelongsTo Role
-    //* Property
+
+    //* Properties
     role: NonAttribute<Models.Role>
+
 
     //* Mixins
     getRole: BelongsToGetAssociationMixin<Role>
@@ -231,8 +272,10 @@ declare module "@/types/models" {
     createRole: BelongsToCreateAssociationMixin<Role>
     
     //Tl User HasMany PasswordReset
-    //* Property
-    passwordResets: NonAttribute<Models.PasswordReset[]>
+
+    //* Properties
+    passwordReset: NonAttribute<Models.PasswordReset>
+
 
     //* Mixins
     getPasswordResets: HasManyGetAssociationsMixin<Models.PasswordReset>
@@ -241,8 +284,10 @@ declare module "@/types/models" {
     createPasswordReset: HasManyCreateAssociationMixin<PasswordReset>
     
     //Tl User HasMany Session
-    //* Property
-    sessions: NonAttribute<Models.Session[]>
+
+    //* Properties
+    session: NonAttribute<Models.Session>
+
 
     //* Mixins
     getSessions: HasManyGetAssociationsMixin<Models.Session>
@@ -251,8 +296,10 @@ declare module "@/types/models" {
     createSession: HasManyCreateAssociationMixin<Session>
     
     //Tl User HasOne Profile
-    //* Property
+
+    //* Properties
     profile: NonAttribute<Models.Profile>
+
 
     //* Mixins
     getProfile: HasOneGetAssociationMixin<Profile>
@@ -260,8 +307,10 @@ declare module "@/types/models" {
     createProfile: HasOneCreateAssociationMixin<Profile>
     
     //Tl User HasOne Candidate
-    //* Property
+
+    //* Properties
     candidate: NonAttribute<Models.Candidate>
+
 
     //* Mixins
     getCandidate: HasOneGetAssociationMixin<Candidate>
@@ -269,8 +318,10 @@ declare module "@/types/models" {
     createCandidate: HasOneCreateAssociationMixin<Candidate>
     
     //Tl User BelongsTo ShiftType
-    //* Property
+
+    //* Properties
     shiftType: NonAttribute<Models.ShiftType>
+
 
     //* Mixins
     getShiftType: BelongsToGetAssociationMixin<ShiftType>
@@ -283,8 +334,10 @@ declare module "@/types/models" {
 declare module "@/types/models" {
   interface Vote extends MagicModel<Vote, 'createdAt' | 'updatedAt', 'createdAt' | 'updatedAt'>, Timestamps {
     //Tl Vote BelongsTo Candidate
-    //* Property
+
+    //* Properties
     candidate: NonAttribute<Models.Candidate>
+
 
     //* Mixins
     getCandidate: BelongsToGetAssociationMixin<Candidate>
@@ -292,8 +345,10 @@ declare module "@/types/models" {
     createCandidate: BelongsToCreateAssociationMixin<Candidate>
     
     //Tl Vote BelongsTo User
-    //* Property
+
+    //* Properties
     user: NonAttribute<Models.User>
+
 
     //* Mixins
     getUser: BelongsToGetAssociationMixin<User>
@@ -301,8 +356,10 @@ declare module "@/types/models" {
     createUser: BelongsToCreateAssociationMixin<User>
     
     //Tl Vote BelongsTo Election
-    //* Property
+
+    //* Properties
     election: NonAttribute<Models.Election>
+
 
     //* Mixins
     getElection: BelongsToGetAssociationMixin<Election>
