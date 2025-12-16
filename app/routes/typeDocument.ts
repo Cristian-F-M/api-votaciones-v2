@@ -1,39 +1,115 @@
+import { roleRequired, sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares.js'
 import express from 'express'
-import { TypeDocument } from '../models/index.js'
-import { verifyToken2, roleRequired } from '@/middlewares/UserMiddlewares.js'
+import { TypeDocument } from '@/models'
+import { deleteOne, getOne, update } from '@/validators/typeDocument.js'
+import type { Request, Response } from 'express'
 
 const typeDocument = express.Router()
 
-typeDocument.get('/' ,async (req, res) => {
-	const { code } = req.query
+typeDocument.get(
+	'/:q',
+	sessionRequired,
+	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
+	validateRequest(getOne),
+	async (req: Request, res: Response) => {
+		const { q } = req.params
 
-	if (!code) {
-		const typesDocuments = await TypeDocument.findAll()
-		res.json({ ok: true, typesDocuments })
+		try {
+			const typeDocument = await TypeDocument.findOne({ where: { code: q } })
+			if (!typeDocument) {
+				res
+					.status(404)
+					.json({ ok: false, message: 'No se encontro el tipo de documento, por favor intenta nuevamente...' })
+				return
+			}
+
+			res.json({ ok: true, typeDocument })
+			return
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error buscando el tipo de documento, por favor intenta nuevamente...' })
+			return
+		}
+	}
+)
+
+typeDocument.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
+	try {
+		const typeDocuments = await TypeDocument.findAll()
+		res.json({ ok: true, typeDocuments })
+		return
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({
+			ok: false,
+			message: 'Ocurrio un error buscando los tipos de documentos, por favor intenta nuevamente...'
+		})
 		return
 	}
-
-	if (typeof code !== 'string') {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Parametro de busqueda incorrecto', code })
-		return
-	}
-
-	const typeDocument = await TypeDocument.findOne({
-		where: {
-			code,
-		},
-	})
-
-	if (!typeDocument) {
-		res
-			.status(404)
-			.json({ ok: false, message: 'Tipo de documento no encontrado' })
-		return
-	}
-
-	res.json({ ok: true, typesDocuments: [typeDocument] })
 })
+
+typeDocument.put(
+	'/',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(update),
+	async (req: Request, res: Response) => {
+		const { id, name, description } = req.body
+
+		try {
+			const typeDocument = await TypeDocument.findOne({ where: { id } })
+			if (!typeDocument) {
+				res
+					.status(404)
+					.json({ ok: false, message: 'No se encontro el tipo de documento, por favor intenta nuevamente...' })
+				return
+			}
+
+			await typeDocument.update({ name, description })
+			res.json({ ok: true, message: 'Tipo de documento actualizado correctamente', typeDocument })
+			return
+		} catch (err) {
+			console.log(err)
+			res.status(500).json({
+				ok: false,
+				message: 'Ocurrio un error actualizando el tipo de documento, por favor intenta nuevamente...'
+			})
+			return
+		}
+	}
+)
+
+typeDocument.delete(
+	'/:id',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(deleteOne),
+	async (req: Request, res: Response) => {
+		const { id } = req.params
+
+		try {
+			const typeDocument = await TypeDocument.findOne({ where: { id } })
+			if (!typeDocument) {
+				res
+					.status(404)
+					.json({ ok: false, message: 'No se encontro el tipo de documento, por favor intenta nuevamente...' })
+				return
+			}
+
+			await typeDocument.destroy()
+			res.json({ ok: true, message: 'Tipo de documento eliminado correctamente', typeDocument })
+			return
+		} catch (err) {
+			console.log(err)
+			res.status(500).json({
+				ok: false,
+				message: 'Ocurrio un error eliminando el tipo de documento, por favor intenta nuevamente...'
+			})
+			return
+		}
+	}
+)
 
 export default typeDocument
