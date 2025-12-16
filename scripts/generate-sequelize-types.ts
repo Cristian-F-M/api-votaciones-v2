@@ -31,32 +31,28 @@ function getMixinsFunctionsNames(a: AssociationMeta) {
 	if (a.type === 'HasMany') return `'${get}s' | '${add}' | '${add}s' | '${create}'`
 }
 
+function nonAttributesFor(a: AssociationMeta) {
+	const T = a.target
+	const propertyName = T[0]?.toLowerCase() + T.slice(1)
+	return `    ${propertyName}: NonAttribute<Models.${T}>`
+}
+
 function mixinsFor(a: AssociationMeta) {
 	const T = a.target
 	const propertyName = T[0]?.toLowerCase() + T.slice(1)
 	const id = `Models.${T}['id']`
 
-	let text = `    //Tl ${a.source} ${a.type} ${T}`
+	let text = ''
 
 	if (a.type === 'BelongsTo') {
-		text += `
-    //* Property
-    ${propertyName}: NonAttribute<Models.${T}>
-
-    //* Mixins
-    get${T}: BelongsToGetAssociationMixin<${T}>
+		text += `    get${T}: BelongsToGetAssociationMixin<${T}>
     set${T}: BelongsToSetAssociationMixin<${T}, ${id}>
     create${T}: BelongsToCreateAssociationMixin<${T}>
     `
 	}
 
 	if (a.type === 'HasMany') {
-		text += `
-    //* Property
-    ${propertyName}s: NonAttribute<Models.${T}[]>
-
-    //* Mixins
-    get${T}s: HasManyGetAssociationsMixin<Models.${T}>
+		text += `    get${T}s: HasManyGetAssociationsMixin<Models.${T}>
     add${T}: HasManyAddAssociationMixin<Models.${T}, ${id}>
     add${T}s: HasManyAddAssociationsMixin<Models.${T}, ${id}>
     create${T}: HasManyCreateAssociationMixin<${T}>
@@ -64,12 +60,7 @@ function mixinsFor(a: AssociationMeta) {
 	}
 
 	if (a.type === 'HasOne') {
-		text += `
-    //* Property
-    ${propertyName}: NonAttribute<Models.${T}>
-
-    //* Mixins
-    get${T}: HasOneGetAssociationMixin<${T}>
+		text += `    get${T}: HasOneGetAssociationMixin<${T}>
     set${T}: HasOneSetAssociationMixin<${T}, ${id}>
     create${T}: HasOneCreateAssociationMixin<${T}>
     `
@@ -102,22 +93,41 @@ let modelsIndex = 0
 for (const [modelName, model] of Object.entries(models)) {
 	const assocs = model.associations
 
-	if (!assocs || Object.keys(assocs).length === 0) {
-		modelsIndex++
-		continue
-	}
-	const text = getMixinsFunctionsNames(meta[modelsIndex] as AssociationMeta)
-
 	lines.push('declare module "@/types/models" {')
 	lines.push(
 		`  interface ${modelName} extends MagicModel<${modelName}, ${timestampsText}, ${timestampsText}>, Timestamps {`
 	)
+	if (!assocs || Object.keys(assocs).length === 0) {
+		lines.push('  }')
+		lines.push('}')
+		lines.push('')
+		modelsIndex++
+		continue
+	}
+
+	const text = getMixinsFunctionsNames(meta[modelsIndex] as AssociationMeta)
 
 	for (const assoc of Object.values(assocs)) {
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		const as = cap(assoc.as!)
 		const target = assoc.target.name
-		const mixins = mixinsFor({ source: modelName, target, type: assoc.associationType as AssociationMeta['type'] })
+
+		const associationMeta: AssociationMeta = {
+			source: modelName,
+			target,
+			type: assoc.associationType as AssociationMeta['type']
+		}
+
+		const nonAttributes = nonAttributesFor(associationMeta)
+		const mixins = mixinsFor(associationMeta)
+
+		lines.push(`    //Tl ${associationMeta.source} ${associationMeta.type} ${associationMeta.target}`)
+		lines.push('')
+    lines.push('    //* Properties')
+		lines.push(nonAttributes)
+		lines.push('')
+		lines.push('')
+		lines.push('    //* Mixins')
 		lines.push(mixins)
 	}
 
