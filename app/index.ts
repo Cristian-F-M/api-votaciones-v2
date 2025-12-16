@@ -35,7 +35,7 @@ export default function createApp() {
 	app.use('/config', routes.config)
 	app.use('/typeDocument', routes.typeDocument)
 	app.use('/user', routes.user)
-	app.use('/vote', routes.vote)
+	app.use('/election', routes.election)
 	app.use('/candidate', routes.candidate)
 	app.use('/role', routes.role)
 	app.use('/reset-password', routes.resetPassword)
