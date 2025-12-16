@@ -1,41 +1,125 @@
+import { roleRequired, sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares.js'
 import express from 'express'
 import { Role } from '../models/index.js'
-import { verifyToken2, roleRequired } from '@/middlewares/UserMiddlewares.js'
+import { deleteOne, getOne, update } from '@/validators/role.js'
+import { Op } from 'sequelize'
+import type { Request, Response } from 'express'
+import type { Role as RoleModel } from '@/types/models'
 
 const role = express.Router()
 
-role.get('/', verifyToken2, roleRequired(['Apprentice', 'Candidate', 'Administrator']) ,async (req, res) => {
-	const { code } = req.query
+role.get(
+	'/:q',
+	sessionRequired,
+	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
+	validateRequest(getOne),
+	async (req: Request, res: Response) => {
+		const { q } = req.params
 
-	if (!code || typeof code !== 'string') {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Parametro de busqueda incorrecto' })
-		return
-	}
+		let role: RoleModel | null = null
 
-	if (code) {
-		const role = await Role.findOne({
-			where: { code },
-		})
+		try {
+			role = await Role.findOne({ where: { [Op.or]: [{ code: q }, { id: q }] } })
 
-		if (!role) {
-			res.json({ message: 'Rol no encontrado' })
+			if (!role) {
+				res.status(404).json({ ok: false, message: 'No se encontro el rol, por favor intenta nuevamente...' })
+				return
+			}
+		} catch (err) {
+			console.log(err)
+			res.status(500).json({ ok: false, message: 'Ocurrio un error buscando el rol, por favor intenta nuevamente...' })
 			return
 		}
 
-		res.json({ roles: [role] })
+		res.json({ ok: true, role })
+	}
+)
+
+role.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
+	try {
+		const roles = await Role.findAll()
+		res.json({ ok: true, roles })
+
+		return
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error buscando los roles, por favor intenta nuevamente...' })
 		return
 	}
-
-	const roles = await Role.findAll()
-
-	if (!roles) {
-		res.status(404).json({ message: 'Roles no encontrados' })
-		return
-	}
-
-	res.json({ roles })
 })
+
+role.put(
+	'/',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(update),
+	async (req: Request, res: Response) => {
+		const { id } = req.body
+
+		let role: RoleModel | null = null
+
+		try {
+			role = await Role.findOne({ where: { id } })
+
+			if (!role) {
+				res.status(404).json({ ok: false, message: 'No se encontro el rol, por favor intenta nuevamente...' })
+				return
+			}
+		} catch (err) {
+			console.log(err)
+			res.status(500).json({ ok: false, message: 'Ocurrio un error buscando el rol, por favor intenta nuevamente...' })
+			return
+		}
+
+		try {
+			await role.update(req.body)
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error actualizando el rol, por favor intenta nuevamente...' })
+			return
+		}
+
+		res.json({ ok: true, message: 'Rol actualizado correctamente', role })
+	}
+)
+
+role.delete(
+	'/:id',
+	sessionRequired,
+	roleRequired('ADMINISTRATOR'),
+	validateRequest(deleteOne),
+	async (req: Request, res: Response) => {
+		const { id } = req.params
+
+		let role: RoleModel | null = null
+
+		try {
+			role = await Role.findOne({ where: { id } })
+		} catch (err) {
+			console.log(err)
+			res.status(500).json({ ok: false, message: 'Ocurrio un error buscando el rol, por favor intenta nuevamente...' })
+			return
+		}
+
+		if (!role) {
+			res.status(404).json({ ok: false, message: 'No se encontro el rol, por favor intenta nuevamente...' })
+			return
+		}
+
+		try {
+			await role.destroy()
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error eliminando el rol, por favor intenta nuevamente...' })
+			return
+		}
+
+		res.json({ ok: true, message: 'Rol eliminado correctamente', role })
+	}
+)
 
 export default role
