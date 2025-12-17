@@ -12,7 +12,7 @@ declare module "@/types/models" {
     //Tl Candidate HasMany Vote
 
     //* Properties
-    vote: NonAttribute<Models.Vote>
+    votes: NonAttribute<Models.Vote[]>
 
 
     //* Mixins
@@ -24,7 +24,7 @@ declare module "@/types/models" {
     //Tl Candidate HasMany Objective
 
     //* Properties
-    objective: NonAttribute<Models.Objective>
+    objectives: NonAttribute<Models.Objective[]>
 
 
     //* Mixins
@@ -73,7 +73,7 @@ declare module "@/types/models" {
     //Tl Election HasMany Vote
 
     //* Properties
-    vote: NonAttribute<Models.Vote>
+    votes: NonAttribute<Models.Vote[]>
 
 
     //* Mixins
@@ -149,7 +149,7 @@ declare module "@/types/models" {
     //Tl Role HasMany User
 
     //* Properties
-    user: NonAttribute<Models.User>
+    users: NonAttribute<Models.User[]>
 
 
     //* Mixins
@@ -182,7 +182,7 @@ declare module "@/types/models" {
     //Tl ShiftType HasMany Election
 
     //* Properties
-    election: NonAttribute<Models.Election>
+    elections: NonAttribute<Models.Election[]>
 
 
     //* Mixins
@@ -194,7 +194,7 @@ declare module "@/types/models" {
     //Tl ShiftType HasMany User
 
     //* Properties
-    user: NonAttribute<Models.User>
+    users: NonAttribute<Models.User[]>
 
 
     //* Mixins
@@ -211,7 +211,7 @@ declare module "@/types/models" {
     //Tl TypeDocument HasMany User
 
     //* Properties
-    user: NonAttribute<Models.User>
+    users: NonAttribute<Models.User[]>
 
 
     //* Mixins
@@ -239,7 +239,7 @@ declare module "@/types/models" {
     //Tl User HasMany Vote
 
     //* Properties
-    vote: NonAttribute<Models.Vote>
+    votes: NonAttribute<Models.Vote[]>
 
 
     //* Mixins
@@ -251,7 +251,7 @@ declare module "@/types/models" {
     //Tl User HasMany DeviceToken
 
     //* Properties
-    deviceToken: NonAttribute<Models.DeviceToken>
+    deviceTokens: NonAttribute<Models.DeviceToken[]>
 
 
     //* Mixins
@@ -274,7 +274,7 @@ declare module "@/types/models" {
     //Tl User HasMany PasswordReset
 
     //* Properties
-    passwordReset: NonAttribute<Models.PasswordReset>
+    passwordResets: NonAttribute<Models.PasswordReset[]>
 
 
     //* Mixins
@@ -286,7 +286,7 @@ declare module "@/types/models" {
     //Tl User HasMany Session
 
     //* Properties
-    session: NonAttribute<Models.Session>
+    sessions: NonAttribute<Models.Session[]>
 
 
     //* Mixins
