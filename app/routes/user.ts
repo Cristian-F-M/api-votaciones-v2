@@ -10,7 +10,7 @@ import { uploadImage } from '@/lib/cloudinary'
 import path from 'node:path'
 import type { RequestWithUser } from '@/types/auth'
 
-const user = express.Router()
+const router = express.Router()
 const limit = pLimit(6)
 
 const storage = multer.diskStorage({
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage })
 const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
 
-user.get('/', sessionRequired, async (req: Request, res: Response) => {
+router.get('/', sessionRequired, async (req: Request, res: Response) => {
 	const {
 		id,
 		email,
@@ -52,7 +52,7 @@ user.get('/', sessionRequired, async (req: Request, res: Response) => {
 	res.json({ ok: true, user: userObject })
 })
 
-user.patch(
+router.patch(
 	'/notification-token',
 	sessionRequired,
 	validateRequest(notificationToken),
@@ -97,13 +97,13 @@ user.patch(
 	}
 )
 
-user.post('/send-notification', sessionRequired, roleRequired('ADMINISTRATOR'), (req: Request, res: Response) => {
+router.post('/send-notification', sessionRequired, roleRequired('ADMINISTRATOR'), (req: Request, res: Response) => {
 	const user = (req as RequestWithUser).user
 
 	// TODO -> Hacer esta ruta para permitir notificar a todos los usuarios | aprendices (con notification token activo), notificar solo a usuario.
 })
 
-user.put(
+router.put(
 	'/profile',
 	sessionRequired,
 	roleRequired('*'),
@@ -162,4 +162,4 @@ user.put(
 	}
 )
 
-export default user
+export default router

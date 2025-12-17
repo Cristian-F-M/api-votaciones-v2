@@ -6,9 +6,9 @@ import { Op } from 'sequelize'
 import type { Request, Response } from 'express'
 import type { Role as RoleModel } from '@/types/models'
 
-const role = express.Router()
+const router = express.Router()
 
-role.get(
+router.get(
 	'/:q',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -35,7 +35,7 @@ role.get(
 	}
 )
 
-role.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
+router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
 	try {
 		const roles = await Role.findAll()
 		res.json({ ok: true, roles })
@@ -48,7 +48,7 @@ role.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Req
 	}
 })
 
-role.put(
+router.put(
 	'/',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -85,7 +85,7 @@ role.put(
 	}
 )
 
-role.delete(
+router.delete(
 	'/:id',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -122,4 +122,4 @@ role.delete(
 	}
 )
 
-export default role
+export default router

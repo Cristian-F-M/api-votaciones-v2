@@ -6,9 +6,9 @@ import { Config } from '@/models'
 import { deleteOne, getOne, update } from '@/validators/config'
 import { Op } from 'sequelize'
 
-const config = express.Router()
+const router = express.Router()
 
-config.get(
+router.get(
 	'/:q',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -37,7 +37,7 @@ config.get(
 	}
 )
 
-config.get(
+router.get(
 	'/all',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -56,7 +56,7 @@ config.get(
 	}
 )
 
-config.put(
+router.put(
 	'/',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -94,7 +94,7 @@ config.put(
 	}
 )
 
-config.delete(
+router.delete(
 	'/:id',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -117,4 +117,4 @@ config.delete(
 	}
 )
 
-export default config
+export default router

@@ -4,9 +4,9 @@ import { TypeDocument } from '@/models'
 import { deleteOne, getOne, update } from '@/validators/typeDocument.js'
 import type { Request, Response } from 'express'
 
-const typeDocument = express.Router()
+const router = express.Router()
 
-typeDocument.get(
+router.get(
 	'/:q',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -35,7 +35,7 @@ typeDocument.get(
 	}
 )
 
-typeDocument.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
+router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
 	try {
 		const typeDocuments = await TypeDocument.findAll()
 		res.json({ ok: true, typeDocuments })
@@ -50,7 +50,7 @@ typeDocument.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (
 	}
 })
 
-typeDocument.put(
+router.put(
 	'/',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -81,7 +81,7 @@ typeDocument.put(
 	}
 )
 
-typeDocument.delete(
+router.delete(
 	'/:id',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -112,4 +112,4 @@ typeDocument.delete(
 	}
 )
 
-export default typeDocument
+export default router

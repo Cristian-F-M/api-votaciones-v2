@@ -15,9 +15,9 @@ import type { Request, Response } from 'express'
 import type { WhereOptions } from 'sequelize'
 import { Op } from 'sequelize'
 
-const candidate = express.Router()
+const router = express.Router()
 
-candidate.get(
+router.get(
 	'/',
 	sessionRequired,
 	roleRequired('*'),
@@ -56,7 +56,7 @@ candidate.get(
 	}
 )
 
-candidate.get(
+router.get(
 	'/all',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -84,7 +84,7 @@ candidate.get(
 	}
 )
 
-candidate.patch(
+router.patch(
 	'/',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -141,7 +141,7 @@ candidate.patch(
 	}
 )
 
-candidate.delete(
+router.delete(
 	'/:id',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -187,7 +187,7 @@ candidate.delete(
 		}
 	}
 )
-candidate.post(
+router.post(
 	'/vote/:id',
 	sessionRequired,
 	roleRequired('APPRENTICE'),
@@ -248,7 +248,7 @@ candidate.post(
 	}
 )
 
-candidate.put(
+router.put(
 	'/profile',
 	sessionRequired,
 	roleRequired('CANDIDATE'),
@@ -280,4 +280,4 @@ candidate.put(
 	}
 )
 
-export default candidate
+export default router

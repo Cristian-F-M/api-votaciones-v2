@@ -13,9 +13,9 @@ import { ShiftType, Vote } from '@/models'
 import { createElection, finishElection } from '@/validators/election'
 import { BLANK_VOTE_USER, ROLES } from '@/constants/database'
 
-const vote = express.Router()
+const router = express.Router()
 
-vote.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), async (req: Request, res: Response) => {
+router.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), async (req: Request, res: Response) => {
 	const user = (req as RequestWithUser).user
 
 	try {
@@ -54,7 +54,7 @@ vote.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), async 
 	}
 })
 
-vote.post(
+router.post(
 	'/',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -106,7 +106,7 @@ vote.post(
 	}
 )
 
-vote.put(
+router.put(
 	'/finish',
 	sessionRequired,
 	roleRequired('ADMINISTRATOR'),
@@ -184,4 +184,4 @@ vote.put(
 	}
 )
 
-export default vote
+export default router
