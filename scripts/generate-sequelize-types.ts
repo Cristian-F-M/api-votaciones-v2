@@ -34,6 +34,9 @@ function getMixinsFunctionsNames(a: AssociationMeta) {
 function nonAttributesFor(a: AssociationMeta) {
 	const T = a.target
 	const propertyName = T[0]?.toLowerCase() + T.slice(1)
+
+	if (a.type === 'HasMany') return `    ${propertyName}s: NonAttribute<Models.${T}[]>`
+
 	return `    ${propertyName}: NonAttribute<Models.${T}>`
 }
 
@@ -123,7 +126,7 @@ for (const [modelName, model] of Object.entries(models)) {
 
 		lines.push(`    //Tl ${associationMeta.source} ${associationMeta.type} ${associationMeta.target}`)
 		lines.push('')
-    lines.push('    //* Properties')
+		lines.push('    //* Properties')
 		lines.push(nonAttributes)
 		lines.push('')
 		lines.push('')
