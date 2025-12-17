@@ -101,7 +101,7 @@ router.post(
 
 		const waitSeconds = getWaitSeconds(passwordReset.attempts)
 		const nextSendAt = new Date(new Date().getTime() + waitSeconds * 1000)
-		const passwordResetCode = getPasswordResetCode(6)
+		const passwordResetCode = bcryp.hashSync(getPasswordResetCode(6), bcryp.genSaltSync())
 		const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
 
 		await passwordReset.update({
@@ -145,7 +145,7 @@ router.post(
 			return
 		}
 
-		if (passwordReset.code !== code) {
+		if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
 			res.status(400).json({ ok: false, message: 'El código no coindide, asegura de usar el ultimo enviado' })
 			return
 		}
@@ -180,7 +180,7 @@ router.patch('/update-password', validateRequest(updatePassword), async (req: Re
 		return
 	}
 
-	if (passwordReset.code !== code) {
+	if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
 		res.status(400).json({ ok: false, message: 'El código no coindide, asegura de usar el ultimo enviado' })
 		return
 	}
