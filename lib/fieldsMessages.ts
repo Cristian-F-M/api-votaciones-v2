@@ -87,7 +87,7 @@ export function greaterThanMessage(field: string, options: GreaterThanMessageOpt
 
 	let message = `El valor de ${pronoun} ${locationText} ${field} debe ser mayor que ${secondPronoun}`
 
-	if (secondLocationText) message += secondLocationText
+	if (secondLocationText) message += ` ${secondLocationText}`
 
 	message += ` ${options.secondField.field}`
 
@@ -104,7 +104,7 @@ export function lessThanMessage(field: string, options: LessThanMessageOptions) 
 
 	let message = `El valor de ${pronoun} ${locationText} ${field} debe ser menor que ${secondPronoun}`
 
-	if (secondLocationText) message += secondLocationText
+	if (secondLocationText) message += ` ${secondLocationText}`
 
 	message += ` ${options.secondField.field}`
 
