@@ -10,7 +10,7 @@ import { col, fn } from 'sequelize'
 import type { Request, Response } from 'express'
 import type { RequestWithUser } from '@/types/auth'
 import { ShiftType, Vote } from '@/models'
-import { createElection, finishElection } from '@/validators/rlection'
+import { createElection, finishElection } from '@/validators/election'
 import { BLANK_VOTE_USER, ROLES } from '@/constants/database'
 
 const vote = express.Router()
