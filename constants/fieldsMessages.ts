@@ -1,6 +1,6 @@
 import type {
-	GreaterThatMessageOptions,
-	LessThatMessageOptions,
+	GreaterThanMessageOptions,
+	LessThanMessageOptions,
 	Location,
 	RequiredMessageOptions,
 	StrongMessageOptions
@@ -25,7 +25,7 @@ export const STRONG_DEFAULT_OPTIONS: StrongMessageOptions = {
 	requirements: []
 }
 
-export const GREATER_THAT_DEFAULT_OPTIONS: GreaterThatMessageOptions = {
+export const GREATER_THAN_DEFAULT_OPTIONS: GreaterThanMessageOptions = {
 	...DEFAULT_MESSAGE_OPTIONS,
 	secondField: {
 		gender: 'M',
@@ -34,7 +34,7 @@ export const GREATER_THAT_DEFAULT_OPTIONS: GreaterThatMessageOptions = {
 	}
 }
 
-export const LESS_THAT_DEFAULT_OPTIONS: LessThatMessageOptions = {
+export const LESS_THAN_DEFAULT_OPTIONS: LessThanMessageOptions = {
 	...DEFAULT_MESSAGE_OPTIONS,
 	secondField: {
 		gender: 'M',

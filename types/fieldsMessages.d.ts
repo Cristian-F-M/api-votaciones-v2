@@ -24,10 +24,10 @@ export interface StrongMessageOptions extends MessageOptions {
 	requirements: string[]
 }
 
-export interface GreaterThatMessageOptions extends CustomPartial<MessageOptions, 'complement'> {
+export interface GreaterThanMessageOptions extends CustomPartial<MessageOptions, 'complement'> {
 	secondField: CustomOmit<MessageOptions, 'complement'> & { field: string; location: Location | null }
 }
 
-export interface LessThatMessageOptions extends CustomPartial<MessageOptions, 'complement'> {
+export interface LessThanMessageOptions extends CustomPartial<MessageOptions, 'complement'> {
 	secondField: CustomOmit<MessageOptions, 'complement'> & { field: string; location: Location | null }
 }

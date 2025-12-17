@@ -1,13 +1,7 @@
-import {
-	LOCATION_TEXTS,
-	DEFAULT_MESSAGE_OPTIONS,
-	STRONG_DEFAULT_OPTIONS,
-	GREATER_THAT_DEFAULT_OPTIONS,
-	LESS_THAT_DEFAULT_OPTIONS
-} from '@/constants/fieldsMessages'
+import { LOCATION_TEXTS, DEFAULT_MESSAGE_OPTIONS, STRONG_DEFAULT_OPTIONS, LESS_THAN_DEFAULT_OPTIONS, GREATER_THAN_DEFAULT_OPTIONS } from '@/constants/fieldsMessages'
 import type {
-	GreaterThatMessageOptions,
-	LessThatMessageOptions,
+	GreaterThanMessageOptions,
+	LessThanMessageOptions,
 	MessageOptions,
 	MinMaxMessageOptions,
 	NotValidMessageOptions,
@@ -83,8 +77,8 @@ export function strongMessage(field: string, options: PartialExcept<StrongMessag
 	return message
 }
 
-export function greaterThatMessage(field: string, options: GreaterThatMessageOptions) {
-	const mergedOptions = mergeObjects<GreaterThatMessageOptions>(GREATER_THAT_DEFAULT_OPTIONS, options)
+export function greaterThanMessage(field: string, options: GreaterThanMessageOptions) {
+	const mergedOptions = mergeObjects<GreaterThanMessageOptions>(GREATER_THAN_DEFAULT_OPTIONS, options)
 	const pronoun = getPronoun(mergedOptions.gender, true)
 	const secondPronoun = getPronoun(mergedOptions.secondField.gender, true)
 	const secondLocationText = getLocationText(mergedOptions.secondField.location)
@@ -100,8 +94,8 @@ export function greaterThatMessage(field: string, options: GreaterThatMessageOpt
 	return message
 }
 
-export function lessThatMessage(field: string, options: LessThatMessageOptions) {
-	const mergedOptions = mergeObjects<LessThatMessageOptions>(LESS_THAT_DEFAULT_OPTIONS, options)
+export function lessThanMessage(field: string, options: LessThanMessageOptions) {
+	const mergedOptions = mergeObjects<LessThanMessageOptions>(LESS_THAN_DEFAULT_OPTIONS, options)
 	const pronoun = getPronoun(mergedOptions.gender, true)
 	const secondPronoun = getPronoun(mergedOptions.secondField.gender, true)
 	const secondLocationText = getLocationText(mergedOptions.secondField.location)
