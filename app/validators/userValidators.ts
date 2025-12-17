@@ -1,126 +1,149 @@
 import { body } from 'express-validator'
+import { requiredMessage, minMaxMessage, strongMessage, notValidMessage } from '@/lib/fieldsMessages'
 
-export const registerValidation = [
+export const register = [
 	body('name')
 		.notEmpty()
-		.withMessage('Name is required')
+		.withMessage(requiredMessage('nombre'))
 		.isLength({ min: 3, max: 20 })
-		.withMessage('Name must be between 3 and 20 characters long'),
+		.withMessage(minMaxMessage('nombre', { min: 3, max: 20 })),
 	body('lastname')
 		.notEmpty()
-		.withMessage('Lastname is required')
+		.withMessage(requiredMessage('apellido'))
 		.isLength({ min: 3, max: 25 })
-		.withMessage('Lastname must be between 3 and 25 characters long'),
-	body('typeDocumentCode').notEmpty().withMessage('Type document is required'),
+		.withMessage(minMaxMessage('apellido', { min: 3, max: 25 })),
+	body('typeDocumentCode').notEmpty().withMessage(requiredMessage('tipo de documento')),
 	body('document')
 		.notEmpty()
-		.withMessage('Document is required')
+		.withMessage(requiredMessage('documento'))
 		.isLength({ min: 7, max: 15 })
-		.withMessage('Document must be between 7 and 15 characters long'),
+		.withMessage(minMaxMessage('documento', { min: 7, max: 15 })),
 	body('phone')
 		.notEmpty()
-		.withMessage('Phone is required')
+		.withMessage(requiredMessage('telefono'))
 		.isLength({ min: 10, max: 10 })
-		.withMessage('Phone must be between 10 and 15 characters long'),
-	body('email')
-		.notEmpty()
-		.withMessage('Email is required')
-		.isEmail()
-		.withMessage('Email must be a valid email'),
+		.withMessage(minMaxMessage('telefono', { min: 10, max: 10 })),
+	body('email').notEmpty().withMessage(requiredMessage('correo')).isEmail().withMessage('El correo debe ser valido'),
+	body('shiftTypeCode').notEmpty().withMessage(requiredMessage('tipo de turno')),
 	body('password')
 		.notEmpty()
-		.withMessage('Password is required')
+		.withMessage(requiredMessage('contraseña'))
 		.isLength({ min: 8, max: 20 })
+		.withMessage(minMaxMessage('contraseña', { min: 8, max: 20 }))
 		.isStrongPassword({
 			minLength: 8,
 			minUppercase: 1,
 			minSymbols: 1,
 			minNumbers: 1,
-			minLowercase: 1,
+			minLowercase: 1
 		})
 		.withMessage(
-			'Password must be between 8 and 20 characters long and contain at least 1 uppercase letter and 1 symbol',
+			strongMessage('contraseña', {
+				requirements: ['1 mayuscula', '1 minuscula', '1 numero', '1 simbolo']
+			})
 		),
+	body('passwordConfirmation').notEmpty().withMessage(requiredMessage('confirmacion de contraseña'))
 ]
 
-export const loginValidation = [
-	body('typeDocumentCode')
-		.notEmpty()
-		.withMessage('Type of document is required'),
-	body('document').notEmpty().withMessage('Document is required'),
-	body('password').notEmpty().withMessage('Password is required'),
+export const login = [
+	body('typeDocumentCode').notEmpty().withMessage(requiredMessage('tipo de documento')),
+	body('document').notEmpty().withMessage(requiredMessage('documento')),
+	body('password').notEmpty().withMessage(requiredMessage('contraseña'))
 ]
 
-export const updateProfileValidation = [
+export const updateProfile = [
 	body('name')
 		.notEmpty()
-		.withMessage('Nombre es requerido')
+		.withMessage(requiredMessage('nombre'))
 		.isLength({ min: 3, max: 20 })
-		.withMessage('Nombre debe ser entre 3 y 20 caracteres'),
+		.withMessage(minMaxMessage('nombre', { min: 3, max: 20 })),
 	body('lastname')
 		.notEmpty()
-		.withMessage('Apellido es requerido')
+		.withMessage(requiredMessage('apellido'))
 		.isLength({ min: 3, max: 25 })
-		.withMessage('Apellido debe ser entre 3 y 25 caracteres'),
+		.withMessage(minMaxMessage('apellido', { min: 3, max: 25 })),
 	body('phone')
 		.notEmpty()
-		.withMessage('Telefono es requerido')
+		.withMessage(requiredMessage('telefono'))
 		.isLength({ min: 10, max: 10 })
-		.withMessage('Telefono debe ser entre 10 y 15 caracteres'),
+		.withMessage(minMaxMessage('telefono', { min: 10, max: 10 })),
 	body('email')
 		.notEmpty()
-		.withMessage('Correo electronico es requerido')
+		.withMessage(requiredMessage('correo'))
 		.isEmail()
-		.withMessage('El correo electronico debe ser valido'),
+		.withMessage(notValidMessage('correo electronico'))
 ]
 
-export const findUserValidation = [
-	body('typeDocumentCode')
-		.notEmpty()
-		.withMessage('El tipo de documento es requirido'),
-	body('document').notEmpty().withMessage('El documento es requerido'),
+export const findUser = [
+	body('typeDocumentCode').notEmpty().withMessage(requiredMessage('tipo de documento')),
+	body('document').notEmpty().withMessage(requiredMessage('documento'))
 ]
 
-export const sendResetCodeValidation = [
-	body('userId').notEmpty().withMessage('El id del usuario es requerido'),
+export const sendResetCode = [body('userId').notEmpty().withMessage(requiredMessage('id del usuario'))]
+
+export const verifyPasswordResetCode = [
+	body('userId').notEmpty().withMessage(requiredMessage('id del usuario')),
+	body('code').notEmpty().withMessage(requiredMessage('codigo de verificacion'))
 ]
 
-export const verifyPasswordResetCodeValidation = [
-	body('userId').notEmpty().withMessage('El id del usuario es requerido'),
-	body('code').notEmpty().withMessage('El codigo de verificacion es requerido'),
-]
-
-export const updatePasswordValidation = [
-	body('userId').notEmpty().withMessage('El id del usuario es requerido'),
+export const updatePassword = [
+	body('userId').notEmpty().withMessage(requiredMessage('id del usuario')),
 	body('password')
 		.notEmpty()
-		.withMessage('La nueva contraseña es requerida')
+		.withMessage(requiredMessage('contraseña'))
 		.isLength({ min: 8, max: 20 })
-    .withMessage('Password must be between 8 and 20 characters long')
+		.withMessage(minMaxMessage('contraseña', { min: 8, max: 20 }))
 		.isStrongPassword({
 			minLength: 8,
 			minUppercase: 1,
 			minSymbols: 1,
 			minNumbers: 1,
-			minLowercase: 1,
+			minLowercase: 1
 		})
 		.withMessage(
-			'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 symbol and 1 number',
+			strongMessage('contraseña', { requirements: ['1 mayuscula', '1 minuscula', '1 numero', '1 simbolo'] })
 		),
-	body('passwordConfirmation')
-		.notEmpty()
-		.withMessage('La confirmación de la nueva contraseña es requerida'),
+	body('passwordConfirmation').notEmpty().withMessage(requiredMessage('confirmacion de contraseña'))
 ]
 
-export const notifyValidation = [
+export const notify = [
 	body('title')
 		.notEmpty()
-		.withMessage('El titulo es requerido')
+		.withMessage(requiredMessage('titulo'))
 		.isLength({ min: 6, max: 15 })
-		.withMessage('El titulo debe ser entre 6 y 15 caracteres'),
+		.withMessage(minMaxMessage('titulo', { min: 6, max: 15 })),
 	body('body')
 		.notEmpty()
-		.withMessage('El cuerpo es requerido')
+		.withMessage(requiredMessage('cuerpo'))
 		.isLength({ min: 6, max: 15 })
-		.withMessage('El cuerpo debe ser entre 6 y 15 caracteres'),
+		.withMessage(minMaxMessage('cuerpo', { min: 6, max: 15 }))
+]
+
+export const sendNotification = [
+	body('title')
+		.notEmpty()
+		.withMessage(requiredMessage('titulo'))
+		.isLength({ min: 6, max: 15 })
+		.withMessage(minMaxMessage('titulo', { min: 6, max: 15 })),
+	body('body')
+		.notEmpty()
+		.withMessage(requiredMessage('cuerpo'))
+		.isLength({ min: 6, max: 15 })
+		.withMessage(minMaxMessage('cuerpo', { min: 6, max: 15 }))
+]
+
+export const notificationToken = [
+	body('notificationToken').notEmpty().withMessage(requiredMessage('token')),
+	body('deviceType').notEmpty().withMessage(requiredMessage('tipo de dispositivo'))
+]
+
+export const validatePermissions = [
+	body('roles')
+		.notEmpty()
+		.withMessage(requiredMessage('roles'))
+		.isArray()
+		.withMessage(notValidMessage('roles'))
+		.custom((input: unknown[], meta) => {
+			return input.every((i) => typeof i === 'string')
+		})
 ]

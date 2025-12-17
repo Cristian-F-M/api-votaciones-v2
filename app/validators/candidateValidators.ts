@@ -1,6 +1,21 @@
-import { body } from 'express-validator'
+import { requiredMessage, minMaxMessage, notValidMessage } from '@/lib/fieldsMessages'
+import { body, param, query } from 'express-validator'
 
-export const updateProfileValidation = [
-	body('description').notEmpty().withMessage('La descripción es requerida'),
-	body('objectives').isArray({ min: 5, max: 30 }).withMessage('Debes tener al menos 5 objetivos y maximo 30'),
+export const updateProfile = [
+	body('description').notEmpty().withMessage(requiredMessage('descripción')),
+	body('objectives')
+		.isArray({ min: 5, max: 30 })
+		.withMessage(minMaxMessage('objetivos', { min: 5, max: 30 }))
+		.custom((input) => input.every((o: unknown) => Object.prototype.toString.call(o) === '[object Object]'))
+		.withMessage(notValidMessage('objetivos'))
+		.custom((input) => input.every((objective: Record<string, string>) => 'id' in objective && 'text' in objective))
+		.withMessage(notValidMessage('objetivos'))
 ]
+
+export const createCandidate = [body('userId').notEmpty().withMessage(requiredMessage('id del usuario'))]
+
+export const getCandidate = [query('id').notEmpty().withMessage(requiredMessage('id del candidato'))]
+
+export const deleteCandidate = [param('id').notEmpty().withMessage(requiredMessage('id del candidato'))]
+
+export const voteToCandidate = [param('id').notEmpty().withMessage(requiredMessage('id del candidato'))]
