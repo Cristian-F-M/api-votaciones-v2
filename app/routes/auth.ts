@@ -6,7 +6,7 @@ import Session from '@/models/Session'
 import { Profile, Role, ShiftType, TypeDocument, User } from '@/models/index.js'
 import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
 import type { Role as RoleModel, ShiftType as ShiftTypeModel, TypeDocument as TypeDocumentModel } from '@/types/models'
-import { loginValidation, registerValidation, validatePermissions } from '@/validators/userValidators'
+import { login, register, validatePermissions } from '@/validators/userValidators'
 import bcrypt from 'bcrypt'
 import express from 'express'
 import type { Request, Response } from 'express'
@@ -20,7 +20,7 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 	res.json({ ok: true, urlRedirect: 'apprentice/' })
 })
 
-router.post('/register', validateRequest(registerValidation), async (req: Request, res: Response) => {
+router.post('/register', validateRequest(register), async (req: Request, res: Response) => {
 	const { name, lastname, typeDocumentCode, document, phone, email, shiftTypeCode, password, passwordConfirmation } =
 		req.body
 
@@ -121,7 +121,7 @@ router.post('/register', validateRequest(registerValidation), async (req: Reques
 	res.json({ message: 'Registered', ok: true, urlRedirect: 'login' })
 })
 
-router.post('/login', validateRequest(loginValidation), async (req: Request, res: Response) => {
+router.post('/login', validateRequest(login), async (req: Request, res: Response) => {
 	const { typeDocumentCode, document, password, remember } = req.body
 	const { 'session-type': sessionType } = req.headers
 

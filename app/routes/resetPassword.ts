@@ -4,10 +4,10 @@ import { getPasswordResetCode, getSecretEmail } from '@/lib/user'
 import { validateRequest } from '@/middlewares/UserMiddlewares'
 import { PasswordReset, TypeDocument, User } from '@/models'
 import {
-	findUserValidation,
-	sendResetCodeValidation,
-	updatePasswordValidation,
-	verifyPasswordResetCodeValidation
+	findUser,
+	sendResetCode,
+	updatePassword,
+	verifyPasswordResetCode
 } from '@/validators/userValidators'
 import express from 'express'
 import type { Request, Response } from 'express'
@@ -15,7 +15,7 @@ import bcryp from 'bcrypt'
 
 const router = express.Router()
 
-router.post('/find-user', validateRequest(findUserValidation), async (req: Request, res: Response) => {
+router.post('/find-user', validateRequest(findUser), async (req: Request, res: Response) => {
 	const { typeDocumentCode, document } = req.body
 
 	const typeDocument = await TypeDocument.findOne({
@@ -63,7 +63,7 @@ router.post('/find-user', validateRequest(findUserValidation), async (req: Reque
 
 router.post(
 	'/send-password-reset-code',
-	validateRequest(sendResetCodeValidation),
+	validateRequest(sendResetCode),
 	async (req: Request, res: Response) => {
 		const { userId } = req.body
 		const user = await User.findByPk(userId)
@@ -119,7 +119,7 @@ router.post(
 
 router.post(
 	'/verify-password-reset-code',
-	validateRequest(verifyPasswordResetCodeValidation),
+	validateRequest(verifyPasswordResetCode),
 	async (req: Request, res: Response) => {
 		const { userId, code } = req.body
 		const user = await User.findByPk(userId)
@@ -154,7 +154,7 @@ router.post(
 	}
 )
 
-router.patch('/update-password', validateRequest(updatePasswordValidation), async (req: Request, res: Response) => {
+router.patch('/update-password', validateRequest(updatePassword), async (req: Request, res: Response) => {
 	const { userId, code, password, passwordConfirmation } = req.body
 
 	const user = await User.findByPk(userId)

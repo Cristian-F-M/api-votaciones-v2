@@ -3,7 +3,7 @@ import type { Request, Response } from 'express'
 import { DeviceToken, Profile, User } from '@/models/index'
 import { roleRequired, sessionRequired, validateRequest } from '@/middlewares/UserMiddlewares'
 import fs from 'node:fs'
-import { updateProfileValidation, notificationTokenValidation } from '@/validators/userValidators'
+import { updateProfile, notificationToken } from '@/validators/userValidators'
 import multer from 'multer'
 import pLimit from 'p-limit'
 import { uploadImage } from '@/lib/cloudinary'
@@ -55,7 +55,7 @@ user.get('/', sessionRequired, async (req: Request, res: Response) => {
 user.patch(
 	'/notification-token',
 	sessionRequired,
-	validateRequest(notificationTokenValidation),
+	validateRequest(notificationToken),
 	async (req: Request, res: Response) => {
 		const { notificationToken, deviceType } = req.body
 		const user = (req as RequestWithUser).user
@@ -107,7 +107,7 @@ user.put(
 	'/profile',
 	sessionRequired,
 	roleRequired('*'),
-	validateRequest(updateProfileValidation),
+	validateRequest(updateProfile),
 	upload.single('image'),
 	async (req: Request, res: Response) => {
 		const user = (req as RequestWithUser).user
