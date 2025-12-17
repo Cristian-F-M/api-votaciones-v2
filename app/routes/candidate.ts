@@ -7,7 +7,7 @@ import {
 	createCandidate,
 	deleteCandidate,
 	getCandidate,
-	updateProfileValidation,
+	updateProfile,
 	voteToCandidate
 } from '@/validators/candidateValidators'
 import express from 'express'
@@ -252,7 +252,7 @@ candidate.put(
 	'/profile',
 	sessionRequired,
 	roleRequired('CANDIDATE'),
-	validateRequest(updateProfileValidation),
+	validateRequest(updateProfile),
 	async (req: Request, res: Response) => {
 		const { objectives, description } = req.body as { objectives: { id: string; text: string }[]; description: string }
 		const user = (req as RequestWithUser).user
