@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "port=8085 bun --watch app.js",
-    "sync:db": "bun app/config/syncDb.js",
-    "seed:db": "bun app/config/seed.js",
+    "sync:db": "bun config/syncDb.js",
+    "seed:db": "bun config/seed.js",
     "setup:db": "bun run sync:db && bun run seed:db",
     "dev:https": "bun --watch httpsServer.js",
     "setup:types": "bun scripts/generate-sequelize-types.ts"
