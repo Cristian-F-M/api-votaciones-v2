@@ -3,10 +3,10 @@ import type { Config as ConfigModel } from '@/types/models'
 import type { CreationAttributes } from 'sequelize'
 dotenv.config()
 
-const { CM_PASSWORD } = process.env
+const { CM_PASSWORD, SMTP_USER = '', SMTP_PASSWORD = '' } = process.env
 
 export const ALLOWED_SESSION_TYPES = {
-  WEB: 'WEB',
+	WEB: 'WEB',
 	MOBILE: 'MOBILE'
 }
 
@@ -17,7 +17,7 @@ export const BLANK_VOTE_USER = {
 	name: 'Voto en blanco',
 	lastname: '',
 	description: 'Vota en blanco si no estás de acuerdo con ninguno de los candidatos',
-	password: CM_PASSWORD,
+	password: CM_PASSWORD
 }
 
 export const TYPES_DOCUMENTS = {
@@ -25,51 +25,51 @@ export const TYPES_DOCUMENTS = {
 		name: 'Cédula de ciudadanía',
 		code: 'CedulaCiudadania',
 		description:
-			'Documento de identidad emitido a los ciudadanos colombianos mayores de 18 años para acreditar su ciudadanía',
+			'Documento de identidad emitido a los ciudadanos colombianos mayores de 18 años para acreditar su ciudadanía'
 	},
 	TARJETA_IDENTIDAD: {
 		name: 'Tarjeta de identidad',
 		code: 'TarjetaIdentidad',
-		description: 'Documento emitido a los ciudadanos colombianos mayores de 7 años para acreditar su identidad',
+		description: 'Documento emitido a los ciudadanos colombianos mayores de 7 años para acreditar su identidad'
 	},
 	CEDULA_EXTRANJERIA: {
 		name: 'Cédula de extranjería',
 		code: 'CedulaExtranjeria',
-		description: 'Documento emitido a los ciudadanos extranjeros para acreditar su ciudadanía',
+		description: 'Documento emitido a los ciudadanos extranjeros para acreditar su ciudadanía'
 	},
 	PASAPORTE: {
 		name: 'Pasaporte',
 		code: 'Passport',
-		description: 'Documento con validez internacional expedido por las autoridades de su respectivo país',
-	},
+		description: 'Documento con validez internacional expedido por las autoridades de su respectivo país'
+	}
 }
 
 export const ROLES = {
 	USER: {
 		name: 'Usuario',
 		code: 'User',
-		description: 'Usuario de la aplicación',
+		description: 'Usuario de la aplicación'
 	},
 	APPRENTICE: {
 		name: 'Aprendiz',
 		code: 'Apprentice',
-		description: 'Usuario que se encuentra registrado en el sistema y tiene acceso a las funciones de aprendizaje',
+		description: 'Usuario que se encuentra registrado en el sistema y tiene acceso a las funciones de aprendizaje'
 	},
 	ADMINISTRATOR: {
 		name: 'Administrador',
 		code: 'Administrator',
-		description: 'Usuario que tiene acceso a la administración de la aplicación',
+		description: 'Usuario que tiene acceso a la administración de la aplicación'
 	},
 	DEVELOPER: {
 		name: 'Desarrollador',
 		code: 'Developer',
-		description: 'Desarrollador de la aplicación',
+		description: 'Desarrollador de la aplicación'
 	},
 	CANDIDATE: {
 		name: 'Candidato',
 		code: 'Candidate',
-		description: 'Usuario candidato a votar',
-	},
+		description: 'Usuario candidato a votar'
+	}
 }
 
 export const CONFIGS: Record<string, CreationAttributes<ConfigModel>> = {
@@ -104,25 +104,25 @@ export const CONFIGS: Record<string, CreationAttributes<ConfigModel>> = {
 }
 
 export const SHIFT_TYPES = {
-  MORNING: {
-    name: 'Mañana',
-    code: 'MORNING',
-    description: 'Jornada de la mañana',
-    startTime: '07:00',
-    endTime: '12:00'
-  },
-  AFTERNOON: {
-    name: 'Tarde',
-    code: 'AFTERNOON',
-    description: 'Jornada de la tarde',
-    startTime: '13:00',
-    endTime: '18:00'
-  },
-  NIGHT: {
-    name: 'Noche',
-    code: 'NIGHT',
-    description: 'Jornada de la noche',
-    startTime: '19:00',
-    endTime: '10:00'
-  }
+	MORNING: {
+		name: 'Mañana',
+		code: 'MORNING',
+		description: 'Jornada de la mañana',
+		startTime: '07:00',
+		endTime: '12:00'
+	},
+	AFTERNOON: {
+		name: 'Tarde',
+		code: 'AFTERNOON',
+		description: 'Jornada de la tarde',
+		startTime: '13:00',
+		endTime: '18:00'
+	},
+	NIGHT: {
+		name: 'Noche',
+		code: 'NIGHT',
+		description: 'Jornada de la noche',
+		startTime: '19:00',
+		endTime: '10:00'
+	}
 }
