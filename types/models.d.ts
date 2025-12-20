@@ -1,4 +1,4 @@
-import type { ALLOWED_SESSION_TYPE } from '@/types/index'
+import type { ALLOWED_SESSION_TYPE, ConfigScope } from '@/types/index'
 import type { CreationOptional, ForeignKey } from 'sequelize'
 
 export interface Candidate {
@@ -14,6 +14,7 @@ export interface Config {
 	code: string
 	description: string
 	value: string
+  scope: ConfigScope
 }
 
 export interface Role {

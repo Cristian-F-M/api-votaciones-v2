@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize'
 import sequelize from '@/config/database'
 import type { Config as ConfigModel } from '@/types/models'
+import { CONFIG_SCOPES } from '@/constants/database'
 
 const Config = sequelize.define<ConfigModel>(
 	'Config',
@@ -26,6 +27,10 @@ const Config = sequelize.define<ConfigModel>(
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
+    scope: {
+      type: DataTypes.ENUM(...Object.values(CONFIG_SCOPES)),
+      allowNull: false,
+    }
 	}
 )
 
