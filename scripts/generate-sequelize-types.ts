@@ -108,13 +108,13 @@ for (const [modelName, model] of Object.entries(models)) {
 		const nonAttributes = nonAttributesFor(associationMeta)
 		const mixins = mixinsFor(associationMeta)
 
-		lines.push(`    //Tl ${associationMeta.source} ${associationMeta.type} ${associationMeta.target}`)
+		lines.push(`    // ${associationMeta.source} ${associationMeta.type} ${associationMeta.target}`)
 		lines.push('')
-		lines.push('    //* Properties')
+		lines.push('    // Properties')
 		lines.push(nonAttributes)
 		lines.push('')
 		lines.push('')
-		lines.push('    //* Mixins')
+		lines.push('    // Mixins')
 		lines.push(mixins)
 	}
 
