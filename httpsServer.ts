@@ -15,12 +15,8 @@ const CERTIFCATE_NAME = process.env.CERTIFCATE_NAME
 app.use(morgan('dev'))
 
 const options = {
-	key: fs.readFileSync(
-		path.join(__dirname, `certificates/${CERTIFCATE_NAME}-key.pem`)
-	),
-	cert: fs.readFileSync(
-		path.join(__dirname, `certificates/${CERTIFCATE_NAME}.pem`)
-	),
+	key: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}-key.pem`)),
+	cert: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}.pem`))
 }
 
 const server = https.createServer(options, app)
