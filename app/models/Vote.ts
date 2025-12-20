@@ -32,6 +32,6 @@ const Vote = sequelize.define<VoteModel>('Vote', {
 			key: 'id'
 		}
 	}
-})
+}, { paranoid: true })
 
 export default Vote

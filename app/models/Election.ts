@@ -47,6 +47,6 @@ const Election = sequelize.define<ElectionModel>('Election', {
 			key: 'id'
 		}
 	}
-})
+}, { paranoid: true })
 
 export default Election

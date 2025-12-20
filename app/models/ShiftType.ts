@@ -28,6 +28,6 @@ const ShiftType = sequelize.define<ShiftTypeModel>('ShiftType', {
 		type: DataTypes.TIME,
 		allowNull: false
 	}
-})
+}, { paranoid: true })
 
 export default ShiftType

@@ -33,6 +33,6 @@ const Profile = sequelize.define<ProfileModel>('Profile', {
 		type: DataTypes.STRING,
 		allowNull: true
 	}
-})
+}, { paranoid: true })
 
 export default Profile

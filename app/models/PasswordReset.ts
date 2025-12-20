@@ -37,6 +37,6 @@ const PasswordReset = sequelize.define<PasswordResetModel>('PasswordReset', {
 	usedAt: {
 		type: DataTypes.DATE
 	}
-})
+}, { paranoid: true })
 
 export default PasswordReset

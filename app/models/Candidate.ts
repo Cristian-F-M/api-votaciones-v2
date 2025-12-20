@@ -26,6 +26,6 @@ const Candidate = sequelize.define<CandidateModel>('Candidate', {
 		allowNull: false,
 		defaultValue: true
 	}
-})
+}, { paranoid: true })
 
 export default Candidate

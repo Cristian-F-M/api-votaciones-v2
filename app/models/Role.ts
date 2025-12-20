@@ -21,6 +21,6 @@ const Role = sequelize.define<RoleModel>('Role', {
 		allowNull: true,
 		defaultValue: 'Sin definir'
 	}
-})
+}, { paranoid: true })
 
 export default Role

@@ -21,6 +21,6 @@ const TypeDocument = sequelize.define<TypeDocumentModel>('TypeDocument', {
 		allowNull: true,
 		defaultValue: 'Sin definir'
 	}
-})
+}, { paranoid: true })
 
 export default TypeDocument

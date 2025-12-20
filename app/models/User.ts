@@ -54,6 +54,6 @@ const User = sequelize.define<UserModel>('User', {
 			key: 'id'
 		}
 	}
-})
+}, { paranoid: true })
 
 export default User

@@ -34,6 +34,6 @@ const DeviceToken = sequelize.define<DeviceTokenModel>('DeviceToken', {
 		allowNull: false,
 		defaultValue: true
 	}
-})
+}, { paranoid: true })
 
 export default DeviceToken
