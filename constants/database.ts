@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-import type { Config as ConfigModel } from '@/types/models'
+import type { Config as ConfigModel, TypeDocument as TypeDocumentModel, Role as RoleModel } from '@/types/models'
 import type { CreationAttributes } from 'sequelize'
 dotenv.config()
 
@@ -20,7 +20,7 @@ export const BLANK_VOTE_USER = {
 	password: CM_PASSWORD
 }
 
-export const TYPES_DOCUMENTS = {
+export const TYPES_DOCUMENTS: Record<string, CreationAttributes<TypeDocumentModel>> = {
 	CEDULA_CIUDADANIA: {
 		name: 'Cédula de ciudadanía',
 		code: 'CedulaCiudadania',
@@ -44,7 +44,7 @@ export const TYPES_DOCUMENTS = {
 	}
 }
 
-export const ROLES = {
+export const ROLES: Record<string, CreationAttributes<RoleModel>> = {
 	USER: {
 		name: 'Usuario',
 		code: 'User',
