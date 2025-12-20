@@ -3,7 +3,7 @@ import { groupBy } from '@/lib/fields.js'
 import { DeviceToken, PasswordReset, Profile, Role, Session, ShiftType, TypeDocument, User, Vote } from '@/models/index'
 import type { AllowedRole } from '@/types/UserMiddleware'
 import type { RequestWithUser, UserJWTPaylod } from '@/types/auth'
-import type { ALLOWED_SESSION_TYPE } from '@/types/index'
+import type { AllowedSessionTypes } from '@/types/index'
 import type { Session as SessionModel, User as UserModel } from '@/types/models'
 import type { NextFunction, Request, Response } from 'express'
 import { type ValidationChain, validationResult } from 'express-validator'
@@ -67,7 +67,7 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 	const { token: userToken } = req.cookies
 	const { 'session-type': sessionType } = req.headers
 
-	const SESSION_TYPE = sessionType.toUpperCase() as ALLOWED_SESSION_TYPE
+	const SESSION_TYPE = sessionType.toUpperCase() as AllowedSessionTypes
 
 	const needLoginData = { ok: false, message: 'Debes iniciar sesión para acceder al aplicativo', urlRedirect: '/login' }
 
