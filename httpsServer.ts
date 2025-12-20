@@ -3,6 +3,7 @@ import { getIp } from './config.js'
 import https from 'node:https'
 import fs from 'node:fs'
 import path from 'node:path'
+import { ConfigService } from '@/services/config.service.js'
 import morgan from 'morgan'
 
 const PORT = process.env.PORT || 3000
@@ -23,7 +24,9 @@ const options = {
 
 const server = https.createServer(options, app)
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
+	await ConfigService.load()
+
 	console.log(`Server is running on port https://localhost:${PORT}`)
 	if (ip) console.log(`Server is running on port https://${ip}:${PORT}`)
 })
