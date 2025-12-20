@@ -12,6 +12,7 @@ import {
 import express from 'express'
 import type { Request, Response } from 'express'
 import bcryp from 'bcrypt'
+import { renderResetPasswordEmail, sendEmail } from '@/lib/email'
 
 const router = express.Router()
 
@@ -97,17 +98,31 @@ router.post(
 			return
 		}
 
-		// TODO -> Compilar el correo usando react-mail y enviar el correo con node-mailer
+
+	const passwordResetCode = getPasswordResetCode(6)
+	try {
+		const html = await renderResetPasswordEmail(passwordResetCode)
+
+		await sendEmail({
+			to: user.email,
+			subject: `Código de restablecimiento para la cuenta de votaciones CGAO ${new Date().getFullYear()}`,
+			html
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error enviando el correo, por favor intenta más tarde.' })
+		return
+	}
 
 		const waitSeconds = getWaitSeconds(passwordReset.attempts)
 		const nextSendAt = new Date(new Date().getTime() + waitSeconds * 1000)
-		const passwordResetCode = bcryp.hashSync(getPasswordResetCode(6), bcryp.genSaltSync())
+		const hashedPasswordResetCode = bcryp.hashSync(passwordResetCode, bcryp.genSaltSync())
 		const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
 
 		await passwordReset.update({
 			nextSendAt,
 			attempts: passwordReset.attempts + 1,
-			code: passwordResetCode,
+			code: hashedPasswordResetCode,
 			expiresAt
 		})
 
