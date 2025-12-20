@@ -11,3 +11,5 @@ certificates/
 env.d.ts
 
 types/models-associations.d.ts
+
+bun.lock
