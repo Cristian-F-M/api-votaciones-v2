@@ -1,7 +1,7 @@
 {
   "name": "api-votaciones-v2",
   "version": "0.0.1",
-  "main": "app.js",
+  "main": "app.ts",
   "type": "module",
   "scripts": {
     "dev": "port=8085 bun --watch app.js",
@@ -48,9 +48,8 @@
     "@types/react": "^19.2.7",
     "typescript": "^5.8.3"
   },
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "bcrypt",
-    "sqlite3"
-  ]
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true
 }
