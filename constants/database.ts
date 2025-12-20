@@ -73,10 +73,16 @@ export const ROLES = {
 export const CONFIGS = {
 	COLOR: {
 		name: 'Color',
-		code: 'color',
+		code: 'COLOR',
 		description: 'Color of the logo and the main texts',
 		value: '#ff6719',
 	},
+	LOGO_IMAGE: {
+		name: 'Logo image',
+		code: 'LOGO_IMAGE',
+		description: 'Logo de la aplicación',
+		value: 'https://images.seeklogo.com/logo-png/24/1/sena-logo-png_seeklogo-242896.png'
+	}
 }
 
 
