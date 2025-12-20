@@ -85,7 +85,7 @@ lines.push(
 )
 lines.push('')
 lines.push(
-	`type MagicModel<M, AttrsOmit extends keyof InferAttributes<M> = never, CreationAttrsOmit extends keyof InferCreationAttributes<M> = never> = Model<InferAttributes<M, { omit: 'createdAt' | 'updatedAt' | AttrsOmit }>, InferCreationAttributes<M, { omit: 'createdAt' | 'updatedAt' | CreationAttrsOmit }>>`
+	`type MagicModel<M, AttrsOmit extends keyof InferAttributes<M> = never, CreationAttrsOmit extends keyof InferCreationAttributes<M> = never> = Model<InferAttributes<M, { omit: ${timestampsText} | AttrsOmit }>, InferCreationAttributes<M, { omit: ${timestampsText} | CreationAttrsOmit }>>`
 )
 lines.push('')
 lines.push('interface Timestamps { createdAt: Date; updatedAt: Date }')
