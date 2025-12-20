@@ -49,7 +49,7 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 		profile: { name, lastname, phone, imageUrl }
 	}
 
-	res.json({ ok: true, user: userObject })
+	res.json({ ok: true, data: userObject })
 })
 
 router.patch(

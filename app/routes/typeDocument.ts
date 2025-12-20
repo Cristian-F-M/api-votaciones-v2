@@ -11,7 +11,7 @@ router.get('/all', async (req: Request, res: Response) => {
 		const typeDocuments = await TypeDocument.findAll({
 			attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] }
 		})
-		res.json({ ok: true, typeDocuments })
+		res.json({ ok: true, data: typeDocuments })
 		return
 	} catch (err) {
 		console.log(err)
@@ -40,7 +40,7 @@ router.get(
 				return
 			}
 
-			res.json({ ok: true, typeDocument })
+			res.json({ ok: true, data: typeDocument })
 			return
 		} catch (err) {
 			console.log(err)

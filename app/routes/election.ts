@@ -44,7 +44,7 @@ router.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), asyn
 			return
 		}
 
-		res.json({ ok: true, election: election })
+		res.json({ ok: true, data: election })
 	} catch (err) {
 		console.log(err)
 		res

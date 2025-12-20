@@ -44,7 +44,7 @@ router.get(
 				return
 			}
 
-			res.json({ ok: true, candidate })
+			res.json({ ok: true, data: candidate })
 			return
 		} catch (err) {
 			console.log(err)
@@ -80,7 +80,7 @@ router.get(
 			attributes: ['id', 'userId', 'description', 'isActive']
 		})
 
-		res.json({ ok: true, candidates })
+		res.json({ ok: true, data: candidates })
 	}
 )
 

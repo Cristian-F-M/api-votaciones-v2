@@ -16,7 +16,7 @@ router.get(
 		try {
 			const configs = await Config.findAll()
 
-			res.json({ ok: true, configs })
+			res.json({ ok: true, data: configs })
 		} catch (err) {
 			console.log(err)
 			res
@@ -52,7 +52,7 @@ router.get(
 			return
 		}
 
-		res.json({ ok: true, config })
+		res.json({ ok: true, data: config })
 	}
 )
 

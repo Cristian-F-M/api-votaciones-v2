@@ -11,7 +11,7 @@ const router = express.Router()
 router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
 	try {
 		const roles = await Role.findAll()
-		res.json({ ok: true, roles })
+		res.json({ ok: true, data: roles })
 
 		return
 	} catch (err) {
@@ -44,7 +44,7 @@ router.get(
 			return
 		}
 
-		res.json({ ok: true, role })
+		res.json({ ok: true, data: role })
 	}
 )
 
