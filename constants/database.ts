@@ -21,7 +21,7 @@ export const BLANK_VOTE_USER = {
 	password: CM_PASSWORD
 }
 
-export const TYPES_DOCUMENTS: Record<string, CreationAttributes<TypeDocumentModel>> = {
+export const TYPES_DOCUMENTS = {
 	CEDULA_CIUDADANIA: {
 		name: 'Cédula de ciudadanía',
 		code: 'CedulaCiudadania',
@@ -45,7 +45,7 @@ export const TYPES_DOCUMENTS: Record<string, CreationAttributes<TypeDocumentMode
 	}
 }
 
-export const ROLES: Record<string, CreationAttributes<RoleModel>> = {
+export const ROLES = {
 	USER: {
 		name: 'Usuario',
 		code: 'User',
@@ -73,7 +73,7 @@ export const ROLES: Record<string, CreationAttributes<RoleModel>> = {
 	}
 }
 
-export const CONFIGS: Record<string, CreationAttributes<ConfigModel>> = {
+export const CONFIGS = {
 	COLOR: {
 		name: 'Color',
 		code: 'COLOR',
