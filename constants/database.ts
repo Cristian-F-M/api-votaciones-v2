@@ -1,6 +1,7 @@
 import dotenv from 'dotenv'
 import type { Config as ConfigModel, TypeDocument as TypeDocumentModel, Role as RoleModel } from '@/types/models'
 import type { CreationAttributes } from 'sequelize'
+import type { ConfigScope } from '@/types/index'
 dotenv.config()
 
 const { CM_PASSWORD, SMTP_USER = '', SMTP_PASSWORD = '' } = process.env
@@ -125,4 +126,9 @@ export const SHIFT_TYPES = {
 		startTime: '19:00',
 		endTime: '10:00'
 	}
+}
+
+export const CONFIG_SCOPES: Record<Uppercase<ConfigScope>, string> = {
+	SYSTEM: 'system',
+	USER: 'user'
 }
