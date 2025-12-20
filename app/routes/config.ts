@@ -9,6 +9,25 @@ import { Op } from 'sequelize'
 const router = express.Router()
 
 router.get(
+	'/all',
+	sessionRequired,
+	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
+	async (req: Request, res: Response) => {
+		try {
+			const configs = await Config.findAll()
+
+			res.json({ ok: true, configs })
+		} catch (err) {
+			console.log(err)
+			res
+				.status(500)
+				.json({ ok: false, message: 'Ocurrio un error buscando las configuraciones, por favor intenta nuevamente...' })
+			return
+		}
+	}
+)
+
+router.get(
 	'/:q',
 	sessionRequired,
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
@@ -34,25 +53,6 @@ router.get(
 		}
 
 		res.json({ ok: true, config })
-	}
-)
-
-router.get(
-	'/all',
-	sessionRequired,
-	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
-	async (req: Request, res: Response) => {
-		try {
-			const configs = await Config.findAll()
-
-			res.json({ ok: true, configs })
-		} catch (err) {
-			console.log(err)
-			res
-				.status(500)
-				.json({ ok: false, message: 'Ocurrio un error buscando las configuraciones, por favor intenta nuevamente...' })
-			return
-		}
 	}
 )
 

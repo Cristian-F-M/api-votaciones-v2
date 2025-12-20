@@ -6,6 +6,23 @@ import type { Request, Response } from 'express'
 
 const router = express.Router()
 
+router.get('/all', async (req: Request, res: Response) => {
+	try {
+		const typeDocuments = await TypeDocument.findAll({
+			attributes: { exclude: ['createdAt', 'updatedAt', 'deletedAt'] }
+		})
+		res.json({ ok: true, typeDocuments })
+		return
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({
+			ok: false,
+			message: 'Ocurrio un error buscando los tipos de documentos, por favor intenta nuevamente...'
+		})
+		return
+	}
+})
+
 router.get(
 	'/:q',
 	sessionRequired,
@@ -34,21 +51,6 @@ router.get(
 		}
 	}
 )
-
-router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
-	try {
-		const typeDocuments = await TypeDocument.findAll()
-		res.json({ ok: true, typeDocuments })
-		return
-	} catch (err) {
-		console.log(err)
-		res.status(500).json({
-			ok: false,
-			message: 'Ocurrio un error buscando los tipos de documentos, por favor intenta nuevamente...'
-		})
-		return
-	}
-})
 
 router.put(
 	'/',

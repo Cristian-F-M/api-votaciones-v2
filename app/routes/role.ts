@@ -8,6 +8,19 @@ import type { Role as RoleModel } from '@/types/models'
 
 const router = express.Router()
 
+router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
+	try {
+		const roles = await Role.findAll()
+		res.json({ ok: true, roles })
+
+		return
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error buscando los roles, por favor intenta nuevamente...' })
+		return
+	}
+})
+
 router.get(
 	'/:q',
 	sessionRequired,
@@ -34,19 +47,6 @@ router.get(
 		res.json({ ok: true, role })
 	}
 )
-
-router.get('/all', sessionRequired, roleRequired('ADMINISTRATOR'), async (req: Request, res: Response) => {
-	try {
-		const roles = await Role.findAll()
-		res.json({ ok: true, roles })
-
-		return
-	} catch (err) {
-		console.log(err)
-		res.status(500).json({ ok: false, message: 'Ocurrio un error buscando los roles, por favor intenta nuevamente...' })
-		return
-	}
-})
 
 router.put(
 	'/',
