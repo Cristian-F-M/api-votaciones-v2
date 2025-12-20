@@ -14,7 +14,7 @@ export interface Config {
 	code: string
 	description: string
 	value: string
-  scope: ConfigScope
+	scope: ConfigScope
 }
 
 export interface Role {

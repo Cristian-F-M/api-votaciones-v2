@@ -7,15 +7,15 @@ const PasswordReset = sequelize.define<PasswordResetModel>('PasswordReset', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	userId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
 			model: User,
-			key: 'id',
-		},
+			key: 'id'
+		}
 	},
 	code: {
 		type: DataTypes.STRING
@@ -23,7 +23,7 @@ const PasswordReset = sequelize.define<PasswordResetModel>('PasswordReset', {
 	attempts: {
 		type: DataTypes.INTEGER,
 		allowNull: false,
-		defaultValue: 0,
+		defaultValue: 0
 	},
 	isActive: {
 		type: DataTypes.BOOLEAN

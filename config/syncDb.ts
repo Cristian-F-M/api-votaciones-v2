@@ -1,6 +1,5 @@
 import sequelize from '@/config/database'
 import * as models from '@/models'
-
 ;[models]
 
 async function setupDb() {

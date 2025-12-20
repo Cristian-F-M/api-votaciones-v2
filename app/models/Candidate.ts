@@ -7,25 +7,25 @@ const Candidate = sequelize.define<CandidateModel>('Candidate', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	userId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
 			model: User,
-			key: 'id',
-		},
+			key: 'id'
+		}
 	},
 	description: {
 		type: DataTypes.STRING,
-		allowNull: true,
+		allowNull: true
 	},
 	isActive: {
 		type: DataTypes.BOOLEAN,
 		allowNull: false,
-		defaultValue: true,
-	},
+		defaultValue: true
+	}
 })
 
 export default Candidate

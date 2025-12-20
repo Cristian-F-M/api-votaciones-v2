@@ -6,6 +6,6 @@ const app = createApp()
 const ip = getIp()
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port http://localhost:${PORT}`)
-  if (ip) console.log(`Server is running on port http://${ip}:${PORT}`)
+	console.log(`Server is running on port http://localhost:${PORT}`)
+	if (ip) console.log(`Server is running on port http://${ip}:${PORT}`)
 })

@@ -7,20 +7,20 @@ const Objective = sequelize.define<ObjectiveModel>('Objective', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	text: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	candidateId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
 			model: Candidate,
-			key: 'id',
-		},
-	},
+			key: 'id'
+		}
+	}
 })
 
 export default Objective

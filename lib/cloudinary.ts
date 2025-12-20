@@ -7,7 +7,7 @@ const defaultOptions: Partial<UploadApiOptions> = {
 	use_filename: false,
 	unique_filename: false,
 	resource_type: 'auto',
-	type: 'upload',
+	type: 'upload'
 }
 
 export async function uploadImage(filePath: string, options?: Partial<UploadApiOptions>) {

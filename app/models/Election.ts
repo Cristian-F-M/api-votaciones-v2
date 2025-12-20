@@ -7,46 +7,46 @@ const Election = sequelize.define<ElectionModel>('Election', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	apprenticeCount: {
 		type: DataTypes.INTEGER,
-		defaultValue: 0,
+		defaultValue: 0
 	},
 	totalVotes: {
 		type: DataTypes.INTEGER,
 		allowNull: false,
-		defaultValue: 0,
+		defaultValue: 0
 	},
 	winnerVoteCount: {
 		type: DataTypes.INTEGER,
-		defaultValue: 0,
+		defaultValue: 0
 	},
 	winner: {
 		type: DataTypes.JSON,
-		allowNull: true,
+		allowNull: true
 	},
 	startDate: {
 		type: DataTypes.DATE,
-		allowNull: false,
+		allowNull: false
 	},
 	endDate: {
 		type: DataTypes.DATE,
-		allowNull: false,
+		allowNull: false
 	},
 	status: {
 		type: DataTypes.ENUM('active', 'finished', 'canceled'),
 		allowNull: false,
-		defaultValue: 'active',
+		defaultValue: 'active'
 	},
 	shiftTypeId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
 			model: ShiftType,
-			key: 'id',
-		},
-	},
+			key: 'id'
+		}
+	}
 })
 
 export default Election

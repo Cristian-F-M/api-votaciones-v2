@@ -6,20 +6,20 @@ const Role = sequelize.define<RoleModel>('Role', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	name: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	code: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	description: {
 		type: DataTypes.STRING,
 		allowNull: true,
-		defaultValue: 'Sin definir',
+		defaultValue: 'Sin definir'
 	}
 })
 

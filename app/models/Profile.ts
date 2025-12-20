@@ -7,32 +7,32 @@ const Profile = sequelize.define<ProfileModel>('Profile', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	userId: {
 		type: DataTypes.UUID,
 		allowNull: false,
 		references: {
 			model: User,
-			key: 'id',
-		},
+			key: 'id'
+		}
 	},
 	name: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	lastname: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	phone: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	imageUrl: {
 		type: DataTypes.STRING,
-		allowNull: true,
-	},
+		allowNull: true
+	}
 })
 
 export default Profile

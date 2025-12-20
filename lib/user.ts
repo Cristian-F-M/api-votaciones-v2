@@ -1,10 +1,9 @@
 export function getSecretEmail(email: string, maxLetter: number) {
 	const [user, dom] = email.split('@')
-  if (!user || !dom) return '****@****'
+	if (!user || !dom) return '****@****'
 
 	const visiblePercent = Math.floor((user.length * 20) / 100) || 2
-	const visibleLetters =
-		visiblePercent <= maxLetter ? visiblePercent : maxLetter
+	const visibleLetters = visiblePercent <= maxLetter ? visiblePercent : maxLetter
 	const visibleUser = user.slice(0, visibleLetters)
 	const newEmail = `${visibleUser}*****@${dom}`
 	return newEmail
@@ -22,8 +21,8 @@ export function getPasswordResetCode(length: number) {
 
 export function getWaitSeconds(attempts: number): number {
 	const waitTimes = [0, 30, 60, 120, 300, 600, 1800, 3600]
-  const index = Math.min(Math.max(0, attempts), waitTimes.length - 1)
+	const index = Math.min(Math.max(0, attempts), waitTimes.length - 1)
 
-	// biome-ignore lint/style/noNonNullAssertion: It will be not undefined 
+	// biome-ignore lint/style/noNonNullAssertion: It will be not undefined
 	return waitTimes[index]!
 }

@@ -4,32 +4,31 @@ import type { Session as SessionModel } from '@/types/models'
 import User from '@/models/User'
 import { ALLOWED_SESSION_TYPES } from '@/constants/database'
 
-
 const Session = sequelize.define<SessionModel>('Session', {
 	id: {
 		type: DataTypes.UUID,
 		primaryKey: true,
-		defaultValue: DataTypes.UUIDV4,
+		defaultValue: DataTypes.UUIDV4
 	},
 	token: {
 		type: DataTypes.STRING,
-		allowNull: false,
+		allowNull: false
 	},
 	expires: {
 		type: DataTypes.DATE,
-		allowNull: false,
+		allowNull: false
 	},
 	userId: {
 		type: DataTypes.UUID,
 		references: {
 			model: User,
-			key: 'id',
-		},
+			key: 'id'
+		}
 	},
 	type: {
 		type: DataTypes.ENUM(...Object.keys(ALLOWED_SESSION_TYPES)),
-		allowNull: false,
-	},
+		allowNull: false
+	}
 })
 
 export default Session

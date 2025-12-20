@@ -5,10 +5,9 @@ async function seedDb() {
 	const typesDocuments = TypeDocument.bulkCreate(Object.values(TYPES_DOCUMENTS))
 	const roles = Role.bulkCreate(Object.values(ROLES))
 	const configs = Config.bulkCreate(Object.values(CONFIGS))
-  const shiftTypes = ShiftType.bulkCreate(Object.values(SHIFT_TYPES))
+	const shiftTypes = ShiftType.bulkCreate(Object.values(SHIFT_TYPES))
 
 	await Promise.all([typesDocuments, roles, configs, shiftTypes])
-
 
 	console.log('Database seeded!!!!')
 }
