@@ -75,7 +75,7 @@ function mixinsFor(a: AssociationMeta) {
 const cap = (s: string) => s[0]?.toUpperCase() + s.slice(1)
 const lines: string[] = []
 
-const timestampsText = `'createdAt' | 'updatedAt'`
+const timestampsText = `'createdAt' | 'updatedAt' | 'deletedAt'`
 
 lines.push('// ⚠️ AUTO-GENERATED FILE — DO NOT EDIT')
 lines.push(`import type { NonAttribute } from 'sequelize'`)
@@ -89,16 +89,18 @@ lines.push(
 )
 lines.push('')
 lines.push('interface Timestamps { createdAt: Date; updatedAt: Date }')
+lines.push('interface SoftDelete { deletedAt: Date }')
 lines.push('')
 
 let modelsIndex = 0
 
 for (const [modelName, model] of Object.entries(models)) {
 	const assocs = model.associations
+	const { paranoid } = model.options
 
 	lines.push('declare module "@/types/models" {')
 	lines.push(
-		`  interface ${modelName} extends MagicModel<${modelName}, ${timestampsText}, ${timestampsText}>, Timestamps {`
+		`  interface ${modelName} extends MagicModel<${modelName}, ${timestampsText}, ${timestampsText}>, Timestamps ${paranoid ? ', SoftDelete' : ''} {`
 	)
 	if (!assocs || Object.keys(assocs).length === 0) {
 		lines.push('  }')
@@ -137,8 +139,6 @@ for (const [modelName, model] of Object.entries(models)) {
 	lines.push('  }')
 	lines.push('}')
 	lines.push('')
-
-	modelsIndex++
 }
 
 const target = path.resolve('types/models-associations.d.ts')
