@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+import type { Config as ConfigModel } from '@/types/models'
+import type { CreationAttributes } from 'sequelize'
 dotenv.config()
 
 const { CM_PASSWORD } = process.env
@@ -70,21 +72,36 @@ export const ROLES = {
 	},
 }
 
-export const CONFIGS = {
+export const CONFIGS: Record<string, CreationAttributes<ConfigModel>> = {
 	COLOR: {
 		name: 'Color',
 		code: 'COLOR',
 		description: 'Color of the logo and the main texts',
 		value: '#ff6719',
+		scope: 'system'
 	},
 	LOGO_IMAGE: {
 		name: 'Logo image',
 		code: 'LOGO_IMAGE',
 		description: 'Logo de la aplicación',
-		value: 'https://images.seeklogo.com/logo-png/24/1/sena-logo-png_seeklogo-242896.png'
+		value: 'https://images.seeklogo.com/logo-png/24/1/sena-logo-png_seeklogo-242896.png',
+		scope: 'system'
+	},
+	SMTP_USER: {
+		name: 'SMTP User',
+		code: 'SMTP_USER',
+		description: 'Usuario para enviar correos electrónicos',
+		value: SMTP_USER,
+		scope: 'system'
+	},
+	SMTP_PASSWORD: {
+		name: 'SMTP Password',
+		code: 'SMTP_PASSWORD',
+		description: 'Contraseña del usuario para enviar correos electrónicos',
+		value: SMTP_PASSWORD,
+		scope: 'system'
 	}
 }
-
 
 export const SHIFT_TYPES = {
   MORNING: {
