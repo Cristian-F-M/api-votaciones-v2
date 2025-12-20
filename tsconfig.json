@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+    "jsx": "react-jsx",
 		// Environment setup & latest features
 		"lib": ["ESNEXT"],
 		"target": "ESNEXT",
@@ -33,6 +34,7 @@
 			"@/constants/*": ["constants/*"],
 			"@/lib/*": ["lib/*"],
 			"@/config/*": ["config/*"],
+      "@/emails/*": ["emails/*"]
 		}
 	}
 }
