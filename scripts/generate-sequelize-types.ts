@@ -18,19 +18,6 @@ type AssociationMeta = {
 	type: 'BelongsTo' | 'HasOne' | 'HasMany'
 }
 
-function getMixinsFunctionsNames(a: AssociationMeta) {
-	const T = a.target
-
-	const get = `get${T}`
-	const set = `set${T}`
-	const add = `add${T}`
-	const create = `create${T}`
-
-	if (a.type === 'BelongsTo') return `'${get}' | '${set}' | '${create}'`
-	if (a.type === 'HasOne') return `'${get}' | '${set}' | '${create}'`
-	if (a.type === 'HasMany') return `'${get}s' | '${add}' | '${add}s' | '${create}'`
-}
-
 function nonAttributesFor(a: AssociationMeta) {
 	const T = a.target
 	const propertyName = T[0]?.toLowerCase() + T.slice(1)
@@ -92,8 +79,6 @@ lines.push('interface Timestamps { createdAt: Date; updatedAt: Date }')
 lines.push('interface SoftDelete { deletedAt: Date }')
 lines.push('')
 
-let modelsIndex = 0
-
 for (const [modelName, model] of Object.entries(models)) {
 	const assocs = model.associations
 	const { paranoid } = model.options
@@ -106,11 +91,8 @@ for (const [modelName, model] of Object.entries(models)) {
 		lines.push('  }')
 		lines.push('}')
 		lines.push('')
-		modelsIndex++
 		continue
 	}
-
-	const text = getMixinsFunctionsNames(meta[modelsIndex] as AssociationMeta)
 
 	for (const assoc of Object.values(assocs)) {
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
