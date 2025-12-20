@@ -1,10 +1,10 @@
 import transporter from '@/config/nodemailer'
 import { RESET_PASSWORD_CODE_EXPIRATION_TIME } from '@/constants/auth'
+import ResetPasswordEmail from '@/emails/password-reset/email'
+import { ConfigService } from '@/services/config.service'
 import { render } from '@react-email/components'
 import dotenv from 'dotenv'
 import type { SendMailOptions } from 'nodemailer'
-import { ConfigService } from '@/services/emailConfig.service'
-import ResetPasswordEmail from '@/emails/password-reset/email'
 import { formatTime } from './global'
 
 interface SendEmailProps extends SendMailOptions {
@@ -15,15 +15,15 @@ interface SendEmailProps extends SendMailOptions {
 
 dotenv.config()
 
-const { SMTP_USER } = process.env
-
 export async function renderEmail(Email: React.ReactNode) {
 	return await render(Email)
 }
 
 export async function sendEmail({ to, subject, html, ...props }: SendEmailProps) {
+	const configs = ConfigService.get()
+
 	return await transporter.sendMail({
-		from: `Votaciones <${SMTP_USER}>`,
+		from: `Votaciones <${configs.SMTP_USER}>`,
 		to,
 		subject,
 		html,
