@@ -3,12 +3,7 @@ import { getWaitSeconds } from '@/lib/user'
 import { getPasswordResetCode, getSecretEmail } from '@/lib/user'
 import { validateRequest } from '@/middlewares/UserMiddlewares'
 import { PasswordReset, TypeDocument, User } from '@/models'
-import {
-	findUser,
-	sendResetCode,
-	updatePassword,
-	verifyPasswordResetCode
-} from '@/validators/userValidators'
+import { findUser, sendResetCode, updatePassword, verifyPasswordResetCode } from '@/validators/userValidators'
 import express from 'express'
 import type { Request, Response } from 'express'
 import bcryp from 'bcrypt'
@@ -43,7 +38,7 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 		const [passwordReset, created] = await PasswordReset.findOrCreate({
 			where: {
 				userId: user.id,
-        isActive: true
+				isActive: true
 			},
 			defaults: {
 				attempts: 0,
@@ -62,42 +57,38 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 	}
 })
 
-router.post(
-	'/send-password-reset-code',
-	validateRequest(sendResetCode),
-	async (req: Request, res: Response) => {
-		const { userId } = req.body
-		const user = await User.findByPk(userId)
+router.post('/send-password-reset-code', validateRequest(sendResetCode), async (req: Request, res: Response) => {
+	const { userId } = req.body
+	const user = await User.findByPk(userId)
 
-		if (!user) {
-			res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
-			return
+	if (!user) {
+		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
+		return
+	}
+
+	const passwordReset = await PasswordReset.findOne({
+		where: {
+			userId: user.id,
+			isActive: true
 		}
+	})
 
-		const passwordReset = await PasswordReset.findOne({
-			where: {
-				userId: user.id,
-				isActive: true
-			}
+	if (!passwordReset) {
+		res
+			.status(400)
+			.json({ ok: false, message: 'Realiza el paso anterior antes de intentar enviar un código de restablecimiento' })
+		return
+	}
+
+	if (passwordReset.nextSendAt && passwordReset.nextSendAt > new Date()) {
+		console.log(passwordReset.nextSendAt.toString())
+		res.json({
+			ok: false,
+			message: 'Tiempo de espera excedido, espera un momento',
+			nextSendAt: passwordReset.nextSendAt
 		})
-
-		if (!passwordReset) {
-			res
-				.status(400)
-				.json({ ok: false, message: 'Realiza el paso anterior antes de intentar enviar un código de restablecimiento' })
-			return
-		}
-
-		if (passwordReset.nextSendAt && passwordReset.nextSendAt > new Date()) {
-			console.log(passwordReset.nextSendAt.toString())
-			res.json({
-				ok: false,
-				message: 'Tiempo de espera excedido, espera un momento',
-				nextSendAt: passwordReset.nextSendAt
-			})
-			return
-		}
-
+		return
+	}
 
 	const passwordResetCode = getPasswordResetCode(6)
 	try {
@@ -114,23 +105,22 @@ router.post(
 		return
 	}
 
-		const waitSeconds = getWaitSeconds(passwordReset.attempts)
-		const nextSendAt = new Date(new Date().getTime() + waitSeconds * 1000)
-		const hashedPasswordResetCode = bcryp.hashSync(passwordResetCode, bcryp.genSaltSync())
-		const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
+	const waitSeconds = getWaitSeconds(passwordReset.attempts)
+	const nextSendAt = new Date(new Date().getTime() + waitSeconds * 1000)
+	const hashedPasswordResetCode = bcryp.hashSync(passwordResetCode, bcryp.genSaltSync())
+	const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
 
-		await passwordReset.update({
-			nextSendAt,
-			attempts: passwordReset.attempts + 1,
-			code: hashedPasswordResetCode,
-			expiresAt
-		})
+	await passwordReset.update({
+		nextSendAt,
+		attempts: passwordReset.attempts + 1,
+		code: hashedPasswordResetCode,
+		expiresAt
+	})
 
-		// TODO -> añadir a la cola un evento para deshabilitar el `passwordReset`
+	// TODO -> añadir a la cola un evento para deshabilitar el `passwordReset`
 
-		res.json({ ok: true, message: 'Se te ha enviado un correo con el código', nextSendAt })
-	}
-)
+	res.json({ ok: true, message: 'Se te ha enviado un correo con el código', nextSendAt })
+})
 
 router.post(
 	'/verify-password-reset-code',
