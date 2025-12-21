@@ -211,7 +211,7 @@ router.patch('/update-password', validateRequest(updatePassword), async (req: Re
 		})
 	])
 
-	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlReturn: 'login/' })
+	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlRedirect: 'login/' })
 })
 
 export default router
