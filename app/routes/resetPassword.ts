@@ -191,7 +191,9 @@ router.patch('/update-password', validateRequest(updatePassword), async (req: Re
 	}
 
 	if (password !== passwordConfirmation) {
-		const passwordConfirmationError = { path: 'passwordConfirmation', message: 'Las contraseñas deben ser iguales' }
+		const passwordConfirmationError = {
+			passwordConfirmation: { path: 'passwordConfirmation', message: 'Las contraseñas deben ser iguales' }
+		}
 		res.status(400).json({
 			ok: false,
 			errors: [passwordConfirmationError]
