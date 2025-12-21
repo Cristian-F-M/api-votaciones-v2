@@ -70,7 +70,7 @@ router.put(
 			}
 
 			await typeDocument.update({ name, description })
-			res.json({ ok: true, message: 'Tipo de documento actualizado correctamente', typeDocument })
+			res.json({ ok: true, message: 'Tipo de documento actualizado correctamente', data: typeDocument })
 			return
 		} catch (err) {
 			console.log(err)
