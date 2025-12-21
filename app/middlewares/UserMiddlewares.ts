@@ -18,7 +18,9 @@ export function validateRequest(middlewares: ValidationChain[]) {
 		await new Promise((r) => setTimeout(r, 0))
 
 		const errors = validationResult(req).array()
-		const filterErrors = errors.filter((item) => item.type === 'field')
+		const filterErrors = errors
+			.filter((item) => item.type === 'field')
+			.map(({ msg, location, ...item }) => ({ ...item, message: msg }))
 
 		if (errors.length === 0) return next()
 
