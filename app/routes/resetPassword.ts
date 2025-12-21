@@ -57,7 +57,7 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 	}
 })
 
-router.post('/send-password-reset-code', validateRequest(sendResetCode), async (req: Request, res: Response) => {
+router.post('/send-code', validateRequest(sendResetCode), async (req: Request, res: Response) => {
 	const { userId } = req.body
 	const user = await User.findByPk(userId)
 
@@ -123,7 +123,7 @@ router.post('/send-password-reset-code', validateRequest(sendResetCode), async (
 })
 
 router.post(
-	'/verify-password-reset-code',
+	'/verify-code',
 	validateRequest(verifyPasswordResetCode),
 	async (req: Request, res: Response) => {
 		const { userId, code } = req.body
