@@ -101,7 +101,7 @@ router.delete(
 			}
 
 			await typeDocument.destroy()
-			res.json({ ok: true, message: 'Tipo de documento eliminado correctamente', typeDocument })
+			res.json({ ok: true, message: 'Tipo de documento eliminado correctamente' })
 			return
 		} catch (err) {
 			console.log(err)
