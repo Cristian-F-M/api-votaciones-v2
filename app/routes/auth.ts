@@ -81,7 +81,9 @@ router.post('/register', validateRequest(register), async (req: Request, res: Re
 	}
 
 	if (password !== passwordConfirmation) {
-		const passwordConfirmationError = { path: 'passwordConfirmation', msg: 'Las contraseas deben ser iguales' }
+		const passwordConfirmationError = {
+			passwordConfirmation: { path: 'passwordConfirmation', message: 'Las contraseas deben ser iguales' }
+		}
 		res.status(400).json({ ok: false, errors: [passwordConfirmationError] })
 		return
 	}
