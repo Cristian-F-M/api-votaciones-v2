@@ -17,7 +17,7 @@ const { JWT_SECRET } = process.env
 const router = express.Router()
 
 router.get('/', sessionRequired, async (req: Request, res: Response) => {
-	res.json({ ok: true, urlRedirect: 'apprentice/' })
+	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect: 'apprentice/' })
 })
 
 router.post('/register', validateRequest(register), async (req: Request, res: Response) => {
