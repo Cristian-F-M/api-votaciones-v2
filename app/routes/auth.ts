@@ -268,7 +268,7 @@ router.post('/logout', sessionRequired, async (req: Request, res: Response) => {
 })
 
 router.post(
-	'validate-permissions',
+	'/validate-permissions',
 	validateRequest(validatePermissions),
 	sessionRequired,
 	async (req: Request, res: Response) => {
