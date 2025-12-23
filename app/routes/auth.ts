@@ -217,7 +217,7 @@ router.post('/login', validateRequest(login), async (req: Request, res: Response
 
 	const tokenToSend = sessionType === 'MOBILE' && jwtToken
 
-	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend, r: jwtToken })
+	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend })
 })
 
 router.post('/login-biometrics', sessionRequired, async (req: Request, res: Response) => {
