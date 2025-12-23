@@ -217,6 +217,12 @@ router.post('/login', validateRequest(login), async (req: Request, res: Response
 
 	const tokenToSend = sessionType === 'MOBILE' && jwtToken
 
+	res.cookie('token', jwtToken, {
+		secure: true,
+		httpOnly: true,
+		sameSite: 'none',
+		maxAge: tokenDuration * 1000
+	})
 	res.json({ ok: true, message: 'Has iniciado sesión correctamente...', urlRedirect, token: tokenToSend })
 })
 
