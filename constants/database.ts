@@ -24,23 +24,23 @@ export const BLANK_VOTE_USER = {
 export const TYPES_DOCUMENTS = {
 	CEDULA_CIUDADANIA: {
 		name: 'Cédula de ciudadanía',
-		code: 'CedulaCiudadania',
+		code: 'CEDULA_CIUDADANIA',
 		description:
 			'Documento de identidad emitido a los ciudadanos colombianos mayores de 18 años para acreditar su ciudadanía'
 	},
 	TARJETA_IDENTIDAD: {
 		name: 'Tarjeta de identidad',
-		code: 'TarjetaIdentidad',
+		code: 'TARJETA_IDENTIDAD',
 		description: 'Documento emitido a los ciudadanos colombianos mayores de 7 años para acreditar su identidad'
 	},
 	CEDULA_EXTRANJERIA: {
 		name: 'Cédula de extranjería',
-		code: 'CedulaExtranjeria',
+		code: 'CEDULA_EXTRANJERIA',
 		description: 'Documento emitido a los ciudadanos extranjeros para acreditar su ciudadanía'
 	},
 	PASAPORTE: {
 		name: 'Pasaporte',
-		code: 'Passport',
+		code: 'PASAPORTE',
 		description: 'Documento con validez internacional expedido por las autoridades de su respectivo país'
 	}
 }
@@ -48,27 +48,27 @@ export const TYPES_DOCUMENTS = {
 export const ROLES = {
 	USER: {
 		name: 'Usuario',
-		code: 'User',
+		code: 'USER',
 		description: 'Usuario de la aplicación'
 	},
 	APPRENTICE: {
 		name: 'Aprendiz',
-		code: 'Apprentice',
+		code: 'APPRENTICE',
 		description: 'Usuario que se encuentra registrado en el sistema y tiene acceso a las funciones de aprendizaje'
 	},
 	ADMINISTRATOR: {
 		name: 'Administrador',
-		code: 'Administrator',
+		code: 'ADMINISTRATOR',
 		description: 'Usuario que tiene acceso a la administración de la aplicación'
 	},
 	DEVELOPER: {
 		name: 'Desarrollador',
-		code: 'Developer',
+		code: 'DEVELOPER',
 		description: 'Desarrollador de la aplicación'
 	},
 	CANDIDATE: {
 		name: 'Candidato',
-		code: 'Candidate',
+		code: 'CANDIDATE',
 		description: 'Usuario candidato a votar'
 	}
 }
