@@ -27,7 +27,10 @@ router.get(
 		const id = req.query.id as string
 
 		try {
-			const candidate = await Candidate.findByPk(id, {
+			const candidate = await Candidate.findOne({
+				where: {
+					[Op.or]: [{ id }, { userId: id }]
+				},
 				include: [
 					{
 						model: User,
