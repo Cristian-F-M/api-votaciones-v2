@@ -39,12 +39,14 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 		typeDocumentId,
 		typeDocument: {
 			id: typeDocument.id,
-			name: typeDocument.name
+			name: typeDocument.name,
+			code: typeDocument.code
 		},
 		roleId,
 		role: {
 			id: role.id,
-			name: role.name
+			name: role.name,
+			code: role.code
 		},
 		profile: { name, lastname, phone, imageUrl }
 	}
