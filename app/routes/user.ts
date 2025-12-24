@@ -29,7 +29,8 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 		role,
 		profile: { name, lastname, phone, imageUrl },
 		roleId,
-		typeDocumentId
+		typeDocumentId,
+    shiftType
 	} = (req as RequestWithUser).user
 
 	const userObject = {
@@ -48,7 +49,12 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 			name: role.name,
 			code: role.code
 		},
-		profile: { name, lastname, phone, imageUrl }
+		profile: { name, lastname, phone, imageUrl },
+    shiftType: {
+      id: shiftType.id,
+      name: shiftType.name,
+      code: shiftType.code
+    }
 	}
 
 	res.json({ ok: true, data: userObject })
