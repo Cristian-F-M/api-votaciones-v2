@@ -119,7 +119,7 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 	if (!user) {
 		res
 			.status(404)
-			.json({ ok: false, message: 'Usuario no encontrado, por favor registrate primero', urlRedirect: '/register' })
+			.json({ ok: false, message: 'Usuario no encontrado, por favor registrate primero', urlRedirect: '/login' })
 		return
 	}
 
