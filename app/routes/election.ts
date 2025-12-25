@@ -24,12 +24,11 @@ router.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), asyn
 				status: 'active',
 				shiftTypeId: user.shiftType.id
 			},
+
+			attributes: {
+				include: ['id', 'startDate', 'endDate', 'status', 'shiftTypeId']
+			},
 			include: [
-				'id',
-				'startData',
-				'endDate',
-				'status',
-				'shiftType',
 				{
 					model: ShiftType,
 					as: 'shiftType'
