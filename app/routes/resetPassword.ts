@@ -11,6 +11,32 @@ import { renderResetPasswordEmail, sendEmail } from '@/lib/email'
 
 const router = express.Router()
 
+router.get('/', async (req: Request, res: Response) => {
+	const { token } = req.query as { token: string }
+	const hashedToken = crypto.hash('sha256', token)
+
+	try {
+		const passwordReset = await PasswordReset.findOne({ where: { isActive: true, token: hashedToken } })
+		const user = await User.findByPk(passwordReset?.userId ?? '')
+
+		if (!passwordReset || !user) {
+			res.status(404).json({ ok: false, message: 'El token utilizado no es válido :c', urlRedirect: 'find-user' })
+			return
+		}
+
+		const hiddenEmail = getSecretEmail(user.email, 2)
+
+		res.json({
+			ok: true,
+			data: { email: hiddenEmail, nextSendAt: passwordReset.nextSendAt }
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error buscando tu usario, por favor intenta más tarde.' })
+		return
+	}
+})
+
 router.post('/find-user', validateRequest(findUser), async (req: Request, res: Response) => {
 	const { typeDocumentCode, document } = req.body
 
