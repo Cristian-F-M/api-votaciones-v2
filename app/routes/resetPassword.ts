@@ -8,6 +8,7 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import bcryp from 'bcrypt'
 import { renderResetPasswordEmail, sendEmail } from '@/lib/email'
+import crypto from 'node:crypto'
 
 const router = express.Router()
 
@@ -170,42 +171,58 @@ router.post('/send-code', validateRequest(sendResetCode), async (req: Request, r
 	})
 })
 
-router.post(
-	'/verify-code',
-	validateRequest(verifyPasswordResetCode),
-	async (req: Request, res: Response) => {
-		const { userId, code } = req.body
-		const user = await User.findByPk(userId)
+router.post('/verify-code', validateRequest(verifyPasswordResetCode), async (req: Request, res: Response) => {
+	const { token, code } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const newToken = crypto.randomBytes(64).toString('hex')
+	const newHashedToken = crypto.hash('sha256', newToken)
+	const urlRedirect = `verify-code?token=${newToken}`
 
-		if (!user) {
-			res
-				.status(404)
-				.json({ ok: false, message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...' })
-			return
+	const passwordReset = await PasswordReset.findOne({
+		where: {
+			isActive: true,
+			token: hashedToken
 		}
+	})
 
-		const passwordReset = await PasswordReset.findOne({
-			where: {
-				userId: user.id,
-				isActive: true
-			}
+	if (!passwordReset) {
+		res.status(404).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de enviar el código de restablecimiento',
+			urlRedirect: 'find-user'
 		})
-
-		if (!passwordReset) {
-			res
-				.status(404)
-				.json({ ok: false, message: 'Realiza el paso anterior antes de enviar el código de restablecimiento' })
-			return
-		}
-
-		if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
-			res.status(400).json({ ok: false, message: 'El código no coindide, asegura de usar el ultimo enviado' })
-			return
-		}
-
-		res.json({ ok: true, message: 'Código verificado correctamente...' })
+		return
 	}
-)
+
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({
+			ok: false,
+			message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...',
+			urlRedirect: 'find-user'
+		})
+		return
+	}
+
+	if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
+		res.status(400).json({
+			ok: false,
+			errors: [{ code: [{ path: 'code', message: 'Código no válido' }] }],
+			message: 'El código no coindide, asegura de usar el ultimo enviado',
+			urlRedirect
+		})
+		return
+	}
+
+	await passwordReset.update({ token: newHashedToken })
+
+	res.json({
+		ok: true,
+		message: 'Código verificado correctamente...',
+		urlRedirect: `update-password?token=${newToken}`
+	})
+})
 
 router.patch('/update-password', validateRequest(updatePassword), async (req: Request, res: Response) => {
 	const { userId, code, password, passwordConfirmation } = req.body
