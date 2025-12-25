@@ -14,7 +14,7 @@ router.get(
 	roleRequired(['ADMINISTRATOR', 'APPRENTICE', 'CANDIDATE']),
 	async (req: Request, res: Response) => {
 		try {
-			const configs = await Config.findAll()
+			const configs = await Config.findAll({ attributes: { include: ['name', 'value', 'code'] } })
 
 			res.json({ ok: true, data: configs })
 		} catch (err) {
@@ -38,7 +38,10 @@ router.get(
 		let config: ConfigModel | null = null
 
 		try {
-			config = await Config.findOne({ where: { [Op.or]: [{ code: q }, { id: q }] } })
+			config = await Config.findOne({
+				where: { [Op.or]: [{ code: q }, { id: q }] },
+				attributes: { include: ['name', 'value', 'code'] }
+			})
 
 			if (!config) {
 				res.status(404).json({ ok: false, message: 'No se encontro la configuración, por favor intenta nuevamente...' })
