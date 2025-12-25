@@ -39,6 +39,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/find-user', validateRequest(findUser), async (req: Request, res: Response) => {
 	const { typeDocumentCode, document } = req.body
+	const urlRedirect = 'find-user'
 
 	const typeDocument = await TypeDocument.findOne({
 		where: {
@@ -54,11 +55,14 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 	})
 
 	if (!typeDocument || !user) {
-		res.status(404).json({ ok: false, message: 'Usuario no encontrado, asegurate de ingresar los datos correctos' })
+		res
+			.status(404)
+			.json({ ok: false, message: 'Usuario no encontrado, asegurate de ingresar los datos correctos', urlRedirect })
 		return
 	}
 
-	const hiddenEmail = getSecretEmail(user.email, 2)
+	const token = crypto.randomBytes(64).toString('hex')
+	const hashedToken = crypto.hash('sha256', token)
 
 	try {
 		const [passwordReset, created] = await PasswordReset.findOrCreate({
@@ -69,16 +73,21 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 			defaults: {
 				attempts: 0,
 				userId: user.id,
-				isActive: true
+				isActive: true,
+				token: hashedToken
 			}
 		})
 
-		const nextSendAt = !created && passwordReset.nextSendAt
+		if (!created) passwordReset.update({ token: hashedToken })
 
-		res.json({ ok: true, user: { id: user.id, email: hiddenEmail }, nextSendAt })
+		res.json({ ok: true, urlRedirect: `send-email?token=${token}` })
 	} catch (err) {
 		console.log(err)
-		res.json({ ok: false, message: 'Ocurrio un error buscando tu usario, por favor intenta más tarde.' })
+		res.json({
+			ok: false,
+			message: 'Ocurrio un error buscando tu usario, por favor intenta más tarde.',
+			urlRedirect
+		})
 		return
 	}
 })
