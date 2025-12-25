@@ -107,7 +107,8 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 		session = await Session.findOne({
 			where: {
 				userId: JWTResult.id,
-				type: SESSION_TYPE
+				type: SESSION_TYPE,
+				isActive: true
 			}
 		})
 	} catch (err) {
