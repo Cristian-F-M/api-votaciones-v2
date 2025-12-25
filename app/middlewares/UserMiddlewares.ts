@@ -69,8 +69,6 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 	const { token: userToken } = req.cookies
 	const { 'session-type': sessionType } = req.headers
 
-	const SESSION_TYPE = sessionType.toUpperCase() as AllowedSessionTypes
-
 	const needLoginData = { ok: false, message: 'Debes iniciar sesión para acceder al aplicativo', urlRedirect: '/login' }
 
 	if (!userToken || !JWT_SECRET) {
@@ -107,7 +105,7 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 		session = await Session.findOne({
 			where: {
 				userId: JWTResult.id,
-				type: SESSION_TYPE,
+				type: sessionType,
 				isActive: true
 			}
 		})
@@ -128,7 +126,6 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 		res.status(401).json(needLoginData)
 		return
 	}
-	req.headers['session-type'] = SESSION_TYPE
 	;(req as RequestWithUser).user = user
 	next()
 }
