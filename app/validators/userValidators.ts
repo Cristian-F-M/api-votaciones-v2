@@ -79,15 +79,15 @@ export const findUser = [
 	body('document').notEmpty().withMessage(requiredMessage('documento'))
 ]
 
-export const sendResetCode = [body('userId').notEmpty().withMessage(requiredMessage('id del usuario'))]
+export const sendResetCode = [body('token').notEmpty().withMessage(requiredMessage('token'))]
 
 export const verifyPasswordResetCode = [
-	body('userId').notEmpty().withMessage(requiredMessage('id del usuario')),
+	body('token').notEmpty().withMessage(requiredMessage('token')),
 	body('code').notEmpty().withMessage(requiredMessage('codigo de verificacion'))
 ]
 
 export const updatePassword = [
-	body('userId').notEmpty().withMessage(requiredMessage('id del usuario')),
+	body('token').notEmpty().withMessage(requiredMessage('token')),
 	body('password')
 		.notEmpty()
 		.withMessage(requiredMessage('contraseña'))
