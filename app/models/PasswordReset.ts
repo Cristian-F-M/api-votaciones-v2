@@ -20,6 +20,9 @@ const PasswordReset = sequelize.define<PasswordResetModel>('PasswordReset', {
 	code: {
 		type: DataTypes.STRING
 	},
+  token: {
+    type: DataTypes.STRING,
+  },
 	attempts: {
 		type: DataTypes.INTEGER,
 		allowNull: false,

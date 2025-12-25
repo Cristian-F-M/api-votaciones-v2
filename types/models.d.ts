@@ -53,6 +53,7 @@ export interface PasswordReset {
 	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	code: string | null
+  token: string
 	attempts: number
 	isActive: boolean
 	nextSendAt: Date | null
