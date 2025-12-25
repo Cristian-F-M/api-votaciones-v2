@@ -28,6 +28,7 @@ export interface Session {
 	id: CreationOptional<string>
 	token: string
 	expires: Date
+	isActive: boolean
 	userId: ForeignKey<User['id']>
 	type: ALLOWED_SESSION_TYPE
 }
@@ -53,7 +54,7 @@ export interface PasswordReset {
 	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	code: string | null
-  token: string
+	token: string
 	attempts: number
 	isActive: boolean
 	nextSendAt: Date | null
