@@ -225,33 +225,34 @@ router.post('/verify-code', validateRequest(verifyPasswordResetCode), async (req
 })
 
 router.patch('/update-password', validateRequest(updatePassword), async (req: Request, res: Response) => {
-	const { userId, code, password, passwordConfirmation } = req.body
-
-	const user = await User.findByPk(userId)
-
-	if (!user) {
-		res
-			.status(404)
-			.json({ ok: false, message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...' })
-		return
-	}
+	const { token, password, passwordConfirmation } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const urlRedirect = `update-password?token=${token}`
 
 	const passwordReset = await PasswordReset.findOne({
 		where: {
-			userId: user.id,
+			token: hashedToken,
 			isActive: true
 		}
 	})
 
 	if (!passwordReset) {
-		res
-			.status(404)
-			.json({ ok: false, message: 'Realiza el paso anterior antes de enviar el código de restablecimiento' })
+		res.status(404).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de enviar el código de restablecimiento',
+			urlRedirect: 'find-user'
+		})
 		return
 	}
 
-	if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
-		res.status(400).json({ ok: false, message: 'El código no coindide, asegura de usar el ultimo enviado' })
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({
+			ok: false,
+			message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...',
+			urlRedirect: 'find-user'
+		})
 		return
 	}
 
@@ -261,7 +262,8 @@ router.patch('/update-password', validateRequest(updatePassword), async (req: Re
 		}
 		res.status(400).json({
 			ok: false,
-			errors: [passwordConfirmationError]
+			errors: [passwordConfirmationError],
+			urlRedirect
 		})
 		return
 	}
@@ -276,7 +278,7 @@ router.patch('/update-password', validateRequest(updatePassword), async (req: Re
 		})
 	])
 
-	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlRedirect: 'login/' })
+	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlRedirect: '/login' })
 })
 
 export default router
