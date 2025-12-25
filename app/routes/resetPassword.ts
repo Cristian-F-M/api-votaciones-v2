@@ -93,25 +93,32 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 })
 
 router.post('/send-code', validateRequest(sendResetCode), async (req: Request, res: Response) => {
-	const { userId } = req.body
-	const user = await User.findByPk(userId)
-
-	if (!user) {
-		res.status(404).json({ ok: false, message: 'Usuario no encontrado' })
-		return
-	}
+	const { token } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const newToken = crypto.randomBytes(64).toString('hex')
+	const newHashedToken = crypto.hash('sha256', newToken)
+	const urlRedirect = `send-code?token=${newToken}`
 
 	const passwordReset = await PasswordReset.findOne({
 		where: {
-			userId: user.id,
-			isActive: true
+			isActive: true,
+			token: hashedToken
 		}
 	})
 
 	if (!passwordReset) {
-		res
-			.status(400)
-			.json({ ok: false, message: 'Realiza el paso anterior antes de intentar enviar un código de restablecimiento' })
+		res.status(400).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de intentar enviar un código de restablecimiento',
+			urlRedirect
+		})
+		return
+	}
+
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({ ok: false, message: 'Usuario no encontrado', urlRedirect })
 		return
 	}
 
@@ -149,12 +156,18 @@ router.post('/send-code', validateRequest(sendResetCode), async (req: Request, r
 		nextSendAt,
 		attempts: passwordReset.attempts + 1,
 		code: hashedPasswordResetCode,
-		expiresAt
+		expiresAt,
+		token: newHashedToken
 	})
 
 	// TODO -> añadir a la cola un evento para deshabilitar el `passwordReset`
 
-	res.json({ ok: true, message: 'Se te ha enviado un correo con el código', nextSendAt })
+	res.json({
+		ok: true,
+		message: 'Se te ha enviado un correo con el código',
+		data: { nextSendAt },
+		urlRedirect: `write-code?token=${newToken}`
+	})
 })
 
 router.post(
