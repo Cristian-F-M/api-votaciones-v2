@@ -71,7 +71,6 @@ router.get(
 		const allowShowInactives = user.role.code === ROLES.ADMINISTRATOR.code && showInactives === 'true'
 		if (!allowShowInactives) clauseWhere.isActive = true
 
-		// TODO ->
 		const candidates = await Candidate.findAll({
 			where: clauseWhere,
 			include: {

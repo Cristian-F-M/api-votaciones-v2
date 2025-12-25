@@ -34,7 +34,6 @@ export function validateRequest(middlewares: ValidationChain[]) {
  * Use it after {@link sessionRequired} middleware
  */
 export function roleRequired(role: '*' | AllowedRole | AllowedRole[]) {
-	// TODO -> modificar la función para acceptar el comodin `*`
 	const fn = (req: Request, res: Response, next: NextFunction) => {
 		const notAllowedData = { ok: false, message: 'No tienes permiso para acceder a esta ruta' }
 
