@@ -187,25 +187,27 @@ router.post('/login', validateRequest(login), async (req: Request, res: Response
 	}
 
 	try {
-		const [session, created] = await Session.findOrCreate({
+		const oldSession = await Session.findOne({
 			where: {
 				type: sessionType,
-				userId: user.id
-			},
-			defaults: {
-				token: jwtToken,
-				type: sessionType,
 				userId: user.id,
-				expires: sessionExpirationDate
+				isActive: true
 			}
 		})
 
-		if (!created) {
-			await session.update({
+		await Promise.all([
+			oldSession?.update({
+				isActive: false,
+				expires: new Date()
+			}),
+			Session.create({
 				token: jwtToken,
-				expires: sessionExpirationDate
+				type: sessionType,
+				userId: user.id,
+				expires: sessionExpirationDate,
+				isActive: true
 			})
-		}
+		])
 	} catch (err) {
 		console.log(err)
 		res.json({ ok: false, message: 'Ocurrio un error, por favor intenta nuevamente' })
