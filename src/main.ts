@@ -5,6 +5,7 @@ import https from 'node:https'
 import type { Express } from 'express'
 import fs from 'node:fs'
 import path from 'node:path'
+import { ConfigService } from '@/app/services/config.service.js'
 
 const args = process.argv
 const isSecure = args.includes('--secure')
@@ -22,23 +23,29 @@ const app = createApp()
 const ip = getIp()
 const protocol = isSecure ? 'https' : 'http'
 
-let server: https.Server | Express = app
-
-if (isSecure || runBothServers) {
-	const options = {
-		key: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}-key.pem`)),
-		cert: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}.pem`))
-	}
-
-	const httpsServer = https.createServer(options, app)
-	if (runBothServers) httpsServer.listen(securePort, () => listeningListener(securePort, 'https'))
-	if (isSecure) server = httpsServer
-}
-
-server.listen(PORT, () => listeningListener(PORT, protocol))
-
 function listeningListener(port: number, protocol: string) {
 	console.log(`\x1b[36m[${protocol.toUpperCase()}]\x1b[0m`)
 	console.log(`Server is running on port ${protocol}://localhost:${port}`)
 	if (ip) console.log(`Server is running on port ${protocol}://${ip}:${port}`)
 }
+
+async function main() {
+	let server: https.Server | Express = app
+
+	await ConfigService.load()
+
+	if (isSecure || runBothServers) {
+		const options = {
+			key: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}-key.pem`)),
+			cert: fs.readFileSync(path.join(__dirname, `certificates/${CERTIFCATE_NAME}.pem`))
+		}
+
+		const httpsServer = https.createServer(options, app)
+		if (runBothServers) httpsServer.listen(securePort, () => listeningListener(securePort, 'https'))
+		if (isSecure) server = httpsServer
+	}
+
+	server.listen(PORT, () => listeningListener(PORT, protocol))
+}
+
+main()
