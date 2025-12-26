@@ -1,7 +1,7 @@
 {
   "name": "api-votaciones-v2",
   "version": "0.0.1",
-  "main": "app.ts",
+  "main": "main.ts",
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/main.ts",
