@@ -1,4 +1,3 @@
-import limiter from '@/config/rateLimit'
 import * as routes from '@/app/routes'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
@@ -30,7 +29,6 @@ export default function createApp() {
 
 	app.use(setToUpperCaseHeader('session-type'))
 	app.use(globalValidator)
-	app.use(limiter)
 
 	// ? Hacerlo para las demás rutas
 	app.use('/', routes.auth)
