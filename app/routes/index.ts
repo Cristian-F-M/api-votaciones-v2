@@ -1,8 +1,0 @@
-export { default as auth } from './auth'
-export { default as config } from './config'
-export { default as typeDocument } from './typeDocument'
-export { default as user } from './user'
-export { default as election } from './election'
-export { default as candidate } from './candidate'
-export { default as role } from './role'
-export { default as resetPassword } from './resetPassword'

@@ -1,0 +1,293 @@
+import crypto from 'node:crypto'
+import { validateRequest } from '@/app/middlewares/UserMiddlewares'
+import { PasswordReset, TypeDocument, User } from '@/app/models'
+import { findUser, sendResetCode, updatePassword, verifyPasswordResetCode } from '@/app/validators/userValidators'
+import { RESET_PASSWORD_CODE_EXPIRATION_TIME } from '@/constants/auth'
+import { renderResetPasswordEmail, sendEmail } from '@/lib/email'
+import { getWaitSeconds } from '@/lib/user'
+import { getPasswordResetCode, getSecretEmail } from '@/lib/user'
+import bcryp from 'bcrypt'
+import express from 'express'
+import type { Request, Response } from 'express'
+
+const router = express.Router()
+
+// TODO -> Hacer que al pasar de `X` intentos de envio de código se deshabilite el PasswordReset
+// TODO -> Verificar que el PasswordReset no se halla expirado y si fué así deshabilitarlo
+router.get('/', async (req: Request, res: Response) => {
+	const { token } = req.query as { token: string }
+	const hashedToken = crypto.hash('sha256', token)
+
+	try {
+		const passwordReset = await PasswordReset.findOne({ where: { isActive: true, token: hashedToken } })
+		const user = await User.findByPk(passwordReset?.userId ?? '')
+
+		if (!passwordReset || !user) {
+			res.status(404).json({ ok: false, message: 'El token utilizado no es válido :c', urlRedirect: 'find-user' })
+			return
+		}
+
+		// const isExpired = oldResetPassword.expiresAt && oldResetPassword.expiresAt < new Date()
+		// 			await oldResetPassword.update({ isActive: !isExpired })
+
+		const hiddenEmail = getSecretEmail(user.email, 2)
+
+		res.json({
+			ok: true,
+			data: { email: hiddenEmail, nextSendAt: passwordReset.nextSendAt }
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error buscando tu usario, por favor intenta más tarde.' })
+		return
+	}
+})
+
+router.post('/find-user', validateRequest(findUser), async (req: Request, res: Response) => {
+	const { typeDocumentCode, document } = req.body
+	const urlRedirect = 'find-user'
+
+	const typeDocument = await TypeDocument.findOne({
+		where: {
+			code: typeDocumentCode
+		}
+	})
+
+	const user = await User.findOne({
+		where: {
+			typeDocumentId: typeDocument?.id ?? '',
+			document
+		}
+	})
+
+	if (!typeDocument || !user) {
+		res
+			.status(404)
+			.json({ ok: false, message: 'Usuario no encontrado, asegurate de ingresar los datos correctos', urlRedirect })
+		return
+	}
+
+	const token = crypto.randomBytes(64).toString('hex')
+	const hashedToken = crypto.hash('sha256', token)
+
+	try {
+		const [passwordReset, created] = await PasswordReset.findOrCreate({
+			where: {
+				userId: user.id,
+				isActive: true
+			},
+			defaults: {
+				attempts: 0,
+				userId: user.id,
+				isActive: true,
+				token: hashedToken
+			}
+		})
+
+		if (!created) {
+			const isExpired = passwordReset.expiresAt && passwordReset.expiresAt < new Date()
+			const tokenToSave = !isExpired ? hashedToken : passwordReset.token
+			await passwordReset.update({ isActive: !isExpired, token: tokenToSave })
+		}
+
+		res.json({ ok: true, urlRedirect: `send-email?token=${token}` })
+	} catch (err) {
+		console.log(err)
+		res.json({
+			ok: false,
+			message: 'Ocurrio un error buscando tu usario, por favor intenta más tarde.',
+			urlRedirect
+		})
+		return
+	}
+})
+
+router.post('/send-code', validateRequest(sendResetCode), async (req: Request, res: Response) => {
+	const { token } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const newToken = crypto.randomBytes(64).toString('hex')
+	const newHashedToken = crypto.hash('sha256', newToken)
+	const urlRedirect = `send-code?token=${newToken}`
+
+	const passwordReset = await PasswordReset.findOne({
+		where: {
+			isActive: true,
+			token: hashedToken
+		}
+	})
+
+	if (!passwordReset) {
+		res.status(400).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de intentar enviar un código de restablecimiento',
+			urlRedirect
+		})
+		return
+	}
+
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({ ok: false, message: 'Usuario no encontrado', urlRedirect })
+		return
+	}
+
+	if (passwordReset.nextSendAt && passwordReset.nextSendAt > new Date()) {
+		console.log(passwordReset.nextSendAt.toString())
+		res.json({
+			ok: false,
+			message: 'Tiempo de espera excedido, espera un momento',
+			nextSendAt: passwordReset.nextSendAt
+		})
+		return
+	}
+
+	const passwordResetCode = getPasswordResetCode(6)
+	try {
+		const html = await renderResetPasswordEmail(passwordResetCode)
+
+		await sendEmail({
+			to: user.email,
+			subject: `Código de restablecimiento para la cuenta de votaciones CGAO ${new Date().getFullYear()}`,
+			html
+		})
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false, message: 'Ocurrio un error enviando el correo, por favor intenta más tarde.' })
+		return
+	}
+
+	const waitSeconds = getWaitSeconds(passwordReset.attempts)
+	const nextSendAt = new Date(new Date().getTime() + waitSeconds * 1000)
+	const hashedPasswordResetCode = bcryp.hashSync(passwordResetCode, bcryp.genSaltSync())
+	const expiresAt = new Date(new Date().getTime() + RESET_PASSWORD_CODE_EXPIRATION_TIME * 1000)
+
+	await passwordReset.update({
+		nextSendAt,
+		attempts: passwordReset.attempts + 1,
+		code: hashedPasswordResetCode,
+		expiresAt,
+		token: newHashedToken
+	})
+
+	// TODO -> añadir a la cola un evento para deshabilitar el `passwordReset`
+
+	res.json({
+		ok: true,
+		message: 'Se te ha enviado un correo con el código',
+		data: { nextSendAt },
+		urlRedirect: `write-code?token=${newToken}`
+	})
+})
+
+router.post('/verify-code', validateRequest(verifyPasswordResetCode), async (req: Request, res: Response) => {
+	const { token, code } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const newToken = crypto.randomBytes(64).toString('hex')
+	const newHashedToken = crypto.hash('sha256', newToken)
+	const urlRedirect = `verify-code?token=${newToken}`
+
+	const passwordReset = await PasswordReset.findOne({
+		where: {
+			isActive: true,
+			token: hashedToken
+		}
+	})
+
+	if (!passwordReset) {
+		res.status(404).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de enviar el código de restablecimiento',
+			urlRedirect: 'find-user'
+		})
+		return
+	}
+
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({
+			ok: false,
+			message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...',
+			urlRedirect: 'find-user'
+		})
+		return
+	}
+
+	if (!passwordReset.code || !bcryp.compareSync(code, passwordReset.code)) {
+		res.status(400).json({
+			ok: false,
+			errors: [{ code: [{ path: 'code', message: 'Código no válido' }] }],
+			message: 'El código no coindide, asegura de usar el ultimo enviado',
+			urlRedirect
+		})
+		return
+	}
+
+	await passwordReset.update({ token: newHashedToken })
+
+	res.json({
+		ok: true,
+		message: 'Código verificado correctamente...',
+		urlRedirect: `update-password?token=${newToken}`
+	})
+})
+
+router.patch('/update-password', validateRequest(updatePassword), async (req: Request, res: Response) => {
+	const { token, password, passwordConfirmation } = req.body
+	const hashedToken = crypto.hash('sha256', token)
+	const urlRedirect = `update-password?token=${token}`
+
+	const passwordReset = await PasswordReset.findOne({
+		where: {
+			token: hashedToken,
+			isActive: true
+		}
+	})
+
+	if (!passwordReset) {
+		res.status(404).json({
+			ok: false,
+			message: 'Realiza el paso anterior antes de enviar el código de restablecimiento',
+			urlRedirect: 'find-user'
+		})
+		return
+	}
+
+	const user = await User.findByPk(passwordReset.userId)
+
+	if (!user) {
+		res.status(404).json({
+			ok: false,
+			message: 'Usuario no encontrado, asegurate de seguir los pasos correctamente...',
+			urlRedirect: 'find-user'
+		})
+		return
+	}
+
+	if (password !== passwordConfirmation) {
+		const passwordConfirmationError = {
+			passwordConfirmation: { path: 'passwordConfirmation', message: 'Las contraseñas deben ser iguales' }
+		}
+		res.status(400).json({
+			ok: false,
+			errors: [passwordConfirmationError],
+			urlRedirect
+		})
+		return
+	}
+
+	await Promise.all([
+		user.update({
+			password: bcryp.hashSync(password, bcryp.genSaltSync())
+		}),
+		passwordReset.update({
+			isActive: false,
+			usedAt: new Date()
+		})
+	])
+
+	res.json({ ok: true, message: 'Su contraseña ha sido actualizada correctamente', urlRedirect: '/login' })
+})
+
+export default router
