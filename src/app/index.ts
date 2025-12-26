@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import { setToUpperCaseHeader } from './middlewares/global'
 import { globalValidator } from './validators/global'
+import { logger } from '@/config/log'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGIN || '').split(',').flatMap((o
 export default function createApp() {
 	const app = express()
 
+	app.use(logger())
 	app.use(bodyParser.json())
 	app.use(bodyParser.urlencoded({ extended: true }))
 	app.use(cookieParser())
