@@ -12,6 +12,8 @@ import crypto from 'node:crypto'
 
 const router = express.Router()
 
+// TODO -> Hacer que al pasar de `X` intentos de envio de código se deshabilite el PasswordReset
+// TODO -> Verificar que el PasswordReset no se halla expirado y si fué así deshabilitarlo
 router.get('/', async (req: Request, res: Response) => {
 	const { token } = req.query as { token: string }
 	const hashedToken = crypto.hash('sha256', token)
@@ -24,6 +26,9 @@ router.get('/', async (req: Request, res: Response) => {
 			res.status(404).json({ ok: false, message: 'El token utilizado no es válido :c', urlRedirect: 'find-user' })
 			return
 		}
+
+		// const isExpired = oldResetPassword.expiresAt && oldResetPassword.expiresAt < new Date()
+		// 			await oldResetPassword.update({ isActive: !isExpired })
 
 		const hiddenEmail = getSecretEmail(user.email, 2)
 
@@ -79,7 +84,11 @@ router.post('/find-user', validateRequest(findUser), async (req: Request, res: R
 			}
 		})
 
-		if (!created) passwordReset.update({ token: hashedToken })
+		if (!created) {
+			const isExpired = passwordReset.expiresAt && passwordReset.expiresAt < new Date()
+			const tokenToSave = !isExpired ? hashedToken : passwordReset.token
+			await passwordReset.update({ isActive: !isExpired, token: tokenToSave })
+		}
 
 		res.json({ ok: true, urlRedirect: `send-email?token=${token}` })
 	} catch (err) {
