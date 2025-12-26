@@ -1,4 +1,3 @@
-import morgan from 'morgan'
 import createApp from './app/index.js'
 import { getIp } from './lib/ip.js'
 import https from 'node:https'
