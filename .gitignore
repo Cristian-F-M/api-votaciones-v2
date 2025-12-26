@@ -2,14 +2,12 @@ node_modules/
 .env
 *.http
 database/
-app/assets/images/*
-!app/assets/images/base
 bun.lockb
 
 certificates/
 
 env.d.ts
 
-types/models-associations.d.ts
+src/types/models-associations.d.ts
 
 bun.lock
