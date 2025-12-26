@@ -123,7 +123,7 @@ for (const [modelName, model] of Object.entries(models)) {
 	lines.push('')
 }
 
-const target = path.resolve('types/models-associations.d.ts')
+const target = path.resolve('src/types/models-associations.d.ts')
 fs.writeFileSync(target, lines.join('\n'))
 
 console.log('✔ Sequelize types generated from real associations')
