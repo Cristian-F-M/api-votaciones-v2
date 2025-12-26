@@ -4,12 +4,13 @@
   "main": "app.ts",
   "type": "module",
   "scripts": {
-    "dev": "port=8085 bun --watch src/app.ts",
+    "dev": "bun --watch src/main.ts",
     "sync:db": "bun src/config/syncDb.js",
     "seed:db": "bun src/config/seed.js",
     "setup:db": "bun run sync:db && bun run seed:db",
-    "dev:https": "bun --watch src/httpsServer.ts",
-    "setup:types": "bun src/scripts/generate-sequelize-types.ts"
+    "dev:secure": "bun dev -- --secure",
+    "setup:types": "bun src/scripts/generate-sequelize-types.ts",
+    "dev:both": "bun dev -- --both"
   },
   "keywords": [],
   "author": "",
