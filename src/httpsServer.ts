@@ -5,7 +5,7 @@ import path from 'node:path'
 import { ConfigService } from '@/app/services/config.service.js'
 import morgan from 'morgan'
 import createApp from './app/index.js'
-import { getIp } from './config.js'
+import { getIp } from './lib/ip.js'
 
 const PORT = process.env.PORT || 3000
 const app = createApp()
