@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { roleRequired, sessionRequired, validateRequest } from '@/app/middlewares/UserMiddlewares'
-import { DeviceToken, Profile, User } from '@/app/models/index'
+import { DeviceToken, Election, Profile, User, Vote } from '@/app/models/index'
 import { notificationToken, updateProfile } from '@/app/validators/userValidators'
 import { uploadImage } from '@/lib/cloudinary'
 import type { RequestWithUser } from '@/types/auth'
@@ -9,6 +9,7 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import multer from 'multer'
 import pLimit from 'p-limit'
+import type { Vote as VoteModel } from '@/types/models'
 
 const router = express.Router()
 const limit = pLimit(6)
@@ -30,10 +31,33 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 		profile: { name, lastname, phone, imageUrl },
 		roleId,
 		typeDocumentId,
-		shiftType
+		shiftType,
+		candidate
 	} = (req as RequestWithUser).user
 
-	const userObject = {
+	const user = (req as RequestWithUser).user
+	let vote: VoteModel | null = null
+
+	try {
+		const election = await Election.findOne({
+			where: {
+				status: 'active',
+				shiftTypeId: user.shiftType.id
+			}
+		})
+
+		if (election) {
+			vote = await Vote.findOne({
+				where: { userId: user.id, electionId: election.id }
+			})
+		}
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({ ok: false })
+		return
+	}
+
+	const userObject: Record<string, unknown> = {
 		id,
 		email,
 		document,
@@ -54,8 +78,16 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 			id: shiftType.id,
 			name: shiftType.name,
 			code: shiftType.code
-		}
+		},
+		vote
 	}
+
+	if (candidate)
+		userObject.candidate = {
+			id: candidate.id,
+			description: candidate.description,
+			objectives: candidate.objectives
+		}
 
 	res.json({ ok: true, data: userObject })
 })
