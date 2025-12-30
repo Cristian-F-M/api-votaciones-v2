@@ -100,14 +100,15 @@ export async function sessionRequired(req: Request, res: Response, next: NextFun
 	try {
 		user = await User.findByPk(JWTResult.id, {
 			include: [
-				{ model: TypeDocument, as: 'typeDocument' },
-				{ model: Role, as: 'role' },
-				{ model: Profile, as: 'profile' },
-				{ model: Session, as: 'sessions' },
-				{ model: PasswordReset, as: 'passwordResets' },
-				{ model: DeviceToken, as: 'deviceTokens' },
-				{ model: Vote, as: 'votes' },
-				{ model: ShiftType, as: 'shiftType' }
+				'typeDocument',
+				'role',
+				'profile',
+				'sessions',
+				'passwordResets',
+				'deviceTokens',
+				'votes',
+				'shiftType',
+				'candidate'
 			]
 		})
 
