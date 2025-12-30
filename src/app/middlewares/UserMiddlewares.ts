@@ -1,14 +1,4 @@
-import {
-	DeviceToken,
-	PasswordReset,
-	Profile,
-	Role,
-	Session,
-	ShiftType,
-	TypeDocument,
-	User,
-	Vote
-} from '@/app/models/index'
+import { Session, User } from '@/app/models/index'
 import { ROLES } from '@/constants/database'
 import { groupBy } from '@/lib/fields.js'
 import type { AllowedRole } from '@/types/UserMiddleware'
