@@ -5,6 +5,7 @@ import { DeviceToken, Election, Profile, User, Vote } from '@/app/models/index'
 import { notificationToken, updateProfile } from '@/app/validators/userValidators'
 import { uploadImage } from '@/lib/cloudinary'
 import type { RequestWithUser } from '@/types/auth'
+import type { DeviceToken as DeviceTokenModel, Vote as VoteModel } from '@/types/models'
 import express from 'express'
 import type { Request, Response } from 'express'
 import multer from 'multer'
@@ -22,6 +23,8 @@ const upload = multer({ storage })
 const EXPO_NOTIFICATION_URL = process.env.EXPO_NOTIFICATION_URL
 
 router.get('/', sessionRequired, async (req: Request, res: Response) => {
+	const { 'session-type': sessionType, 'device-type': deviceType } = req.headers
+
 	const {
 		id,
 		email,
@@ -37,12 +40,20 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 
 	const user = (req as RequestWithUser).user
 	let vote: VoteModel | null = null
+	let deviceToken: DeviceTokenModel | null = null
 
 	try {
 		const election = await Election.findOne({
 			where: {
 				status: 'active',
 				shiftTypeId: user.shiftType.id
+			}
+		})
+
+		deviceToken = await DeviceToken.findOne({
+			where: {
+				userId: user.id,
+				deviceType
 			}
 		})
 
@@ -87,6 +98,13 @@ router.get('/', sessionRequired, async (req: Request, res: Response) => {
 			id: candidate.id,
 			description: candidate.description,
 			objectives: candidate.objectives
+		}
+
+	if (deviceToken)
+		userObject.deviceToken = {
+			id: deviceToken.id,
+			deviceType: deviceToken.deviceType,
+			isActive: deviceToken.isActive
 		}
 
 	res.json({ ok: true, data: userObject })
