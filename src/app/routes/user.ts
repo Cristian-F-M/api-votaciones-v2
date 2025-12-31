@@ -10,7 +10,7 @@ import express from 'express'
 import type { Request, Response } from 'express'
 import multer from 'multer'
 import pLimit from 'p-limit'
-import type { Vote as VoteModel } from '@/types/models'
+import crypto from 'node:crypto'
 
 const router = express.Router()
 const limit = pLimit(6)
@@ -115,17 +115,12 @@ router.patch(
 	sessionRequired,
 	validateRequest(notificationToken),
 	async (req: Request, res: Response) => {
-		const { notificationToken, deviceType } = req.body
+		const { notificationToken } = req.body
 		const user = (req as RequestWithUser).user
-		const { 'session-type': sessionType } = req.headers
+		const { 'session-type': sessionType, 'device-type': deviceType } = req.headers
+		let hashedNotificationToken = notificationToken
 
-		if (sessionType !== 'MOBILE') {
-			res.status(400).json({
-				ok: false,
-				message: 'Las notificaciones mediante un token solo están disponibles los dispositivos móviles'
-			})
-			return
-		}
+		if (sessionType === 'WEB') hashedNotificationToken = crypto.hash('sha256', notificationToken)
 
 		try {
 			const [deviceToken, created] = await DeviceToken.findOrCreate({
@@ -134,14 +129,14 @@ router.patch(
 					deviceType
 				},
 				defaults: {
-					deviceType,
+					deviceType: deviceType,
 					isActive: true,
-					token: notificationToken,
+					token: hashedNotificationToken,
 					userId: user.id
 				}
 			})
 
-			if (!created) await deviceToken.update({ isActive: true, token: notificationToken })
+			if (!created) await deviceToken.update({ isActive: true, token: hashedNotificationToken })
 		} catch (err) {
 			console.log(err)
 
