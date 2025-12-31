@@ -29,8 +29,8 @@ export default function createApp() {
 		})
 	)
 
-	app.use(setToUpperCaseHeader('session-type', 'device-type'))
 	app.use(globalValidator)
+	app.use(setToUpperCaseHeader('session-type', 'device-type'))
 
 	// ? Hacerlo para las demás rutas
 	app.use('/', routes.auth)
