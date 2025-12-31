@@ -1,5 +1,6 @@
 import User from '@/app/models/User.js'
 import sequelize from '@/config/database.js'
+import { ALLOWED_DEVICE_TYPES } from '@/constants/database'
 import type { DeviceToken as DeviceTokenModel } from '@/types/models'
 import { DataTypes } from 'sequelize'
 
@@ -24,7 +25,7 @@ const DeviceToken = sequelize.define<DeviceTokenModel>(
 			allowNull: false
 		},
 		deviceType: {
-			type: DataTypes.ENUM('ios', 'android', 'web'),
+			type: DataTypes.ENUM(...Object.keys(ALLOWED_DEVICE_TYPES)),
 			allowNull: false
 		},
 		lastUsedAt: {

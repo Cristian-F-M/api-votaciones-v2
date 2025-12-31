@@ -1,4 +1,4 @@
-import type { ALLOWED_SESSION_TYPE, ConfigScope } from '@/types/index'
+import type { ALLOWED_SESSION_TYPE, AllowedDeviceTypes, ConfigScope } from '@/types/index'
 import type { CreationOptional, ForeignKey } from 'sequelize'
 
 export interface Candidate {
@@ -66,7 +66,7 @@ export interface DeviceToken {
 	id: CreationOptional<string>
 	userId: ForeignKey<User['id']>
 	token: string
-	deviceType: 'ios' | 'android' | 'web'
+	deviceType: AllowedDeviceTypes
 	lastUsedAt: CreationOptional<Date>
 	isActive: boolean
 }
