@@ -19,4 +19,9 @@ router.get('/app-mobile', async (req: Request, res: Response) => {
 	res.redirect(appMobileUrl as string)
 })
 
+router.get('/server', async (req: Request, res: Response) => {
+	res.json({ ok: true, message: 'El servidor está funcionando correctamente' })
+	return
+})
+
 export default router
