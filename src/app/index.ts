@@ -42,6 +42,7 @@ export default function createApp() {
 	app.use('/role', routes.role)
 	app.use('/reset-password', routes.resetPassword)
 	app.use('/shiftType', routes.shiftType)
+	app.use('/', routes.global)
 
 	return app
 }
