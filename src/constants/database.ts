@@ -11,6 +11,12 @@ export const ALLOWED_SESSION_TYPES = {
 	MOBILE: 'MOBILE'
 }
 
+export const ALLOWED_DEVICE_TYPES = {
+	WEB: 'WEB',
+	IOS: 'IOS',
+	ANDROID: 'ANDROID'
+}
+
 export const BLANK_VOTE_USER = {
 	document: '0',
 	email: 'voto@votaciones.com',
