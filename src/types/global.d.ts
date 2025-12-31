@@ -1,10 +1,10 @@
 import type { Request } from 'express'
 import 'express'
-import type { ALLOWED_SESSION_TYPE, AllowedDeviceTypes } from '@/app/types'
+import type { AllowedSessionTypes, AllowedDeviceTypes } from '@/types/'
 
 declare module 'http' {
 	interface IncomingHttpHeaders {
-		'session-type': ALLOWED_SESSION_TYPE
+		'session-type': AllowedSessionTypes
 		'device-type': AllowedDeviceTypes
 	}
 }
