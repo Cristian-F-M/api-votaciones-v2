@@ -1,10 +1,12 @@
 import type { AllowedSessionTypes } from '@/types/index'
 import type { NextFunction, Request, Response } from 'express'
 
-export function setToUpperCaseHeader(headernName: string) {
+export function setToUpperCaseHeader(...headersNames: string[]) {
 	return function middleware(req: Request, res: Response, next: NextFunction) {
-		const SESSION_TYPE = (req.headers['session-type'] ?? '').toUpperCase()
-		req.headers['session-type'] = SESSION_TYPE as AllowedSessionTypes
+		for (const h of headersNames) {
+			const headerValue = ((req.headers[h] as string) ?? '').toUpperCase()
+			req.headers[h] = headerValue
+		}
 
 		next()
 	}
