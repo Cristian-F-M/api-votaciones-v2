@@ -53,6 +53,36 @@ router.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), asyn
 	}
 })
 
+router.get('/all', sessionRequired, async (req: Request, res: Response) => {
+	const user = (req as RequestWithUser).user
+
+	try {
+		const elections = await Election.findAll({
+			where: {
+				shiftTypeId: user.shiftType.id,
+				status: 'finished'
+			},
+			attributes: {
+				include: ['id', 'startDate', 'endDate', 'status', 'shiftTypeId']
+			},
+			include: [
+				{
+					model: ShiftType,
+					as: 'shiftType'
+				}
+			]
+		})
+
+		res.json({ ok: true, data: elections })
+	} catch (err) {
+		console.log(err)
+		res
+			.status(500)
+			.json({ ok: false, message: 'Ocurrio un error obteniendo las votaciones, por favor intentalo más tarde...' })
+		return
+	}
+})
+
 router.post(
 	'/',
 	sessionRequired,
