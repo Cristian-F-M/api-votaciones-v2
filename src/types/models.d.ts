@@ -84,6 +84,7 @@ export interface Election {
 	totalVotes: CreationOptional<number>
 	winnerVoteCount: CreationOptional<number>
 	winner: JSONValue<Candidate>
+	candidates: Candidate[]
 	startDate: Date
 	endDate: Date
 	status: 'active' | 'finished' | 'canceled'

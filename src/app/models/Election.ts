@@ -28,6 +28,10 @@ const Election = sequelize.define<ElectionModel>(
 			type: DataTypes.JSON,
 			allowNull: true
 		},
+		candidates: {
+			type: DataTypes.ARRAY(DataTypes.JSON),
+			allowNull: true
+		},
 		startDate: {
 			type: DataTypes.DATE,
 			allowNull: false
