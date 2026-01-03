@@ -85,8 +85,8 @@ export interface Election {
 	winnerVoteCount: CreationOptional<number>
 	winner: JSONValue<Candidate>
 	candidates: Candidate[]
-	startDate: Date
-	endDate: Date
+	startAt: Date
+	endAt: Date
 	status: 'active' | 'finished' | 'canceled'
 	shiftTypeId: ForeignKey<ShiftType['id']>
 }

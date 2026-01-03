@@ -32,11 +32,11 @@ const Election = sequelize.define<ElectionModel>(
 			type: DataTypes.ARRAY(DataTypes.JSON),
 			allowNull: true
 		},
-		startDate: {
+		startAt: {
 			type: DataTypes.DATE,
 			allowNull: false
 		},
-		endDate: {
+		endAt: {
 			type: DataTypes.DATE,
 			allowNull: false
 		},

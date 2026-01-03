@@ -1,5 +1,5 @@
 import { roleRequired, sessionRequired, validateRequest } from '@/app/middlewares/UserMiddlewares'
-import { ShiftType, Vote } from '@/app/models'
+import { Candidate, ShiftType, Vote } from '@/app/models'
 import Election from '@/app/models/Election'
 import Role from '@/app/models/Role'
 import User from '@/app/models/User'
@@ -26,7 +26,7 @@ router.get('/', sessionRequired, roleRequired(['APPRENTICE', 'CANDIDATE']), asyn
 			},
 
 			attributes: {
-				include: ['id', 'startDate', 'endDate', 'status', 'shiftTypeId']
+				include: ['id', 'startAt', 'endAt', 'status', 'shiftTypeId']
 			},
 			include: [
 				{
@@ -63,7 +63,7 @@ router.get('/all', sessionRequired, async (req: Request, res: Response) => {
 				status: 'finished'
 			},
 			attributes: {
-				include: ['id', 'startDate', 'endDate', 'status', 'shiftTypeId']
+				include: ['id', 'startAt', 'endAt', 'status', 'shiftTypeId']
 			},
 			include: [
 				{
@@ -90,7 +90,7 @@ router.post(
 	validateRequest(createElection),
 	async (req: Request, res: Response) => {
 		const user = (req as RequestWithUser).user
-		const { startDate, endDate, shiftTypeCode } = req.body
+		const { startAt, endAt, shiftTypeCode } = req.body
 
 		try {
 			const shiftType = await ShiftType.findOne({
@@ -110,10 +110,11 @@ router.post(
 					status: 'active'
 				},
 				defaults: {
-					startDate: new Date(startDate),
-					endDate: new Date(endDate),
+					startAt: new Date(startAt),
+					endAt: new Date(endAt),
 					shiftTypeId: shiftType.id,
-					status: 'active'
+					status: 'active',
+					candidates: []
 				}
 			})
 
@@ -183,6 +184,13 @@ router.put(
 				}) as Promise<(VoteModel & { votesCount: number })[]>
 			])
 
+			const candidates = await Candidate.findAll({
+				where: {
+					isActive: true
+				},
+				include: [{ as: 'user', model: User, include: ['profile'] }]
+			})
+
 			const maxVotes = Math.max(...candidateVotes.map((c) => c.votesCount))
 			const winner = candidateVotes.find(
 				(c) => c.votesCount === maxVotes && c.user.document !== BLANK_VOTE_USER.document
@@ -196,10 +204,11 @@ router.put(
 			await election.update({
 				status: 'finished',
 				apprenticeCount: apprenticesCount,
-				endDate: new Date(),
+				endAt: new Date(),
 				winner: winner,
 				totalVotes,
-				winnerVoteCount: winner.votesCount
+				winnerVoteCount: winner.votesCount,
+				candidates
 			})
 
 			res.json({ ok: true, message: 'Votación finalizada', election })

@@ -2,7 +2,7 @@ import { greaterThanMessage, notValidMessage, requiredMessage } from '@/lib/fiel
 import { body } from 'express-validator'
 
 export const createElection = [
-	body('startDate')
+	body('startAt')
 		.notEmpty()
 		.withMessage(requiredMessage('fecha de inicio'))
 		.custom((value) => !Number.isNaN(new Date(value).getTime()))
@@ -15,12 +15,12 @@ export const createElection = [
 				secondField: { field: 'fecha actual', gender: 'F', location: '' }
 			})
 		),
-	body('endDate')
+	body('endAt')
 		.notEmpty()
 		.withMessage(requiredMessage('fecha de fin'))
 		.custom((value) => !Number.isNaN(new Date(value).getTime()))
 		.withMessage(notValidMessage('fecha de fin'))
-		.custom((value, { req }) => new Date(value) > new Date(req.body.startDate))
+		.custom((value, { req }) => new Date(value) > new Date(req.body.startAt))
 		.withMessage(
 			greaterThanMessage('fecha de fin', {
 				gender: 'M',
